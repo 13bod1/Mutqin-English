@@ -19,6 +19,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Dr. Sherif El-Gazzar', ar: 'د. شريف الجزار' },
     resources: { en: '2 PDF guides + 1 quiz', ar: 'ملفان PDF + اختبار' },
+    thumbnailUrl: 'images/thumb-grammar.svg',
   },
   {
     id: 'l2',
@@ -37,6 +38,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Ms. Layla Mansour', ar: 'أ. ليلى منصور' },
     resources: { en: '1 audio drill + 1 PDF guide', ar: 'تمرين صوتي + ملف PDF' },
+    thumbnailUrl: 'images/thumb-phonetics.svg',
   },
   {
     id: 'l3',
@@ -55,6 +57,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Tarek Radwan', ar: 'أ. طارق رضوان' },
     resources: { en: '3 PDF guides + 2 quizzes', ar: '3 ملفات PDF + اختباران' },
+    thumbnailUrl: 'images/thumb-grammar.svg',
   },
   {
     id: 'l4',
@@ -73,6 +76,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Dr. Sherif El-Gazzar', ar: 'د. شريف الجزار' },
     resources: { en: '2 practice sheets + 1 quiz', ar: 'ورقتا تدريب + اختبار' },
+    thumbnailUrl: 'images/thumb-exam.svg',
   },
   {
     id: 'l5',
@@ -91,6 +95,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Ahmed Taha', ar: 'أ. أحمد طه' },
     resources: { en: '4 PDF guides + chapter summary', ar: '4 ملفات PDF + ملخص الفصول' },
+    thumbnailUrl: 'images/thumb-exam.svg',
   },
   {
     id: 'l6',
@@ -109,6 +114,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Ms. Layla Mansour', ar: 'أ. ليلى منصور' },
     resources: { en: '2 PDF guides + 1 quiz', ar: 'ملفان PDF + اختبار' },
+    thumbnailUrl: 'images/thumb-grammar.svg',
   },
   {
     id: 'l7',
@@ -127,6 +133,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Tarek Radwan', ar: 'أ. طارق رضوان' },
     resources: { en: '1 flashcard set + 1 quiz', ar: 'مجموعة بطاقات + اختبار' },
+    thumbnailUrl: 'images/thumb-phrasal.svg',
   },
   {
     id: 'l8',
@@ -145,6 +152,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Ahmed Taha', ar: 'أ. أحمد طه' },
     resources: { en: '1 PDF guide + 1 quiz', ar: 'ملف PDF + اختبار' },
+    thumbnailUrl: 'images/thumb-grammar.svg',
   },
   {
     id: 'l9',
@@ -163,6 +171,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Ms. Layla Mansour', ar: 'أ. ليلى منصور' },
     resources: { en: '2 audio drills', ar: 'تمرينان صوتيان' },
+    thumbnailUrl: 'images/thumb-phonetics.svg',
   },
 ];
 
@@ -182,6 +191,7 @@ export const CONTINUE_WATCHING_MOCK: ContinueWatchingItem[] = [
       description: { en: '', ar: '' },
       instructor: { en: 'Mr. Ahmed Taha', ar: 'أ. أحمد طه' },
       resources: { en: '', ar: '' },
+    thumbnailUrl: 'images/thumb-grammar.svg',
     },
     percent: 65,
     minutesLeft: 12,

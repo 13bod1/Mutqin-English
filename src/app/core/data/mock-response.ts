@@ -5,6 +5,6 @@ import { Observable, delay, of } from 'rxjs';
  * Every data service returns Observables, so swapping this for
  * `HttpClient.get<T>(url)` later does not change any component.
  */
-export function mockResponse<T>(data: T, latencyMs = 250): Observable<T> {
-  return of(structuredClone(data)).pipe(delay(latencyMs));
+export function mockResponse<T>(data: T, latencyMs = 0): Observable<T> {
+  return of(structuredClone(data));
 }

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgPhrasal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5D4037"/>
+      <stop offset="100%" stop-color="#3E2723"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#bgPhrasal)"/>
+  <circle cx="520" cy="100" r="105" fill="#FFAB91" opacity="0.2"/>
+  <g transform="translate(60, 90)">
+    <rect width="130" height="30" rx="15" fill="#FFAB91"/>
+    <text x="65" y="20" fill="#3E2723" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">PHRASAL VERBS</text>
+    <text x="0" y="80" fill="#FFFFFF" font-family="sans-serif" font-size="28" font-weight="bold">Real-World Expressions</text>
+    <text x="0" y="115" fill="#D7CCC8" font-family="sans-serif" font-size="16">Get, Take &amp; Put Mastery</text>
+  </g>
+  <g transform="translate(480, 210)">
+    <circle cx="45" cy="45" r="35" fill="rgba(255,255,255,0.2)"/>
+    <polygon points="40,32 58,45 40,58" fill="#FFFFFF"/>
+  </g>
+</svg>

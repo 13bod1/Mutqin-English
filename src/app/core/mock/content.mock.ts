@@ -8,6 +8,7 @@ export const PLATFORM_STATS_MOCK: PlatformStats = {
 
 export const INSTRUCTOR_MOCK: Instructor = {
   name: { en: 'Teacher Kareem', ar: 'المعلم كريم' },
+  photoUrl: 'images/instructor.svg',
   title: { en: 'Certified TEFL & Cambridge Delta Instructor', ar: 'مدرّس معتمد TEFL و Cambridge Delta' },
   credential: { en: '10,000+ coached hours for Arab students', ar: 'أكثر من 10,000 ساعة تدريس للطلاب العرب' },
   bio: {

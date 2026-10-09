@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3E0"/>
+      <stop offset="50%" stop-color="#FFE0B2"/>
+      <stop offset="100%" stop-color="#FFCCBC"/>
+    </linearGradient>
+    <linearGradient id="suitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3E2723"/>
+      <stop offset="100%" stop-color="#4E342E"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5CBA7"/>
+      <stop offset="100%" stop-color="#E59866"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="600" height="600" fill="url(#bgGrad)"/>
+
+  <!-- Decorative Architectural / Modern Shapes -->
+  <circle cx="500" cy="120" r="140" fill="#FFE082" opacity="0.4"/>
+  <circle cx="80" cy="480" r="100" fill="#80CBC4" opacity="0.3"/>
+
+  <!-- Abstract Badge / Stamp -->
+  <g transform="translate(420, 40)">
+    <rect width="140" height="40" rx="20" fill="#4E342E"/>
+    <text x="70" y="25" fill="#FFFFFF" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">TEFL &amp; Cambridge</text>
+  </g>
+
+  <!-- Body / Suit -->
+  <path d="M150 600 C150 480, 210 420, 300 420 C390 420, 450 480, 450 600 Z" fill="url(#suitGrad)"/>
+  
+  <!-- Shirt & Tie -->
+  <polygon points="300,420 260,490 340,490" fill="#FFFFFF"/>
+  <polygon points="290,490 310,490 305,580 295,580" fill="#D32F2F"/>
+  <polygon points="285,490 315,490 300,515" fill="#B71C1C"/>
+
+  <!-- Neck -->
+  <rect x="270" y="360" width="60" height="80" rx="10" fill="url(#skinGrad)"/>
+
+  <!-- Head -->
+  <ellipse cx="300" cy="270" rx="85" ry="105" fill="url(#skinGrad)"/>
+
+  <!-- Hair -->
+  <path d="M210 250 C210 160, 240 140, 300 140 C360 140, 390 160, 390 250 C370 200, 340 180, 300 180 C260 180, 230 200, 210 250 Z" fill="#2E1C14"/>
+
+  <!-- Glasses -->
+  <rect x="235" y="245" width="50" height="35" rx="8" fill="none" stroke="#2E1C14" stroke-width="6"/>
+  <rect x="315" y="245" width="50" height="35" rx="8" fill="none" stroke="#2E1C14" stroke-width="6"/>
+  <line x1="285" y1="262" x2="315" y2="262" stroke="#2E1C14" stroke-width="6"/>
+  <line x1="215" y1="260" x2="235" y2="260" stroke="#2E1C14" stroke-width="5"/>
+  <line x1="365" y1="260" x2="385" y2="260" stroke="#2E1C14" stroke-width="5"/>
+
+  <!-- Friendly Smile & Facial Features -->
+  <path d="M275 320 Q300 345 325 320" fill="none" stroke="#6E2C00" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="260" cy="262" r="5" fill="#2E1C14"/>
+  <circle cx="340" cy="262" r="5" fill="#2E1C14"/>
+
+  <!-- Floating Audio & Learning Icons -->
+  <g transform="translate(70, 180)">
+    <circle cx="35" cy="35" r="35" fill="#FFFFFF" filter="drop-shadow(0px 4px 10px rgba(0,0,0,0.1))"/>
+    <path d="M25 45 L35 45 L45 55 L45 15 L35 25 L25 25 Z" fill="#4E342E"/>
+    <path d="M48 27 Q54 35 48 43" fill="none" stroke="#4E342E" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>
