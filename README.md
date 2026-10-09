@@ -30,7 +30,7 @@
 
 | الواجهة العربية (RTL) | الواجهة الإنجليزية (LTR) |
 | :---: | :---: |
-| <img src="docs/screenshots/02_landing_hero_ar.png" width="100%" alt="Arabic Hero" /> | <img src="docs/screenshots/01_landing_hero.png" width="100%" alt="English Hero" /> |
+| <img src="docs/screenshots/02_landing_hero_ar.webp" width="100%" alt="Arabic Hero" loading="lazy" decoding="async" /> | <img src="docs/screenshots/01_landing_hero.webp" width="100%" alt="English Hero" loading="lazy" decoding="async" /> |
 
 ---
 
@@ -38,7 +38,7 @@
 محرك فلترة ذكي حسب المرحلة الدراسية (إعدادي، أولى ثانوي، تانية ثانوي، تالتة ثانوي / ثانوية عامة)، والموضوعات (القواعد، الصوتيات، الأفعال المركبة)، ومدة المحاضرة، مع قسم **"تابع المشاهدة"** لحفظ تقدم الطالب:
 
 <div align="center">
-  <img src="docs/screenshots/03_lectures_catalog.png" width="95%" alt="Lectures Catalog" />
+  <img src="docs/screenshots/03_lectures_catalog.webp" width="95%" alt="Lectures Catalog" loading="lazy" decoding="async" />
 </div>
 
 ---
@@ -47,7 +47,7 @@
 اختبارات تشخيصية دقيقة تهدف لكسر فخاخ امتحانات الثانوية العامة مع شروحات فورية، مستويات صعوبة تدريجية، ومسارات تدريب مخصصة:
 
 <div align="center">
-  <img src="docs/screenshots/04_quizzes_interactive.png" width="95%" alt="Interactive Quizzes" />
+  <img src="docs/screenshots/04_quizzes_interactive.webp" width="95%" alt="Interactive Quizzes" loading="lazy" decoding="async" />
 </div>
 
 ---
@@ -56,7 +56,7 @@
 لوحة متابعة أكاديمية متقدمة تتضمن حلقة إنجاز المنهج، ساعات المذاكرة الحقيقية، سلسلة الالتزام اليومية (Daily Streak)، ومخطط بياني لتوزيع نشاط المذاكرة على مدار الأسبوع، إلى جانب قائمة المتصدرين (Leaderboard):
 
 <div align="center">
-  <img src="docs/screenshots/05_progress_dashboard.png" width="95%" alt="Progress Dashboard" />
+  <img src="docs/screenshots/05_progress_dashboard.webp" width="95%" alt="Progress Dashboard" loading="lazy" decoding="async" />
 </div>
 
 ---
@@ -65,7 +65,7 @@
 
 | تجربة الموبايل المتكاملة (Responsive 390px) | شاشة الدخول الموثقة (Secure Login) |
 | :---: | :---: |
-| <img src="docs/screenshots/07_mobile_responsive_ar.png" width="380" alt="Mobile Responsive" /> | <img src="docs/screenshots/06_auth_login.png" width="550" alt="Login Auth" /> |
+| <img src="docs/screenshots/07_mobile_responsive_ar.webp" width="380" alt="Mobile Responsive" loading="lazy" decoding="async" /> | <img src="docs/screenshots/06_auth_login.webp" width="550" alt="Login Auth" loading="lazy" decoding="async" /> |
 
 ---
 

@@ -3,6 +3,26 @@
   "framework": "angular",
   "buildCommand": "npm run build",
   "outputDirectory": "dist/mutqin-english/browser",
+  "headers": [
+    {
+      "source": "/(.*)\\.(woff2|woff|ttf|eot)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(png|jpg|jpeg|gif|webp|svg|ico)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
