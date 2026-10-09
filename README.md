@@ -1,7 +1,31 @@
 # Mutqin English — Frontend
 
+[![Live Demo](https://img.shields.io/badge/Demo-mutqin--english.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://mutqin-english.vercel.app)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Production%20Active-brightgreen?style=for-the-badge&logo=vercel)](https://mutqin-english.vercel.app)
+
+> 🌐 **Live Production URL:** [https://mutqin-english.vercel.app](https://mutqin-english.vercel.app)
+
 Angular frontend for **Mutqin English**, an English-learning platform for Egyptian and Arab students.
 Built from the "Mutqin English" Figma design. The app is bilingual (English / Arabic with full RTL) and responsive from 360px phones up to desktop.
+
+---
+
+## 🚀 Live Demo & Continuous Deployment (استضافة المشروع والتعديلات)
+
+المشروع مستضاف رسمياً ومربوط بالكامل على **Vercel** عبر الرابط المباشر:
+👉 **[https://mutqin-english.vercel.app](https://mutqin-english.vercel.app)**
+
+### 👥 صلاحيات التعديل لكافة أعضاء الفريق (Team Access & CI/CD)
+تم ضبط خط إنتاج مؤتمت بالكامل (CI/CD Pipeline عبر **GitHub Actions**) مرتبط مع Vercel بحيث يمتلك جميع المساهمين وأعضاء المستودع حرية التعديل الكاملة:
+1. **النشر التلقائي فور التعديل (Automatic Continuous Deployment):**
+   - بمجرد قيام أي عضو في الفريق بعمل `git push` لفرع `main`، يتم بناء وتحديث الموقع الحي فوراً.
+   - عند فتح أي Pull Request أو فرع تجريبي، يتم تلقائياً إنشاء رابط معاينة خاص (Preview Deployment).
+2. **إمكانية إعادة النشر اليدوي (Manual Workflow Trigger):**
+   - يمكن لأي عضو التوجه لتبويب **Actions** في المستودع واختيار `Deploy to Vercel` ثم الضغط على **Run workflow**.
+3. **التحكم بإعدادات الاستضافة والتوجيه (Hosting Configuration):**
+   - ملف `vercel.json` موجود داخل جذر المستودع، مما يتيح للفريق تعديل المسارات (Rewrites / SPA Fallback) وإعدادات التخزين المؤقت والـ Headers بحرية كاملة عبر Git.
+
+---
 
 ## Run it
 
