@@ -1,96 +1,143 @@
-# Mutqin English — Frontend
+<div align="center">
 
-[![Live Demo](https://img.shields.io/badge/Demo-mutqin--english.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://mutqin-english.vercel.app)
+# 🎓 متقن إنجليش — Mutqin English
+### منصة تعليمية ذكية لإتقان اللغة الإنجليزية لطلاب الثانوية والشهادات العامة في مصر والعالم العربي
+**Bilingual (EN / AR) • Angular 20 • Tailwind CSS • Standalone Components • Full RTL Engine**
+
+---
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-mutqin--english.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://mutqin-english.vercel.app)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Production%20Active-brightgreen?style=for-the-badge&logo=vercel)](https://mutqin-english.vercel.app)
+[![GitHub Actions](https://img.shields.io/badge/CI%2FCD-Automated%20Deploy-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/13bod1/Mutqin-English/actions)
+[![Angular](https://img.shields.io/badge/Angular-20.3-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-> 🌐 **Live Production URL:** [https://mutqin-english.vercel.app](https://mutqin-english.vercel.app)
+<br />
 
-Angular frontend for **Mutqin English**, an English-learning platform for Egyptian and Arab students.
-Built from the "Mutqin English" Figma design. The app is bilingual (English / Arabic with full RTL) and responsive from 360px phones up to desktop.
+👉 **[🌐 تصفّح الموقع الحي مباشرة | Open Live Web App](https://mutqin-english.vercel.app)** 👈
 
----
-
-## 🚀 Live Demo & Continuous Deployment (استضافة المشروع والتعديلات)
-
-المشروع مستضاف رسمياً ومربوط بالكامل على **Vercel** عبر الرابط المباشر:
-👉 **[https://mutqin-english.vercel.app](https://mutqin-english.vercel.app)**
-
-### 👥 صلاحيات التعديل لكافة أعضاء الفريق (Team Access & CI/CD)
-تم ضبط خط إنتاج مؤتمت بالكامل (CI/CD Pipeline عبر **GitHub Actions**) مرتبط مع Vercel بحيث يمتلك جميع المساهمين وأعضاء المستودع حرية التعديل الكاملة:
-1. **النشر التلقائي فور التعديل (Automatic Continuous Deployment):**
-   - بمجرد قيام أي عضو في الفريق بعمل `git push` لفرع `main`، يتم بناء وتحديث الموقع الحي فوراً.
-   - عند فتح أي Pull Request أو فرع تجريبي، يتم تلقائياً إنشاء رابط معاينة خاص (Preview Deployment).
-2. **إمكانية إعادة النشر اليدوي (Manual Workflow Trigger):**
-   - يمكن لأي عضو التوجه لتبويب **Actions** في المستودع واختيار `Deploy to Vercel` ثم الضغط على **Run workflow**.
-3. **التحكم بإعدادات الاستضافة والتوجيه (Hosting Configuration):**
-   - ملف `vercel.json` موجود داخل جذر المستودع، مما يتيح للفريق تعديل المسارات (Rewrites / SPA Fallback) وإعدادات التخزين المؤقت والـ Headers بحرية كاملة عبر Git.
+</div>
 
 ---
 
-## Run it
+## 📸 معمل الواجهات ولقطات الشاشة الحية (Visual Showcase)
+
+جميع لقطات الشاشة مأخوذة بجودة **Retina 2x** مباشرة من بيئة الإنتاج الحية للموقع:
+
+### 1. الصفحة الرئيسية (Landing Page — Arabic & English)
+واجهة ترحيبية مصممة خصيصاً لهوية الطالب العربي مع دعم كامل للتبديل الفوري بين اللغتين بدون إعادة تحميل الصفحة:
+
+| الواجهة العربية (RTL) | الواجهة الإنجليزية (LTR) |
+| :---: | :---: |
+| <img src="docs/screenshots/02_landing_hero_ar.png" width="100%" alt="Arabic Hero" /> | <img src="docs/screenshots/01_landing_hero.png" width="100%" alt="English Hero" /> |
+
+---
+
+### 2. مكتبة المحاضرات المسجلة (Recorded Lectures Catalog)
+محرك فلترة ذكي حسب المرحلة الدراسية (إعدادي، أولى ثانوي، تانية ثانوي، تالتة ثانوي / ثانوية عامة)، والموضوعات (القواعد، الصوتيات، الأفعال المركبة)، ومدة المحاضرة، مع قسم **"تابع المشاهدة"** لحفظ تقدم الطالب:
+
+<div align="center">
+  <img src="docs/screenshots/03_lectures_catalog.png" width="95%" alt="Lectures Catalog" />
+</div>
+
+---
+
+### 3. مركز الاختبارات والتمارين التفاعلية (Interactive Quizzes & Exercises)
+اختبارات تشخيصية دقيقة تهدف لكسر فخاخ امتحانات الثانوية العامة مع شروحات فورية، مستويات صعوبة تدريجية، ومسارات تدريب مخصصة:
+
+<div align="center">
+  <img src="docs/screenshots/04_quizzes_interactive.png" width="95%" alt="Interactive Quizzes" />
+</div>
+
+---
+
+### 4. لوحة تقدّم الطالب والشارت الأسبوعي (Progress Dashboard & Analytics)
+لوحة متابعة أكاديمية متقدمة تتضمن حلقة إنجاز المنهج، ساعات المذاكرة الحقيقية، سلسلة الالتزام اليومية (Daily Streak)، ومخطط بياني لتوزيع نشاط المذاكرة على مدار الأسبوع، إلى جانب قائمة المتصدرين (Leaderboard):
+
+<div align="center">
+  <img src="docs/screenshots/05_progress_dashboard.png" width="95%" alt="Progress Dashboard" />
+</div>
+
+---
+
+### 5. التجاوب الكامل مع الهواتف الذكية (Mobile Responsive & Authentication)
+
+| تجربة الموبايل المتكاملة (Responsive 390px) | شاشة الدخول الموثقة (Secure Login) |
+| :---: | :---: |
+| <img src="docs/screenshots/07_mobile_responsive_ar.png" width="380" alt="Mobile Responsive" /> | <img src="docs/screenshots/06_auth_login.png" width="550" alt="Login Auth" /> |
+
+---
+
+## ⚡ الميزات التقنية والمعمارية (Key Architectural Features)
+
+- **⚡ أداء فائق وتوجيه SPA أحادي الصفحة:** مبني بالكامل على **Angular 20** مع معمارية Standalone Components و Vite/Application Builder فائق السرعة.
+- **🌍 محرك تعريب ذكي وتوجيه ثنائي الاتجاه (BiDi / RTL First):**
+  - خطوط محلية مدمجة عبر `@fontsource` لضمان سرعة التحميل دون الاعتماد على خوادم خارجية:
+    - **العربية:** خط Alexandria للعناوين، و IBM Plex Sans Arabic للنصوص.
+    - **الإنجليزية:** خط Plus Jakarta Sans للعناوين، و Inter للنصوص.
+  - انعكاس كامل للأيقونات والتخطيط تلقائياً مع تحديث سمة `dir="rtl"` في وسم `<html>`.
+- **🎨 نظام توكنات وتصميم معتمد على Figma:**
+  - ألوان، ظلال، ومسافات متوافقة 100% مع مواصفات الـ Figma في `tailwind.config.js`.
+  - مكونات CSS قابلة لإعادة الاستخدام (`btn`, `card`, `pill`, `chip`, `input`).
+- **🔌 جاهزية تامة للربط الخلفي (Decoupled & Ready for Backend):**
+  - جميع خدمات البيانات (`LectureService`, `QuizService`, `ProgressService`, `AuthService`) تعتمد على الـ `Observable` والواجهات المكتوبة بصرامة في `src/app/core/models/`.
+  - الانتقال للـ Backend يتطلب فقط استبدال `mockResponse()` بـ `HttpClient`.
+
+---
+
+## 🚀 خط الإنتاج والاستضافة المشتركة للفريق (CI/CD & Collaboration)
+
+تم ربط المستودع باستضافة سحابية عالية الأداء على **Vercel** عبر **GitHub Actions**:
+
+### 👥 صلاحيات التعديل لكافة أعضاء المستودع:
+1. **النشر التلقائي فور التعديل:**
+   - بمجرد قيام أي عضو في الفريق بعمل `git push` أو دمج Pull Request على فرع `main`، يبدأ الـ Workflow ببناء المشروع ونشره خلال ~45 ثانية.
+2. **روابط المعاينة المستقلة (Preview Deployments):**
+   - أي فرع تجريبي أو Pull Request يحصل تلقائياً على رابط معاينة معزول لفحص التعديلات قبل دمجها.
+3. **التحكم عبر `vercel.json`:**
+   - ملف التوجيه وقواعد التوجيه (`rewrites`) متاح ومفتوح لأعضاء الفريق لتعديل أي سلوك خاص بالـ Routing أو الـ Headers بحرية كاملة.
+
+---
+
+## 💻 التشغيل والتطوير المحلي (Local Development)
 
 ```bash
+# 1. تثبيت الحزم والتبعيات
 npm install
-npm start          # http://localhost:4200
-npm run build      # production build in dist/
+
+# 2. تشغيل السيرفر المحلي للتطوير
+npm start
+# يفتح تلقائياً على http://localhost:4200
+
+# 3. بناء نسخة الإنتاج
+npm run build
 ```
 
-Requires Node 20+.
+---
 
-## Pages
+## 📂 هيكلية المشروع (Project Tree)
 
-| Route        | Page                 | Notes                                                                   |
-| ------------ | -------------------- | ----------------------------------------------------------------------- |
-| `/`          | Landing              | Hero, features, instructor, testimonials, CTA                           |
-| `/login`     | Log in               | Validation + error banner (mock: password `wrongpass` fails)            |
-| `/signup`    | Sign up              | Stage chips, strong-password rule, confirm match, terms                 |
-| `/lectures`  | Recorded Lectures    | Search, stage/topic/duration filters, sort, load more, player preview   |
-| `/quizzes`   | Quizzes & Exercises  | Working quiz: answer, navigate, submit, graded review with explanations |
-| `/progress`  | Progress dashboard   | Stats, weekly bar chart, skills, leaderboard, badges                    |
-
-The "Flexible Learning" page from the design is intentionally not built yet.
-
-## Project structure
-
-```
+```text
 src/app/
-  core/
-    i18n/      LanguageService (EN/AR, <html dir>), `t` and `loc` pipes, dictionaries, translated page titles
-    models/    Typed interfaces for everything the backend will return
-    data/      Data services (ContentService, LectureService, QuizService, ProgressService, AuthService)
-    mock/      PLACEHOLDER data used by the services until the backend is ready
-    icons.ts   Registered Lucide icons
-  shared/
-    layout/    Shell, Header, Footer (one shared header/footer for all pages)
-    ui/        Logo, Media (image or placeholder), Avatar, SectionHeader, CtaBanner, ProgressRing, GoogleIcon
-  features/    One folder per page (lazy-loaded routes)
+├── core/
+│   ├── data/       # خدمات جلب البيانات (Services)
+│   ├── i18n/       # قواميس الترجمة والـ Pipes ومحرك تبديل اللغات
+│   ├── mock/       # بيانات تجريبية مطابقة لهيكل قواعد البيانات الحقيقية
+│   └── models/     # واجهات TypeScript المعيارية
+├── features/       # صفحات ومسارات التطبيق (Lazy-loaded Routes)
+│   ├── auth/       # تسجيل الدخول وإنشاء الحساب
+│   ├── landing/    # الصفحة الرئيسية الترحيبية
+│   ├── lectures/   # مكتبة المحاضرات والفلترة ومشغل الفيديو
+│   ├── progress/   # لوحة تحليلات وإحصاءات الطالب
+│   └── quizzes/    # واجهة الاختبارات والتمارين التفاعلية
+└── shared/
+    ├── layout/     # الهيكل الأساسي (Shell, Header, Footer)
+    └── ui/         # المكونات المشتركة (Buttons, Cards, Rings, Avatars)
 ```
 
-## Connecting the backend
+<br />
 
-Every data service returns an `Observable` from `mockResponse(...)`. Each method is commented with the endpoint it stands in for, for example:
-
-```ts
-/** GET /api/lectures */
-getLectures(): Observable<Lecture[]> {
-  return mockResponse(LECTURES_MOCK);              // today
-  // return this.http.get<Lecture[]>('/api/lectures'); // later
-}
-```
-
-To connect a service: add `provideHttpClient()` in `app.config.ts`, swap `mockResponse(...)` for an `HttpClient` call, and delete the matching file in `core/mock/`. Components don't change, because they already handle async data with loading skeletons.
-
-Backend text that appears in both languages uses the `LocalizedText` shape `{ en, ar }` and is shown with the `loc` pipe. Images (`photoUrl`, `thumbnailUrl`, `avatarUrl`) are optional: when they're missing, a branded placeholder is shown.
-
-## Languages and RTL
-
-- UI copy lives in `core/i18n/i18n.en.ts` and `i18n.ar.ts`. The Arabic file is type-checked against the English one, so a missing key fails the build.
-- Switching language updates `<html lang dir>`, the font stack, and the tab title. The choice is remembered in `localStorage`.
-- Layout uses logical spacing (`ms-*`, `pe-*`, `start-*`, `text-start`), so it mirrors automatically. Directional icons use the `flip-rtl` class.
-- Fonts are self-hosted via `@fontsource`:
-  - **English:** Plus Jakarta Sans (headings) and Inter (body)
-  - **Arabic:** Alexandria (headings) and IBM Plex Sans Arabic (body)
-
-## Design tokens
-
-Colors, radii and shadows from the Figma file are defined in `tailwind.config.js`. Shared component classes (`btn`, `card`, `pill`, `chip`, `input`, …) are defined in `src/styles.scss`.
+<div align="center">
+  <b>صُنِعَ بإتقان لدعم وتمكين طلاب الثانوية العامة والشهادات العربية 🌟</b>
+</div>
