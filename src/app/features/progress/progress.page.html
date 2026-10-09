@@ -1,0 +1,239 @@
+@if (profile() && summary()) {
+  @let p = profile()!;
+  @let s = summary()!;
+
+  <div class="container-page space-y-6 py-8 md:py-10">
+    <!-- Profile header -->
+    <section class="card flex flex-col gap-6 p-5 sm:p-7 lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex items-center gap-4 sm:gap-5">
+        <div class="relative">
+          <app-avatar [name]="p.fullName.en" [src]="p.avatarUrl" class="h-16 w-16 rounded-card-lg text-xl sm:h-20 sm:w-20 sm:text-2xl" />
+          <span class="absolute -bottom-1.5 -end-1.5 grid h-7 w-7 place-items-center rounded-full bg-primary text-white ring-2 ring-white">
+            <lucide-icon name="graduation-cap" [size]="14" />
+          </span>
+        </div>
+        <div class="min-w-0">
+          <h1 class="font-display text-xl font-bold sm:text-2xl">{{ p.fullName | loc }}</h1>
+          <span class="pill mt-1.5">{{ p.stage | loc }}</span>
+          <p class="mt-1.5 flex flex-wrap items-center gap-x-2 text-sm text-ink-body">
+            {{ p.goal | loc }}
+            <span class="flex items-center gap-1 text-ink-soft"><lucide-icon name="map-pin" [size]="13" />{{ p.city | loc }}</span>
+          </p>
+        </div>
+      </div>
+      <dl class="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:w-auto">
+        <div class="rounded-card border border-line/70 bg-surface-warm px-3.5 py-2.5 text-center">
+          <dt class="text-[0.6875rem] text-ink-muted">{{ 'progress.profile.level' | t }}</dt>
+          <dd class="mt-0.5 font-display text-sm font-bold text-ink">{{ s.cefrLabel | loc }}</dd>
+        </div>
+        <div class="rounded-card border border-line/70 bg-surface-warm px-3.5 py-2.5 text-center">
+          <dt class="text-[0.6875rem] text-ink-muted">{{ 'progress.profile.weeklyGoal' | t }}</dt>
+          <dd class="mt-0.5 font-display text-sm font-bold text-ink" dir="ltr">{{ s.weeklyGoalHours.done }}h / {{ s.weeklyGoalHours.target }}h</dd>
+        </div>
+        <div class="rounded-card border border-line/70 bg-surface-warm px-3.5 py-2.5 text-center">
+          <dt class="text-[0.6875rem] text-ink-muted">{{ 'progress.profile.vocab' | t }}</dt>
+          <dd class="mt-0.5 font-display text-sm font-bold text-ink">{{ 'progress.profile.vocabValue' | t: { n: s.vocabularyWords } }}</dd>
+        </div>
+        <div class="rounded-card border border-line/70 bg-surface-warm px-3.5 py-2.5 text-center">
+          <dt class="text-[0.6875rem] text-ink-muted">{{ 'progress.profile.accuracy' | t }}</dt>
+          <dd class="mt-0.5 font-display text-sm font-bold text-ink">{{ s.quizAccuracy }}%</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- Stat cards -->
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <article class="card flex flex-col p-5">
+        <header class="flex items-start justify-between gap-3">
+          <h2 class="font-display text-sm font-semibold text-ink-body">{{ 'progress.stats.syllabus' | t }}</h2>
+          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-surface-tint text-primary"><lucide-icon name="chart-pie" [size]="17" /></span>
+        </header>
+        <div class="mt-3 flex items-center gap-4">
+          <app-progress-ring [percent]="syllabusPercent()" [size]="72" [stroke]="7">
+            <span class="font-display text-sm font-bold text-ink">{{ syllabusPercent() }}%</span>
+          </app-progress-ring>
+          <div>
+            <p class="font-display text-xl font-bold text-ink" dir="ltr">{{ s.syllabus.completed }} / {{ s.syllabus.total }}</p>
+            <p class="text-xs text-ink-body">{{ 'progress.stats.unitsCleared' | t }}</p>
+          </div>
+        </div>
+        <div class="progress-track mt-auto pt-0"><div class="progress-fill" [style.width.%]="syllabusPercent()"></div></div>
+      </article>
+
+      <article class="card flex flex-col p-5">
+        <header class="flex items-start justify-between gap-3">
+          <h2 class="font-display text-sm font-semibold text-ink-body">{{ 'progress.stats.studyTime' | t }}</h2>
+          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-surface-tint text-primary"><lucide-icon name="clock" [size]="17" /></span>
+        </header>
+        <p class="mt-3 font-display text-ink"><span class="text-4xl font-bold">{{ s.studyHours }}</span> <span class="ms-1 text-sm text-ink-body">{{ 'progress.stats.hours' | t }}</span></p>
+        <p class="mt-1 text-xs text-ink-body">{{ 'progress.stats.studyText' | t }}</p>
+        <p class="mt-auto flex items-center gap-1.5 rounded-card bg-success-soft px-3 py-2 text-xs font-semibold text-success">
+          <lucide-icon name="trending-up" [size]="14" />{{ 'progress.stats.delta' | t: { n: s.studyHoursDelta } }}
+        </p>
+      </article>
+
+      <article class="card flex flex-col p-5">
+        <header class="flex items-start justify-between gap-3">
+          <h2 class="font-display text-sm font-semibold text-ink-body">{{ 'progress.stats.streak' | t }}</h2>
+          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold-soft text-gold-dark"><lucide-icon name="flame" [size]="17" /></span>
+        </header>
+        <p class="mt-3 font-display text-ink"><span class="text-4xl font-bold">{{ s.streakDays }}</span> <span class="ms-1 text-sm text-ink-body">{{ 'progress.stats.days' | t }}</span></p>
+        <p class="mt-1 text-xs text-ink-body">{{ 'progress.stats.streakText' | t }}</p>
+        <p class="mt-auto flex items-center justify-between gap-2 rounded-card bg-surface-tint px-3 py-2 text-xs">
+          <span class="text-ink-body">{{ 'progress.stats.best' | t: { n: s.bestStreakDays } }}</span>
+          <span class="font-semibold text-ink">{{ 'progress.stats.toBeat' | t: { n: s.bestStreakDays - s.streakDays } }}</span>
+        </p>
+      </article>
+
+      <article class="card flex flex-col p-5">
+        <header class="flex items-start justify-between gap-3">
+          <h2 class="font-display text-sm font-semibold text-ink-body">{{ 'progress.stats.evaluations' | t }}</h2>
+          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-surface-tint text-primary"><lucide-icon name="list-checks" [size]="17" /></span>
+        </header>
+        <p class="mt-3 font-display text-ink"><span class="text-4xl font-bold">{{ s.quizzesCompleted }}</span> <span class="ms-1 text-sm text-ink-body">{{ 'progress.stats.quizzes' | t }}</span></p>
+        <p class="mt-1 text-xs text-ink-body">{{ 'progress.stats.evalText' | t: { n: s.quizAccuracy } }}</p>
+        <p class="mt-auto flex items-center gap-1.5 rounded-card bg-surface-tint px-3 py-2 text-xs font-semibold text-ink">
+          <lucide-icon name="badge-check" [size]="14" class="text-primary" />{{ 'progress.stats.topTier' | t }}
+        </p>
+      </article>
+    </section>
+
+    <div class="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div class="space-y-6">
+        <!-- Weekly activity -->
+        <section class="card p-5 sm:p-7">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h2 class="font-display text-lg font-bold">{{ 'progress.activity.title' | t }}</h2>
+              <p class="mt-1 text-sm text-ink-body">{{ 'progress.activity.subtitle' | t }}</p>
+            </div>
+            <div class="flex gap-4 text-xs text-ink-body">
+              <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-surface-tint3"></span>{{ 'progress.activity.standard' | t }}</span>
+              <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-primary"></span>{{ 'progress.activity.peak' | t }}</span>
+            </div>
+          </div>
+          <app-weekly-chart class="mt-8" [data]="s.weeklyActivity" />
+          <div class="mt-6 flex flex-col gap-2 border-t border-line/70 pt-4 text-sm sm:flex-row sm:justify-between">
+            <span class="text-ink-body">{{ 'progress.activity.average' | t: { n: averageMinutes() } }}</span>
+            <span class="font-semibold text-ink">{{ 'progress.activity.focus' | t: { day: ('progress.daysLong.' + peakDay() | t), topic: (s.weeklyFocus | loc) } }}</span>
+          </div>
+        </section>
+
+        <!-- Skills -->
+        <section class="card p-5 sm:p-7">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 class="font-display text-lg font-bold">{{ 'progress.skills.title' | t }}</h2>
+              <p class="mt-1 text-sm text-ink-body">{{ 'progress.skills.subtitle' | t }}</p>
+            </div>
+            <span class="pill">{{ 'progress.skills.cefr' | t: { n: s.cefrLevel } }}</span>
+          </div>
+          <ul class="mt-6 space-y-5">
+            @for (sk of s.skills; track sk.key) {
+              <li>
+                <div class="flex items-center justify-between gap-3">
+                  <span class="flex items-center gap-2.5 font-display text-sm font-semibold text-ink">
+                    <span class="grid h-8 w-8 place-items-center rounded-card bg-surface-tint text-primary"><lucide-icon [name]="skillIcon[sk.key]" [size]="15" /></span>
+                    {{ 'progress.skills.' + sk.key | t }}
+                  </span>
+                  <span class="flex items-center gap-2">
+                    <span class="font-display text-[0.6875rem] font-bold uppercase tracking-wider" [class]="levelClass[sk.level]">{{ 'progress.skills.levels.' + sk.level | t }}</span>
+                    <span class="font-display text-base font-bold text-ink">{{ sk.percent }}%</span>
+                  </span>
+                </div>
+                <div class="progress-track mt-2.5 !h-2.5"><div class="progress-fill" [style.width.%]="sk.percent"></div></div>
+              </li>
+            }
+          </ul>
+
+          <div class="mt-7 rounded-card border-s-4 border-primary bg-surface-tint p-5">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="grid h-8 w-8 place-items-center rounded-full bg-white text-primary shadow-card"><lucide-icon name="sparkles" [size]="15" /></span>
+              <h3 class="font-display text-base font-bold">{{ 'progress.skills.aiTitle' | t }}</h3>
+              <span class="tag border border-line bg-white text-ink-soft">{{ 'progress.skills.personalized' | t }}</span>
+            </div>
+            <p class="mt-3 leading-7 text-ink-body">“{{ s.recommendation | loc }}”</p>
+            <a href="#" class="mt-3 inline-flex items-center gap-1.5 font-display text-sm font-bold text-ink hover:text-primary">
+              {{ 'progress.skills.openLab' | t }} <lucide-icon name="arrow-right" [size]="14" class="flip-rtl" />
+            </a>
+          </div>
+        </section>
+      </div>
+
+      <aside class="space-y-6">
+        <!-- Leaderboard -->
+        <section class="card p-5 sm:p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h2 class="font-display text-lg font-bold">{{ 'progress.leaderboard.title' | t }}</h2>
+              <p class="mt-1 text-sm text-ink-body">{{ 'progress.leaderboard.subtitle' | t }}</p>
+            </div>
+            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold-soft text-gold-dark"><lucide-icon name="trophy" [size]="17" /></span>
+          </div>
+          <ol class="mt-5 space-y-2.5">
+            @for (e of leaderboard(); track e.rank) {
+              <li class="flex items-center gap-3 rounded-card border px-3.5 py-3"
+                [class]="e.isCurrentUser ? 'border-primary bg-surface-tint ring-1 ring-primary' : 'border-line/70 bg-white'">
+                <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full font-display text-xs font-bold"
+                  [class]="e.rank === 1 ? 'bg-gold text-white' : e.rank <= 3 ? 'bg-surface-highlight text-primary' : e.isCurrentUser ? 'bg-primary text-white' : 'bg-surface-tint2 text-ink-soft'">{{ e.rank }}</span>
+                <div class="min-w-0 flex-1">
+                  <p class="flex items-center gap-1.5 truncate font-display text-sm font-bold text-ink">
+                    {{ e.name | loc }}
+                    @if (e.isCurrentUser) { <span class="tag bg-primary text-white">{{ 'progress.leaderboard.you' | t }}</span> }
+                  </p>
+                  <p class="flex items-center gap-1 text-xs text-ink-muted">
+                    @if (e.isCurrentUser && rival(); as r) {
+                      {{ 'progress.leaderboard.toNext' | t: { n: r.gap } }}
+                    } @else {
+                      <lucide-icon name="map-pin" [size]="11" />{{ e.city | loc }}
+                    }
+                  </p>
+                </div>
+                <p class="text-end font-display text-sm font-bold tabular-nums text-ink">{{ e.xp | number }} <span class="block text-[0.625rem] font-semibold text-ink-muted">XP</span></p>
+              </li>
+            }
+          </ol>
+          <p class="mt-4 border-t border-line/70 pt-3 text-center text-xs text-ink-muted">{{ 'progress.leaderboard.footer' | t }}</p>
+        </section>
+
+        <!-- Badges -->
+        <section class="card p-5 sm:p-6">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h2 class="font-display text-lg font-bold">{{ 'progress.badges.title' | t }}</h2>
+              <p class="mt-1 text-sm text-ink-body">{{ 'progress.badges.subtitle' | t }}</p>
+            </div>
+            <span class="font-display text-xs font-semibold text-ink-soft">{{ 'progress.badges.unlocked' | t: { n: achievements().length } }}</span>
+          </div>
+          <ul class="mt-5 space-y-2.5">
+            @for (a of achievements(); track a.id) {
+              <li class="flex items-center gap-3 rounded-card border border-line/70 bg-surface-warm p-3">
+                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-card bg-gold-soft text-gold-dark ring-1 ring-gold/30">
+                  <lucide-icon [name]="badgeIcon[a.icon]" [size]="20" />
+                </span>
+                <div class="min-w-0">
+                  <p class="font-display text-sm font-bold text-ink">{{ a.title | loc }}</p>
+                  <p class="text-xs text-ink-body">{{ a.description | loc }}</p>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  @if (rival()) {
+    <app-cta-banner layout="split" [eyebrow]="'progress.cta.eyebrow' | t" [title]="'progress.cta.title' | t" [text]="ctaText()">
+      <a routerLink="/quizzes" class="btn btn-light btn-lg">{{ 'common.startNow' | t }} <lucide-icon name="play" [size]="14" class="fill-primary flip-rtl" /></a>
+    </app-cta-banner>
+  }
+} @else {
+  <div class="container-page space-y-6 py-10" aria-busy="true">
+    <div class="h-32 animate-pulse rounded-card-lg bg-surface-tint3"></div>
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      @for (i of [1, 2, 3, 4]; track i) { <div class="h-44 animate-pulse rounded-card-lg bg-surface-tint3"></div> }
+    </div>
+    <span class="sr-only">{{ 'common.loading' | t }}</span>
+  </div>
+}

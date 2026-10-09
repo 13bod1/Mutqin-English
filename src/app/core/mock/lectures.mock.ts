@@ -8,7 +8,7 @@ export const LECTURES_MOCK: Lecture[] = [
     stage: 'sec3',
     topic: 'grammar',
     durationMin: 24,
-    unit: { en: 'Unit 1: Make or Do & Collocations', ar: 'الوحدة 1: Make أو Do والمتلازمات' },
+    unit: { en: 'Unit 1: Make or Do & Collocations', ar: 'الوحدة 1: المتلازمات (Make / Do)' },
     title: {
       en: 'Vocabulary Demystified: Advanced Collocations for Thanawya Amma',
       ar: 'المفردات ببساطة: متلازمات متقدمة للثانوية العامة',
@@ -119,7 +119,7 @@ export const LECTURES_MOCK: Lecture[] = [
     unit: { en: 'Phrasal Verbs Toolkit', ar: 'حقيبة الأفعال المركبة' },
     title: {
       en: 'Get, Take & Put: 30 Phrasal Verbs You Hear Every Day',
-      ar: 'Get وTake وPut: ثلاثون فعلًا مركبًا تسمعها يوميًا',
+      ar: 'ثلاثون فعلًا مركبًا تسمعها يوميًا: Get, Take, Put',
     },
     description: {
       en: 'Learn the phrasal verbs that appear most in conversations and exams, with memorable example sentences.',
@@ -137,7 +137,7 @@ export const LECTURES_MOCK: Lecture[] = [
     unit: { en: 'Common Errors', ar: 'أخطاء شائعة' },
     title: {
       en: 'Mastering Tricky Prepositions: In, On, At',
-      ar: 'إتقان حروف الجر الصعبة: In وOn وAt',
+      ar: 'إتقان حروف الجر الصعبة: In, On, At',
     },
     description: {
       en: 'Why Arabic speakers mix up time and place prepositions, and a simple rule set to stop it for good.',
@@ -155,7 +155,7 @@ export const LECTURES_MOCK: Lecture[] = [
     unit: { en: 'Pronunciation Clinic', ar: 'عيادة النطق' },
     title: {
       en: 'P vs B and V vs F: Fixing the Classic Arabic Swaps',
-      ar: 'P وB وV وF: علاج أشهر أخطاء النطق عند العرب',
+      ar: 'علاج أشهر أخطاء النطق عند العرب: P/B و V/F',
     },
     description: {
       en: 'Minimal-pair drills that train your mouth to separate the sounds Arabic does not distinguish.',

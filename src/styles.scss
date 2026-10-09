@@ -173,4 +173,7 @@ lucide-icon > svg {
   .flip-rtl {
     @apply rtl:-scale-x-100;
   }
+  .hide-mobile {
+    @apply max-sm:hidden;
+  }
 }

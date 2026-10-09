@@ -1,0 +1,100 @@
+<!-- Hero -->
+<section class="banner-gradient relative isolate overflow-hidden text-white">
+  <div class="pointer-events-none absolute -bottom-32 -start-24 -z-10 h-80 w-80 rounded-full border-[40px] border-white/[0.04]"></div>
+  <div class="container-page grid items-center gap-10 py-14 md:py-16 lg:grid-cols-[1.5fr_1fr]">
+    <div>
+      <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 font-display text-xs font-semibold text-white/90 ring-1 ring-white/15">
+        <lucide-icon name="brain-circuit" [size]="14" /> {{ 'quizzes.hero.badge' | t }}
+      </span>
+      <h1 class="mt-5 font-display text-[2rem] font-bold leading-tight text-white md:text-display-xl">{{ 'quizzes.hero.title' | t }}</h1>
+      <p class="mt-4 max-w-2xl text-base leading-7 text-white/80 md:text-lg">{{ 'quizzes.hero.subtitle' | t }}</p>
+      <ul class="mt-7 flex flex-wrap gap-2.5">
+        @for (c of [{ i: 'layers', k: 'quizzes.hero.chip1' }, { i: 'zap', k: 'quizzes.hero.chip2' }, { i: 'headphones', k: 'quizzes.hero.chip3' }]; track c.k) {
+          <li class="inline-flex items-center gap-2 rounded-card border border-white/20 bg-white/5 px-3.5 py-2 text-sm text-white/90">
+            <lucide-icon [name]="c.i" [size]="15" class="text-gold" />{{ c.k | t }}
+          </li>
+        }
+      </ul>
+    </div>
+    <div class="rounded-card-lg border border-white/15 bg-white/[0.07] p-8 text-center backdrop-blur">
+      <span class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-gold/20 text-gold ring-1 ring-gold/50">
+        <lucide-icon name="target" [size]="28" />
+      </span>
+      <p class="mt-4 font-display text-xl font-bold">{{ 'quizzes.hero.targetTitle' | t }}</p>
+      <p class="mt-2 text-sm leading-6 text-white/75">{{ 'quizzes.hero.targetText' | t }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- Module library -->
+<section class="container-page py-14 md:py-16">
+  <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <app-section-header align="start" [eyebrow]="'quizzes.library.eyebrow' | t" [title]="'quizzes.library.title' | t"
+      [subtitle]="'quizzes.library.subtitle' | t" />
+    <div class="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <div class="inline-flex gap-1 rounded-full border border-line bg-white p-1" role="tablist">
+        @for (c of categories; track c) {
+          <button type="button" role="tab" [attr.aria-selected]="category() === c" (click)="category.set(c)"
+            class="whitespace-nowrap rounded-full px-4 py-1.5 font-display text-sm font-semibold transition"
+            [class]="category() === c ? 'bg-primary text-white shadow-btn' : 'text-ink-body hover:bg-surface-tint'">
+            {{ 'quizzes.library.' + c | t }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    @for (m of visibleModules(); track m.id) {
+      <article class="card relative flex flex-col p-6 transition hover:shadow-lift"
+        [class]="m.id === activeModuleId() ? '!border-primary ring-1 ring-primary' : m.recommended ? '!border-primary/40' : ''">
+        @if (m.recommended) {
+          <span class="absolute -top-3 start-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 font-display text-[0.6875rem] font-semibold text-white rtl:translate-x-1/2">
+            {{ 'quizzes.library.recommended' | t }}
+          </span>
+        }
+        <div class="flex items-center justify-between">
+          <span class="tag" [class]="difficultyClass[m.difficulty]">{{ 'quizzes.difficulty.' + m.difficulty | t }}</span>
+          <span class="flex items-center gap-1 text-xs text-ink-muted"><lucide-icon name="clock" [size]="13" />{{ 'common.minutes' | t: { n: m.durationMin } }}</span>
+        </div>
+        <h3 class="mt-4 font-display text-lg font-bold">{{ m.title | loc }}</h3>
+        <p class="mt-2 flex-1 text-sm leading-6 text-ink-body">{{ m.description | loc }}</p>
+        <div class="mt-6 flex items-center justify-between gap-3 border-t border-line/70 pt-4">
+          <span class="flex items-center gap-1.5 text-sm text-ink-soft"><lucide-icon name="file-text" [size]="14" />{{ 'quizzes.library.questions' | t: { n: m.questionCount } }}</span>
+          @if (m.id === activeModuleId()) {
+            <span class="tag bg-surface-tint text-primary">{{ 'quizzes.library.active' | t }}</span>
+          } @else {
+            <button type="button" class="btn btn-primary btn-sm" (click)="start(m)">{{ 'quizzes.library.start' | t }}</button>
+          }
+        </div>
+      </article>
+    }
+  </div>
+</section>
+
+<!-- Live practice -->
+<section #practice class="scroll-mt-24 border-y border-line/50 bg-surface-warm/60 py-14 md:py-16">
+  <div class="container-page">
+    <h2 class="mb-6 flex items-center justify-center gap-2 font-display text-xl font-bold md:text-2xl">
+      <lucide-icon name="list-checks" [size]="20" class="text-ink-soft" />{{ 'quizzes.practice.title' | t }}
+    </h2>
+    @if (activeModule(); as m) {
+      @if (questions().length) {
+        <app-quiz-runner [module]="m" [questions]="questions()" (submitted)="onSubmit($event)" />
+      }
+    } @else {
+      <div class="mx-auto h-96 max-w-3xl animate-pulse rounded-card-lg bg-surface-tint3"></div>
+    }
+  </div>
+
+  @if (result(); as r) {
+    <div #results class="container-page scroll-mt-24 pt-14">
+      <app-section-header [eyebrow]="'quizzes.results.eyebrow' | t" [title]="'quizzes.results.title' | t" />
+      <app-quiz-results class="mt-8" [result]="r" (retry)="retry()" />
+    </div>
+  }
+</section>
+
+<app-cta-banner icon="sparkles" [title]="'quizzes.cta.title' | t" [text]="'quizzes.cta.text' | t">
+  <a routerLink="/signup" class="btn btn-light btn-lg">{{ 'common.startNow' | t }}</a>
+</app-cta-banner>

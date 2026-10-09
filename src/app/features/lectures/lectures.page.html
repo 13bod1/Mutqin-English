@@ -1,0 +1,156 @@
+<!-- Hero with search & filters -->
+<section class="banner-gradient relative isolate overflow-hidden text-white">
+  <div class="pointer-events-none absolute -end-24 -top-24 -z-10 h-80 w-80 rounded-full border-[40px] border-white/[0.04]"></div>
+  <div class="container-page py-14 text-center md:py-16">
+    <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 font-display text-xs font-semibold text-white/90 ring-1 ring-white/15">
+      <lucide-icon name="graduation-cap" [size]="14" /> {{ 'lectures.hero.badge' | t }}
+    </span>
+    <h1 class="mt-5 font-display text-[2rem] font-bold leading-tight text-white md:text-display-xl">{{ 'lectures.hero.title' | t }}</h1>
+    <p class="mx-auto mt-4 max-w-3xl text-base leading-7 text-white/80 md:text-lg">{{ 'lectures.hero.subtitle' | t }}</p>
+
+    <form (ngSubmit)="search()" role="search" class="mx-auto mt-8 flex max-w-2xl items-center gap-2 rounded-card-lg bg-white p-2 shadow-deep">
+      <lucide-icon name="search" [size]="18" class="ms-2 text-ink-muted" />
+      <input type="search" name="q" [ngModel]="searchDraft()" (ngModelChange)="searchDraft.set($event)"
+        [placeholder]="'lectures.hero.searchPlaceholder' | t" [attr.aria-label]="'lectures.hero.search' | t"
+        class="h-10 min-w-0 flex-1 bg-transparent px-1 text-[0.9375rem] text-ink placeholder:text-ink-muted focus:outline-none" />
+      <button type="submit" class="btn btn-primary shrink-0">{{ 'lectures.hero.search' | t }}</button>
+    </form>
+
+    <div class="mx-auto mt-8 max-w-4xl space-y-3 text-start">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <span class="w-36 shrink-0 font-display text-xs font-semibold text-white/70">{{ 'lectures.hero.stage' | t }}</span>
+        <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+          @for (s of stages; track s) {
+            <button type="button" class="chip shrink-0" [class.chip-active]="filters().stage === s" [attr.aria-pressed]="filters().stage === s"
+              (click)="toggle('stage', s)">{{ 'stagesShort.' + s | t }}</button>
+          }
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <span class="w-36 shrink-0 font-display text-xs font-semibold text-white/70">{{ 'lectures.hero.topics' | t }}</span>
+        <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+          @for (tp of topics; track tp) {
+            <button type="button" class="chip shrink-0" [class.chip-active]="filters().topic === tp" [attr.aria-pressed]="filters().topic === tp"
+              (click)="toggle('topic', tp)">{{ 'topics.' + tp | t }}</button>
+          }
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <span class="w-36 shrink-0 font-display text-xs font-semibold text-white/70">{{ 'lectures.hero.duration' | t }}</span>
+        <div class="flex flex-wrap gap-2">
+          @for (d of durations; track d) {
+            <button type="button" class="chip" [class.chip-active]="filters().duration === d" [attr.aria-pressed]="filters().duration === d"
+              (click)="toggle('duration', d)">{{ 'durations.' + d | t }}</button>
+          }
+          @if (hasFilters()) {
+            <button type="button" (click)="clear()" class="inline-flex items-center gap-1 px-2 font-display text-xs font-semibold text-gold hover:underline">
+              <lucide-icon name="x" [size]="13" />{{ 'lectures.hero.clear' | t }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Continue watching -->
+@if (continueWatching().length) {
+  <section class="container-page pt-12">
+    <div class="flex items-center justify-between gap-4">
+      <h2 class="flex items-center gap-2.5 font-display text-xl font-bold md:text-2xl">
+        <lucide-icon name="history" [size]="20" class="text-ink-soft" />{{ 'lectures.continue.title' | t }}
+      </h2>
+      <a href="#" class="flex items-center gap-1 font-display text-sm font-semibold text-ink-soft hover:text-ink">
+        {{ 'lectures.continue.viewAll' | t }} <lucide-icon name="arrow-right" [size]="14" class="flip-rtl" />
+      </a>
+    </div>
+    <div class="mt-6 grid gap-5 lg:grid-cols-2">
+      @for (item of continueWatching(); track item.lecture.id) {
+        <article class="card flex flex-col gap-4 p-4 sm:flex-row">
+          <app-media class="aspect-video shrink-0 rounded-card sm:aspect-[3/2] sm:w-48" icon="play" [iconSize]="28"
+            [src]="item.lecture.thumbnailUrl" [alt]="item.lecture.title | loc">
+            <span class="absolute bottom-2 end-2 rounded bg-ink/80 px-1.5 py-0.5 font-display text-[0.6875rem] font-semibold text-white">
+              {{ 'common.minutes' | t: { n: item.lecture.durationMin } }}
+            </span>
+          </app-media>
+          <div class="flex min-w-0 flex-1 flex-col">
+            <div class="flex flex-wrap gap-2">
+              <span class="tag bg-surface-highlight/60 text-primary">{{ 'stagesShort.' + item.lecture.stage | t }}</span>
+              <span class="tag bg-surface-tint2 text-ink-soft">{{ item.lecture.unit | loc }}</span>
+            </div>
+            <h3 class="mt-2 line-clamp-2 font-display text-base font-bold">{{ item.lecture.title | loc }}</h3>
+            <div class="mt-auto pt-4">
+              <div class="progress-track"><div class="progress-fill" [style.width.%]="item.percent"></div></div>
+              <div class="mt-2 flex items-center justify-between gap-3 text-xs text-ink-muted">
+                <span>{{ 'common.completed' | t: { n: item.percent } }}</span>
+                <span>{{ 'common.minsLeft' | t: { n: item.minutesLeft } }}</span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm self-start sm:self-end">
+            <lucide-icon name="play" [size]="13" class="fill-white" />{{ 'lectures.continue.resume' | t }}
+          </button>
+        </article>
+      }
+    </div>
+  </section>
+}
+
+<!-- Player preview -->
+<section class="container-page pt-12">
+  @if (featured(); as f) {
+    <app-lecture-player [lecture]="f" />
+  } @else {
+    <div class="aspect-video animate-pulse rounded-card-lg bg-surface-tint3"></div>
+  }
+</section>
+
+<!-- Catalog -->
+<section class="container-page py-14 md:py-16">
+  <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+    <app-section-header align="start" [eyebrow]="'lectures.catalog.eyebrow' | t" [title]="'lectures.catalog.title' | t"
+      [subtitle]="'lectures.catalog.subtitle' | t" />
+    <label class="flex shrink-0 items-center gap-2 text-sm text-ink-body">
+      {{ 'lectures.catalog.sortBy' | t }}
+      <select [ngModel]="sort()" (ngModelChange)="sort.set($event)"
+        class="h-10 rounded-card border border-line bg-white pe-8 ps-3 font-display text-sm font-semibold text-ink focus:border-primary focus:outline-none">
+        <option value="curriculum">{{ 'lectures.catalog.sortCurriculum' | t }}</option>
+        <option value="shortest">{{ 'lectures.catalog.sortShortest' | t }}</option>
+        <option value="longest">{{ 'lectures.catalog.sortLongest' | t }}</option>
+      </select>
+    </label>
+  </div>
+
+  @if (lectures()) {
+    <p class="mt-6 text-sm text-ink-muted" aria-live="polite">{{ 'lectures.catalog.results' | t: { n: filtered().length } }}</p>
+    <div class="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      @for (lecture of shown(); track lecture.id) {
+        <app-lecture-card [lecture]="lecture" />
+      } @empty {
+        <div class="card-tint col-span-full flex flex-col items-center gap-3 px-6 py-14 text-center">
+          <lucide-icon name="search" [size]="28" class="text-ink-muted" />
+          <p class="text-ink-body">{{ 'lectures.catalog.empty' | t }}</p>
+          <button type="button" (click)="clear()" class="btn btn-soft btn-sm">{{ 'lectures.hero.clear' | t }}</button>
+        </div>
+      }
+    </div>
+    @if (filtered().length > shown().length) {
+      <div class="mt-10 text-center">
+        <button type="button" (click)="loadMore()" class="btn btn-soft">
+          {{ 'lectures.catalog.loadMore' | t }} <lucide-icon name="chevron-down" [size]="16" />
+        </button>
+      </div>
+    }
+  } @else {
+    <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      @for (s of [1, 2, 3]; track s) {
+        <div class="h-96 animate-pulse rounded-card-lg bg-surface-tint3"></div>
+      }
+    </div>
+  }
+</section>
+
+<app-cta-banner layout="split" [eyebrow]="'lectures.cta.eyebrow' | t" [title]="'lectures.cta.title' | t" [text]="'lectures.cta.text' | t">
+  <a routerLink="/signup" class="btn btn-light btn-lg">{{ 'common.startNow' | t }}</a>
+  <a href="#" class="btn btn-outline-light btn-lg">{{ 'lectures.cta.secondary' | t }}</a>
+</app-cta-banner>
