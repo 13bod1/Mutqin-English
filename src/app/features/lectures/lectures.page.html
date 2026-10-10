@@ -66,13 +66,18 @@
     </div>
     <div class="mt-6 grid gap-5 lg:grid-cols-2">
       @for (item of continueWatching(); track item.lecture.id) {
-        <article class="card flex flex-col gap-4 p-4 sm:flex-row">
-          <app-media class="aspect-video shrink-0 rounded-card sm:aspect-[3/2] sm:w-48" icon="play" [iconSize]="28"
-            [src]="item.lecture.thumbnailUrl" [alt]="item.lecture.title | loc">
-            <span class="absolute bottom-2 end-2 rounded bg-ink/80 px-1.5 py-0.5 font-display text-[0.6875rem] font-semibold text-white">
+        <article class="card flex flex-col gap-4 p-4 sm:flex-row border border-line/60">
+          <div class="relative aspect-video shrink-0 rounded-card sm:aspect-[3/2] sm:w-48 overflow-hidden bg-black group">
+            <video
+              class="h-full w-full object-cover"
+              preload="metadata"
+              playsinline
+              [src]="item.lecture.videoUrl"
+            ></video>
+            <span class="absolute bottom-2 end-2 rounded bg-black/80 px-2 py-0.5 font-display text-[0.6875rem] font-semibold text-white">
               {{ 'common.minutes' | t: { n: item.lecture.durationMin } }}
             </span>
-          </app-media>
+          </div>
           <div class="flex min-w-0 flex-1 flex-col">
             <div class="flex flex-wrap gap-2">
               <span class="tag bg-surface-highlight/60 text-primary">{{ 'stagesShort.' + item.lecture.stage | t }}</span>
@@ -87,7 +92,7 @@
               </div>
             </div>
           </div>
-          <button type="button" class="btn btn-primary btn-sm self-start sm:self-end">
+          <button type="button" (click)="playLecture(item.lecture)" class="btn btn-primary btn-sm self-start sm:self-end">
             <lucide-icon name="play" [size]="13" class="fill-white" />{{ 'lectures.continue.resume' | t }}
           </button>
         </article>
@@ -97,8 +102,8 @@
 }
 
 <!-- Player preview -->
-<section class="container-page pt-12">
-  @if (featured(); as f) {
+<section id="main-player" class="container-page pt-12">
+  @if (activeFeatured(); as f) {
     <app-lecture-player [lecture]="f" />
   } @else {
     <div class="aspect-video animate-pulse rounded-card-lg bg-surface-tint3"></div>
@@ -125,7 +130,7 @@
     <p class="mt-6 text-sm text-ink-muted" aria-live="polite">{{ 'lectures.catalog.results' | t: { n: filtered().length } }}</p>
     <div class="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       @for (lecture of shown(); track lecture.id) {
-        <app-lecture-card [lecture]="lecture" />
+        <app-lecture-card [lecture]="lecture" (watch)="playLecture($event)" />
       } @empty {
         <div class="card-tint col-span-full flex flex-col items-center gap-3 px-6 py-14 text-center">
           <lucide-icon name="search" [size]="28" class="text-ink-muted" />

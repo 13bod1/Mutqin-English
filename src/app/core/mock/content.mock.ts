@@ -7,23 +7,27 @@ export const PLATFORM_STATS_MOCK: PlatformStats = {
 };
 
 export const INSTRUCTOR_MOCK: Instructor = {
-  name: { en: 'Teacher Kareem', ar: 'المعلم كريم' },
-  photoUrl: 'images/instructor.svg',
-  title: { en: 'Certified TEFL & Cambridge Delta Instructor', ar: 'مدرّس معتمد TEFL و Cambridge Delta' },
-  credential: { en: '10,000+ coached hours for Arab students', ar: 'أكثر من 10,000 ساعة تدريس للطلاب العرب' },
+  name: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
+  title: { en: 'Senior English Teacher & Mentor', ar: 'معلم لغة إنجليزية أول وخبير تربوي' },
+  credential: {
+    en: '20+ Years of Excellence & Inspiring Generations',
+    ar: 'أكثر من 20 عامًا من التميز وإلهام الأجيال',
+  },
+
   bio: {
-    en: 'Teacher Kareem specializes in dismantling the specific hurdles Arabic speakers face — consonant clusters, vowel reductions, and the rhythm differences between English and Arabic.',
-    ar: 'يتخصص المعلم كريم في تفكيك العقبات التي تواجه المتحدثين بالعربية تحديدًا — تجمّعات الحروف الساكنة، واختزال حروف العلة، والفروق الإيقاعية بين الإنجليزية والعربية.',
+    en: 'Mr. Adel Mostafa is a highly accomplished and dedicated Senior English Teacher with over two decades of rich experience in inspiring, educating, and mentoring students. Throughout an illustrious career, he has successfully nurtured consecutive generations of learners, employing modern active and interactive learning strategies that balance a robust linguistic foundation with critical thinking skills.',
+    ar: 'أ. عادل مصطفى هو معلم لغة إنجليزية أول متميز ومخلص يتمتع بخبرة تزيد عن عقدين في إلهام وتعليم وتوجيه الطلاب. وطوال مسيرته المهنية الحافلة، نجح في تنشئة أجيال متعاقبة من المتعلمين، متبعًا استراتيجيات تعلّم حديثة ونشطة وتفاعلية توازن بين التأسيس اللغوي القوي ومهارات التفكير النقدي.',
   },
   quote: {
-    en: "We don't memorize word lists. We build communicative muscle memory so you can speak freely in interviews, travel, and university life.",
-    ar: 'نحن لا نحفظ قوائم كلمات. نبني ذاكرة تواصل حقيقية لتتحدث بحرية في المقابلات والسفر والحياة الجامعية.',
+    en: 'We balance a robust linguistic foundation with critical thinking skills, empowering every student to speak and succeed with true mastery.',
+    ar: 'نوازن بين التأسيس اللغوي القوي ومهارات التفكير النقدي، لنمكن كل طالب من التحدث والنجاح بإتقان حقيقي.',
   },
-  quoteAuthor: { en: 'Kareem, Founder & Lead Instructor', ar: 'كريم، المؤسس وكبير المدرّسين' },
+  quoteAuthor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
+  photoUrl: 'images/adel-mostafa.png',
   stats: [
-    { value: '8+', label: { en: 'Years experience', ar: 'سنوات خبرة' } },
-    { value: '1,500+', label: { en: 'Successful students', ar: 'طالب ناجح' } },
-    { value: '12+', label: { en: 'Comprehensive courses', ar: 'دورة شاملة' } },
+    { value: '20+', label: { en: 'Years Experience', ar: 'سنوات خبرة' } },
+    { value: '10,000+', label: { en: 'Students Mentored', ar: 'طالب متفوق' } },
+    { value: '100%', label: { en: 'Dedication & Mastery', ar: 'إتقان وتميز' } },
   ],
 };
 

@@ -43,5 +43,6 @@ export interface QuizResult {
   total: number;
   percent: number;
   elapsedSec: number;
+  xpEarned?: number;
   review: QuizAnswerReview[];
 }

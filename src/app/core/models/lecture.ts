@@ -17,6 +17,7 @@ export interface Lecture {
   /** Curriculum position, used by the "Curriculum order" sort. */
   order: number;
   thumbnailUrl?: string;
+  videoUrl?: string;
 }
 
 /** A lecture the signed-in student has started (GET /api/me/continue-watching). */

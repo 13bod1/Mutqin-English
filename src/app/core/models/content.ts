@@ -32,3 +32,12 @@ export interface Testimonial {
   rating: number;
   avatarUrl?: string;
 }
+
+export interface SiteVideo {
+  id?: string;
+  slug: string;
+  videoUrl: string;
+  posterUrl?: string;
+  title: LocalizedText;
+  isActive?: boolean;
+}

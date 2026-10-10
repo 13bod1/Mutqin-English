@@ -6,9 +6,8 @@ import { LucideAngularModule } from 'lucide-angular';
 import { LectureService, filterLectures } from '../../core/data/lecture.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { LocalizePipe, TranslatePipe } from '../../core/i18n/translate.pipe';
-import { AcademicStage, DurationBucket, LectureFilters, LectureTopic } from '../../core/models/lecture';
+import { AcademicStage, DurationBucket, FeaturedLecture, Lecture, LectureFilters, LectureTopic } from '../../core/models/lecture';
 import { CtaBannerComponent } from '../../shared/ui/cta-banner.component';
-import { MediaComponent } from '../../shared/ui/media-placeholder.component';
 import { SectionHeaderComponent } from '../../shared/ui/section-header.component';
 import { LectureCardComponent } from './lecture-card.component';
 import { LecturePlayerComponent } from './lecture-player.component';
@@ -20,7 +19,7 @@ const PAGE_SIZE = 6;
   selector: 'app-lectures',
   imports: [
     FormsModule, RouterLink, LucideAngularModule, TranslatePipe, LocalizePipe,
-    CtaBannerComponent, MediaComponent, SectionHeaderComponent, LectureCardComponent, LecturePlayerComponent,
+    CtaBannerComponent, SectionHeaderComponent, LectureCardComponent, LecturePlayerComponent,
   ],
   templateUrl: './lectures.page.html',
 })
@@ -31,6 +30,11 @@ export class LecturesPage {
   protected readonly lectures = toSignal(this.lectureService.getLectures());
   protected readonly continueWatching = toSignal(this.lectureService.getContinueWatching(), { initialValue: [] });
   protected readonly featured = toSignal(this.lectureService.getFeaturedLecture());
+  protected readonly selectedLecture = signal<FeaturedLecture | null>(null);
+
+  protected readonly activeFeatured = computed<FeaturedLecture | undefined>(() => {
+    return this.selectedLecture() ?? this.featured();
+  });
 
   protected readonly stages: AcademicStage[] = ['prep', 'sec1', 'sec2', 'sec3'];
   protected readonly topics: LectureTopic[] = ['grammar', 'phrasal', 'phonetics', 'exam'];
@@ -80,6 +84,32 @@ export class LecturesPage {
 
   protected loadMore(): void {
     this.visible.update((n) => n + PAGE_SIZE);
+  }
+
+  protected playLecture(l: Lecture): void {
+    const feat: FeaturedLecture = {
+      title: l.title,
+      subtitle: {
+        en: `Instructor: ${l.instructor.en} • ${l.unit.en}`,
+        ar: `المدرّس: ${l.instructor.ar} • ${l.unit.ar}`,
+      },
+      lessonLabel: {
+        en: `Lesson ${l.order < 10 ? '0' + l.order : l.order}`,
+        ar: `الدرس ${l.order < 10 ? '0' + l.order : l.order}`,
+      },
+      captionBefore: '"',
+      captionHighlight: l.title.en,
+      captionAfter: '"',
+      note: l.description,
+      positionSec: 0,
+      durationSec: l.durationMin * 60,
+      videoUrl: l.videoUrl,
+    };
+    this.selectedLecture.set(feat);
+    const el = document.getElementById('main-player');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   private patch(change: Partial<LectureFilters>): void {

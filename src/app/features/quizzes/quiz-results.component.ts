@@ -22,7 +22,7 @@ import { ProgressRingComponent } from '../../shared/ui/progress-ring.component';
           <h3 class="mt-2 font-display text-xl font-bold">{{ tone().titleKey | t }}</h3>
           <p class="mt-1 text-sm text-ink-body">{{ tone().textKey | t }}</p>
         </div>
-        <dl class="grid grid-cols-3 gap-2 md:w-[300px]">
+        <dl class="grid grid-cols-2 gap-2 md:w-[300px]">
           <div class="rounded-card bg-surface-tint2 p-3 text-center">
             <lucide-icon name="timer" [size]="16" class="text-ink-soft" />
             <dt class="mt-1 text-[0.6875rem] text-ink-muted">{{ 'quizzes.results.timeSpent' | t }}</dt>
@@ -38,6 +38,13 @@ import { ProgressRingComponent } from '../../shared/ui/progress-ring.component';
             <dt class="mt-1 text-[0.6875rem] text-danger">{{ 'quizzes.results.incorrect' | t }}</dt>
             <dd class="font-display text-base font-bold text-danger">{{ result().total - result().correct }}</dd>
           </div>
+          @if (result().xpEarned) {
+            <div class="rounded-card bg-gold-soft p-3 text-center">
+              <lucide-icon name="zap" [size]="16" class="text-gold-dark" />
+              <dt class="mt-1 text-[0.6875rem] text-gold-dark">XP Earned</dt>
+              <dd class="font-display text-base font-bold text-gold-dark">+{{ result().xpEarned }}</dd>
+            </div>
+          }
         </dl>
       </div>
 

@@ -68,6 +68,9 @@ export const AR: Dictionary<typeof EN> = {
       fluencyIndex: 'مؤشر الثقة في الطلاقة',
       playSample: 'تشغيل مقطع صوتي',
       teacherPhoto: 'صورة المدرّس',
+      introVideoLabel: 'الفيديو التعريفي',
+      playIntro: 'شاهد الفيديو التعريفي',
+      pauseIntro: 'إيقاف مؤقت',
     },
     features: {
       eyebrow: 'منهجية متكاملة',

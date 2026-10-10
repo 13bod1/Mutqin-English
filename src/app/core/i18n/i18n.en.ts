@@ -64,6 +64,9 @@ export const EN = {
       fluencyIndex: 'Fluency Confidence Index',
       playSample: 'Play sample audio',
       teacherPhoto: 'Instructor photo',
+      introVideoLabel: 'Introductory Video',
+      playIntro: 'Watch Introductory Video',
+      pauseIntro: 'Pause Video',
     },
     features: {
       eyebrow: 'Comprehensive pedagogy',
