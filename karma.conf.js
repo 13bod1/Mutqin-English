@@ -28,7 +28,7 @@ module.exports = function (config) {
       ]
     },
     reporters: ['progress', 'kjhtml'],
-    browsers: ['ChromeHeadless'],
+    browsers: ['ChromeHeadlessCI'],
     customLaunchers: {
       ChromeHeadlessCI: {
         base: 'ChromeHeadless',
@@ -36,9 +36,9 @@ module.exports = function (config) {
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-gpu',
-          '--no-first-run',
-          '--no-zygote',
-          '--single-process'
+          '--disable-dev-shm-usage',
+          '--disable-extensions',
+          '--no-first-run'
         ]
       }
     },
