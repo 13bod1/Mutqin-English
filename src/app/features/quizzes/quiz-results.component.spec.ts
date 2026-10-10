@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuizResultsComponent } from './quiz-results.component';
 import { QuizResult } from '../../core/models/quiz';
 

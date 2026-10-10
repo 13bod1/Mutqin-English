@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MediaComponent } from './media-placeholder.component';
 
 describe('MediaComponent', () => {

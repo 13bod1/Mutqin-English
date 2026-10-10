@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LecturePlayerComponent } from './lecture-player.component';
 import { FEATURED_LECTURE_MOCK } from '../../core/mock/lectures.mock';
 import { PdfNotesService } from '../../core/services/pdf-notes.service';

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuizRunnerComponent } from './quiz-runner.component';
 import { QUIZ_MODULES_MOCK, QUIZ_QUESTIONS_MOCK } from '../../core/mock/quizzes.mock';
 

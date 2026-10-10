@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { QuizService } from './quiz.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { ProgressService } from './progress.service';

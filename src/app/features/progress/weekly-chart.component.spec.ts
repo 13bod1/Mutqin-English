@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { WeeklyChartComponent } from './weekly-chart.component';
 
 describe('WeeklyChartComponent', () => {

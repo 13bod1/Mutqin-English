@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { LectureService, durationBucket, filterLectures } from './lecture.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { LECTURES_MOCK } from '../mock/lectures.mock';
@@ -89,7 +89,7 @@ describe('LectureService & Helper Functions', () => {
         description: { en: 'Word lists and idioms', ar: 'قوائم الكلمات' },
         unit: { en: 'Unit 2', ar: 'الوحدة 2' },
         stage: 'sec3',
-        topic: 'vocab',
+        topic: 'phrasal',
         durationMin: 40,
         instructor: { en: 'Mr. Adel', ar: 'أ. عادل' },
         resources: { en: 'PDF', ar: 'ملف PDF' },
@@ -99,28 +99,28 @@ describe('LectureService & Helper Functions', () => {
     ];
 
     it('should filter by query', () => {
-      const filters: LectureFilters = { query: 'grammar' };
+      const filters: LectureFilters = { query: 'grammar', stage: null, topic: null, duration: null };
       const filtered = filterLectures(mockLectures, filters, 'en');
       expect(filtered.length).toBe(1);
       expect(filtered[0].id).toBe('l1');
     });
 
     it('should filter by stage', () => {
-      const filters: LectureFilters = { query: '', stage: 'sec3' };
+      const filters: LectureFilters = { query: '', stage: 'sec3', topic: null, duration: null };
       const filtered = filterLectures(mockLectures, filters, 'en');
       expect(filtered.length).toBe(1);
       expect(filtered[0].id).toBe('l2');
     });
 
     it('should filter by topic', () => {
-      const filters: LectureFilters = { query: '', topic: 'grammar' };
+      const filters: LectureFilters = { query: '', stage: null, topic: 'grammar', duration: null };
       const filtered = filterLectures(mockLectures, filters, 'en');
       expect(filtered.length).toBe(1);
       expect(filtered[0].id).toBe('l1');
     });
 
     it('should filter by duration', () => {
-      const filters: LectureFilters = { query: '', duration: 'long' };
+      const filters: LectureFilters = { query: '', stage: null, topic: null, duration: 'long' };
       const filtered = filterLectures(mockLectures, filters, 'en');
       expect(filtered.length).toBe(1);
       expect(filtered[0].id).toBe('l2');

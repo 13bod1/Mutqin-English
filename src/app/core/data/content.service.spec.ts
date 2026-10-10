@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { ContentService } from './content.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { PLATFORM_STATS_MOCK, INSTRUCTOR_MOCK, TESTIMONIALS_MOCK } from '../mock/content.mock';

@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { AuthService, LoginRequest, SignupRequest } from './auth.service';
 import { SupabaseService } from '../supabase/supabase.service';
 
