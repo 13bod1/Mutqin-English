@@ -62,32 +62,35 @@ describe('AuthService', () => {
       next: (user) => {
         expect(user).toBeTruthy();
         expect(service.user()).toBeTruthy();
-        expect(service.user()?.email).toBe('student@example.com');
+        expect(service.user()?.email).toBe('test@example.com');
         done();
       },
     });
   });
 
-  it('should fallback to local demo user on login error if password is not wrongpass', (done) => {
-    supabaseMock.auth.signInWithPassword.and.returnValue(Promise.resolve({ data: { user: null }, error: new Error('Network error') }));
+  it('should reject login on Supabase auth error and not fallback to demo user', (done) => {
+    supabaseMock.auth.signInWithPassword.and.returnValue(Promise.resolve({ data: { user: null }, error: new Error('Invalid login credentials') }));
 
-    const req: LoginRequest = { email: 'offline@example.com', password: 'password123', remember: true };
+    const req: LoginRequest = { email: 'unregistered@example.com', password: 'password123', remember: true };
     service.login(req).subscribe({
-      next: (user) => {
-        expect(user).toBeTruthy();
-        expect(user.fullName).toBe('offline');
+      next: () => {
+        fail('should have failed login');
+      },
+      error: (err) => {
+        expect(err).toBeTruthy();
+        expect(service.user()).toBeNull();
         done();
       },
     });
   });
 
-  it('should throw error on wrongpass', (done) => {
+  it('should throw error on invalid credentials', (done) => {
     supabaseMock.auth.signInWithPassword.and.returnValue(Promise.resolve({ data: { user: null }, error: new Error('Invalid login credentials') }));
 
     const req: LoginRequest = { email: 'user@example.com', password: 'wrongpass', remember: false };
     service.login(req).subscribe({
       error: (err) => {
-        expect(err.message).toBe('invalid_credentials');
+        expect(err.message).toBe('Invalid login credentials');
         done();
       },
     });

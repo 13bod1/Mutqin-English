@@ -8,24 +8,19 @@ describe('ContentService', () => {
   let supabaseMock: any;
 
   beforeEach(() => {
+    const createChain = () => {
+      const chain: any = {
+        select: () => chain,
+        eq: () => chain,
+        order: () => Promise.resolve({ data: null, error: new Error('DB Error') }),
+        limit: () => chain,
+        single: () => Promise.resolve({ data: null, error: new Error('DB Error') }),
+        maybeSingle: () => Promise.resolve({ data: null, error: new Error('DB Error') }),
+      };
+      return chain;
+    };
     supabaseMock = {
-      from: jasmine.createSpy('from').and.callFake((table: string) => {
-        return {
-          select: () => ({
-            limit: () => ({
-              single: () => Promise.resolve({ data: null, error: new Error('DB Error') }),
-              maybeSingle: () => Promise.resolve({ data: null, error: new Error('DB Error') }),
-            }),
-            order: () => Promise.resolve({ data: null, error: new Error('DB Error') }),
-            eq: () => ({
-              limit: () => ({
-                single: () => Promise.resolve({ data: null, error: new Error('DB Error') }),
-                maybeSingle: () => Promise.resolve({ data: null, error: new Error('DB Error') }),
-              }),
-            }),
-          }),
-        };
-      }),
+      from: jasmine.createSpy('from').and.callFake(() => createChain()),
     };
 
     TestBed.configureTestingModule({

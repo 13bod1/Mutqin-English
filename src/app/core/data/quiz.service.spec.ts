@@ -93,7 +93,7 @@ describe('QuizService', () => {
     expect(result.total).toBe(2);
     expect(result.percent).toBe(100);
     expect(result.elapsedSec).toBe(45);
-    expect(result.xpEarned).toBe(20 + 50); // 2*10 + 50 bonus
-    expect(progressMock.recordQuizResult).toHaveBeenCalledWith(module.id, 2, 2, 100);
+    expect(result.xpEarned).toBe(150); // 2*25 + 25 completion + 75 perfect score
+    expect(progressMock.recordQuizResult).toHaveBeenCalledWith(module.id, 2, 2, 100, 150);
   });
 });

@@ -113,6 +113,10 @@
           "options": {
             "karmaConfig": "karma.conf.js",
             "tsConfig": "tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
             "inlineStyleLanguage": "scss",
             "assets": [
               {
@@ -123,6 +127,11 @@
             "styles": [
               "src/styles.scss"
             ]
+          },
+          "configurations": {
+            "ci": {
+              "watch": false
+            }
           }
         }
       }
