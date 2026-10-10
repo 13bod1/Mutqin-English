@@ -169,6 +169,7 @@ export const EN = {
         passwordWeak: 'Password must be 8+ characters with a number and a symbol.',
         mismatch: 'Passwords do not match.',
         terms: 'Please accept the terms to continue.',
+        general: 'Could not create account. The email may already be registered or invalid.',
       },
     },
   },

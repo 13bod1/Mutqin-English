@@ -40,6 +40,8 @@ export class SignupPage {
 
   protected readonly submitted = signal(false);
   protected readonly loading = signal(false);
+  protected readonly authError = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
   protected readonly showPassword = signal(false);
   protected readonly showConfirm = signal(false);
 
@@ -60,6 +62,8 @@ export class SignupPage {
 
   protected submit(): void {
     this.submitted.set(true);
+    this.authError.set(false);
+    this.errorMessage.set(null);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -68,11 +72,19 @@ export class SignupPage {
     this.loading.set(true);
     this.auth
       .signup({ fullName: v.fullName, stage: v.stage as AcademicStage, email: v.email, password: v.password })
-      .subscribe(() => {
-        this.loading.set(false);
-        this.router.navigateByUrl('/progress');
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.router.navigateByUrl('/progress');
+        },
+        error: (err: any) => {
+          this.loading.set(false);
+          this.authError.set(true);
+          this.errorMessage.set(err?.message || null);
+        },
       });
   }
+
 
   protected google(): void {
     this.auth.continueWithGoogle();

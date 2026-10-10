@@ -24,6 +24,7 @@ export class LoginPage {
   protected readonly submitted = signal(false);
   protected readonly loading = signal(false);
   protected readonly authError = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
   protected readonly showPassword = signal(false);
 
   protected showError(name: 'email' | 'password'): boolean {
@@ -34,6 +35,7 @@ export class LoginPage {
   protected submit(): void {
     this.submitted.set(true);
     this.authError.set(false);
+    this.errorMessage.set(null);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -44,12 +46,16 @@ export class LoginPage {
         this.loading.set(false);
         this.router.navigateByUrl('/progress');
       },
-      error: () => {
+      error: (err: any) => {
         this.loading.set(false);
         this.authError.set(true);
+        if (err?.message && !err.message.includes('Invalid login credentials')) {
+          this.errorMessage.set(err.message);
+        }
       },
     });
   }
+
 
   protected google(): void {
     this.auth.continueWithGoogle();

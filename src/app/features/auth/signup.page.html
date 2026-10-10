@@ -9,6 +9,19 @@
           <p class="mt-2 text-[0.9375rem] text-ink-body md:text-base">{{ 'auth.signup.subtitle' | t }}</p>
         </header>
 
+        @if (authError()) {
+          <div role="alert" class="mt-6 flex items-start gap-3 rounded-card border border-danger-line bg-danger-soft p-4 text-danger">
+            <lucide-icon name="circle-alert" [size]="18" class="mt-0.5 shrink-0" />
+            <div class="flex-1">
+              <p class="font-display text-sm font-bold">{{ 'auth.login.errorTitle' | t }}</p>
+              <p class="mt-0.5 text-sm leading-5">{{ errorMessage() || ('auth.signup.errors.general' | t) }}</p>
+            </div>
+            <button type="button" (click)="authError.set(false)" class="rounded p-0.5 hover:bg-danger/10" [attr.aria-label]="'auth.login.dismiss' | t">
+              <lucide-icon name="x" [size]="16" />
+            </button>
+          </div>
+        }
+
         <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="mt-8 space-y-6">
           <!-- Full name -->
           <div>

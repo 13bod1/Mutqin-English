@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, from, map, Observable, of } from 'rxjs';
+import { from, map, Observable } from 'rxjs';
 import { AcademicStage } from '../models/lecture';
 import { SupabaseService } from '../supabase/supabase.service';
 
@@ -67,8 +67,8 @@ export class AuthService {
 
   private async initUser() {
     try {
-      const { data } = await this.supabase.auth.getUser();
-      if (data?.user) {
+      const { data, error } = await this.supabase.auth.getUser();
+      if (!error && data?.user) {
         // Try getting profile from profiles table
         let realName = data.user.user_metadata?.['full_name'];
         let stage = data.user.user_metadata?.['stage'];
@@ -96,9 +96,14 @@ export class AuthService {
         };
         this.user.set(updated);
         this.saveStoredUser(updated);
+      } else {
+        // No active Supabase session — clear any stale local user
+        this.user.set(null);
+        this.saveStoredUser(null);
       }
     } catch {
-      // offline or unauthenticated
+      this.user.set(null);
+      this.saveStoredUser(null);
     }
 
     this.supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -114,7 +119,7 @@ export class AuthService {
         };
         this.user.set(updated);
         this.saveStoredUser(updated);
-      } else if (!this.getStoredUser()) {
+      } else {
         this.user.set(null);
         this.saveStoredUser(null);
       }
@@ -122,52 +127,29 @@ export class AuthService {
   }
 
   login(req: LoginRequest): Observable<AuthUser> {
+    const cleanEmail = req.email.trim();
     return from(
       this.supabase.auth.signInWithPassword({
-        email: req.email,
+        email: cleanEmail,
         password: req.password,
       })
     ).pipe(
       map(({ data, error }) => {
-        if (error) {
-          // If demo login with offline fallback
-          if (req.password !== 'wrongpass') {
-            const fallback: AuthUser = {
-              fullName: req.email.split('@')[0],
-              email: req.email,
-              initials: extractInitials(req.email.split('@')[0]),
-            };
-            this.user.set(fallback);
-            this.saveStoredUser(fallback);
-            return fallback;
-          }
-          throw error;
+        if (error || !data?.user) {
+          throw error || new Error('Invalid login credentials');
         }
 
         const name = data.user.user_metadata?.['full_name'] || data.user.email?.split('@')[0] || 'Student';
         const authUser: AuthUser = {
           id: data.user.id,
           fullName: name,
-          email: data.user.email || req.email,
+          email: data.user.email || cleanEmail,
           stage: data.user.user_metadata?.['stage'] as AcademicStage,
           initials: extractInitials(name),
         };
         this.user.set(authUser);
         this.saveStoredUser(authUser);
         return authUser;
-      }),
-      catchError((err) => {
-        if (req.password === 'wrongpass') {
-          throw new Error('invalid_credentials');
-        }
-        const fallback: AuthUser = {
-          fullName: req.email.split('@')[0],
-          email: req.email,
-          initials: extractInitials(req.email.split('@')[0]),
-        };
-        this.user.set(fallback);
-        this.saveStoredUser(fallback);
-        return of(fallback);
       })
     );
   }
@@ -175,10 +157,11 @@ export class AuthService {
   signup(req: SignupRequest): Observable<AuthUser> {
     const chosenName = req.fullName.trim();
     const initials = extractInitials(chosenName);
+    const cleanEmail = req.email.trim();
 
     return from(
       this.supabase.auth.signUp({
-        email: req.email,
+        email: cleanEmail,
         password: req.password,
         options: {
           data: {
@@ -189,24 +172,27 @@ export class AuthService {
       })
     ).pipe(
       map(({ data, error }) => {
-        const userId = data?.user?.id || 'usr_' + Date.now();
+        if (error || !data?.user) {
+          throw error || new Error('Signup failed');
+        }
+
         const authUser: AuthUser = {
-          id: userId,
+          id: data.user.id,
           fullName: chosenName,
-          email: req.email,
+          email: cleanEmail,
           stage: req.stage,
           initials,
         };
 
         // Try inserting into profiles table in background
-        if (data?.user?.id) {
+        if (data.user.id) {
           Promise.resolve(
             this.supabase.from('profiles').upsert({
               id: data.user.id,
               full_name_en: chosenName,
               full_name_ar: chosenName,
               initials: initials,
-              email: req.email,
+              email: cleanEmail,
               stage_en: req.stage,
               stage_ar: req.stage,
               city_en: 'Cairo',
@@ -220,21 +206,10 @@ export class AuthService {
         this.user.set(authUser);
         this.saveStoredUser(authUser);
         return authUser;
-      }),
-      catchError(() => {
-        const fallback: AuthUser = {
-          id: 'usr_' + Date.now(),
-          fullName: chosenName,
-          email: req.email,
-          stage: req.stage,
-          initials,
-        };
-        this.user.set(fallback);
-        this.saveStoredUser(fallback);
-        return of(fallback);
       })
     );
   }
+
 
   async continueWithGoogle(): Promise<void> {
     try {
