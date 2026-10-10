@@ -1,3 +1,5 @@
+process.env.CHROME_BIN = require('puppeteer')?.executablePath?.() || process.env.CHROME_BIN || require('karma-chrome-launcher').launcher.ChromeHeadless;
+
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -25,13 +27,21 @@ module.exports = function (config) {
       ]
     },
     reporters: ['progress', 'kjhtml'],
-    browsers: ['ChromeHeadless'],
+    browsers: ['ChromeHeadlessCI'],
     customLaunchers: {
       ChromeHeadlessCI: {
         base: 'ChromeHeadless',
-        flags: ['--no-sandbox', '--disable-gpu']
+        flags: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-gpu',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process'
+        ]
       }
     },
-    restartOnFileChange: true
+    singleRun: true,
+    restartOnFileChange: false
   });
 };

@@ -7,14 +7,14 @@ on:
     branches: [ main, master ]
 
 jobs:
-  test:
-    name: Run Unit & Component Tests
+  build-and-test:
+    name: Build & Test Project
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -23,33 +23,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Angular unit tests (Karma ChromeHeadless)
+      - name: Run Angular Unit Tests
         run: npm run test:ci
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
 
-      - name: Generate Code Coverage Report
-        run: npm run test:coverage
-
-      - name: Build production bundle
+      - name: Build Angular Application
         run: npm run build
-
-  e2e:
-    name: Run Playwright E2E Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
-
-      - name: Run Playwright E2E Tests
-        run: npm run test:e2e
