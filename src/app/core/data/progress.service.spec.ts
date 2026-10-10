@@ -71,11 +71,13 @@ describe('ProgressService', () => {
     });
   });
 
-  it('should return fallback leaderboard for guest user', (done) => {
+  it('should return leaderboard with Egyptian cohort and current user', (done) => {
     service.getLeaderboard().subscribe({
       next: (leaderboard) => {
         expect(leaderboard.length).toBeGreaterThan(0);
-        expect(leaderboard[0].isCurrentUser).toBeTrue();
+        const me = leaderboard.find(e => e.isCurrentUser);
+        expect(me).toBeTruthy();
+        expect(me!.xp).toBe(0);
         done();
       },
     });

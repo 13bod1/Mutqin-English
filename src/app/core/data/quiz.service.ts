@@ -82,17 +82,19 @@ export class QuizService {
     const correct = review.filter((r) => r.correct).length;
     const percent = questions.length ? Math.round((correct / questions.length) * 100) : 0;
 
-    // Record result in Supabase and award XP (async, non-blocking)
-    // Calculate XP locally for immediate display
-    let xpEarned = correct * 10;
-    if (percent >= 90) xpEarned += 50;
-    else if (percent >= 80) xpEarned += 25;
-    else if (percent >= 70) xpEarned += 10;
+    // Record result and award XP (async, non-blocking)
+    // Calculate XP locally for immediate display:
+    // 25 XP per correct answer + accuracy bonuses + completion bonus
+    let xpEarned = correct * 25;
+    if (percent === 100) xpEarned += 75;       // Perfect score bonus
+    else if (percent >= 85) xpEarned += 50;    // High accuracy bonus
+    else if (percent >= 70) xpEarned += 25;    // Passing bonus
+    if (correct > 0) xpEarned += 25;           // Completion bonus
 
-    this.progress.recordQuizResult(module.id, correct, questions.length, percent)
+    this.progress.recordQuizResult(module.id, correct, questions.length, percent, xpEarned)
       .then(xp => {
         if (xp > 0) {
-          console.log(`🏆 Earned ${xp} XP from quiz "${module.id}"`);
+          console.log(`🏆 Earned ${xp} XP from quiz "${module.id}" — your rank is updating!`);
         }
       })
       .catch(() => {});
