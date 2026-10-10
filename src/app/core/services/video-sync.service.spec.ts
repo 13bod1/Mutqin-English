@@ -24,11 +24,9 @@ describe('VideoSyncService', () => {
     spyOnProperty(video1, 'paused', 'get').and.returnValue(false);
     const pauseSpy = spyOn(video1, 'pause');
 
-    // Simulate play event on video2
-    const playEvent = new Event('play', { bubbles: true });
-    Object.defineProperty(playEvent, 'target', { value: video2, enumerable: true });
-
-    document.dispatchEvent(playEvent);
+    // Dispatch play event directly on video2 (capturing listener on document catches it)
+    const playEvent = new Event('play', { bubbles: true, cancelable: true });
+    video2.dispatchEvent(playEvent);
 
     expect(pauseSpy).toHaveBeenCalled();
 

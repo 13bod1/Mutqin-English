@@ -1,5 +1,3 @@
-process.env.CHROME_BIN = require('puppeteer')?.executablePath?.() || process.env.CHROME_BIN || require('karma-chrome-launcher').launcher.ChromeHeadless;
-
 module.exports = function (config) {
   config.set({
     basePath: '',

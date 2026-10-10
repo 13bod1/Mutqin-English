@@ -24,7 +24,7 @@ jobs:
         run: npm ci
 
       - name: Run Angular Unit Tests
-        run: npm run test:ci
+        run: npx ng test --watch=false --browsers=ChromeHeadlessCI
         env:
           CHROME_BIN: /usr/bin/google-chrome
 
