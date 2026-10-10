@@ -1,17 +1,19 @@
-process.env.CHROME_BIN = require('puppeteer').executablePath();
+// Karma configuration for @angular/build:karma (Angular 17+)
+// Do NOT require('@angular-devkit/build-angular/plugins/karma') here —
+// the @angular/build:karma builder injects its own plugin automatically.
 
 module.exports = function (config) {
   config.set({
     basePath: '',
-    frameworks: ['jasmine', '@angular-devkit/build-angular'],
+    frameworks: ['jasmine'],
     plugins: [
       require('karma-jasmine'),
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
-      require('karma-coverage'),
-      require('@angular-devkit/build-angular/plugins/karma')
+      require('karma-coverage')
     ],
     client: {
+      jasmine: {},
       clearContext: false
     },
     jasmineHtmlReporter: {
@@ -28,7 +30,7 @@ module.exports = function (config) {
     reporters: ['progress', 'kjhtml'],
     browsers: ['ChromeHeadless'],
     customLaunchers: {
-      ChromeHeadless: {
+      ChromeHeadlessCI: {
         base: 'ChromeHeadless',
         flags: [
           '--no-sandbox',
