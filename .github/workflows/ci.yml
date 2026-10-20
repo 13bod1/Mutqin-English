@@ -28,5 +28,12 @@ jobs:
         env:
           CHROME_BIN: /usr/bin/google-chrome
 
+      - name: Upload JUnit Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-test-results
+          path: test-reports/junit/
+
       - name: Build Angular Application
         run: npm run build
