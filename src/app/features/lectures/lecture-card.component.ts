@@ -1,4 +1,7 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../core/data/auth.service';
+import { CommerceService } from '../../core/data/commerce.service';
 import { LucideAngularModule } from 'lucide-angular';
 import { LocalizePipe, TranslatePipe } from '../../core/i18n/translate.pipe';
 import { Lecture } from '../../core/models/lecture';
@@ -6,7 +9,7 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
 
 @Component({
   selector: 'app-lecture-card',
-  imports: [LucideAngularModule, TranslatePipe, LocalizePipe],
+  imports: [RouterLink, LucideAngularModule, TranslatePipe, LocalizePipe],
   host: { class: 'block' },
   template: `
     <article class="card flex h-full flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lift border border-line/60">
@@ -19,7 +22,7 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
           controlsList="nodownload"
           preload="metadata"
           [controls]="isPlaying()"
-          [src]="lecture().videoUrl"
+          [src]="locked() ? null : lecture().videoUrl"
           (play)="isPlaying.set(true)"
           (pause)="isPlaying.set(false)"
           (ended)="isPlaying.set(false)"
@@ -34,8 +37,24 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
           {{ 'common.minutes' | t: { n: lecture().durationMin } }}
         </span>
 
-        <!-- Play overlay button -->
-        @if (!isPlaying()) {
+        @if (lecture().access?.type === 'free') {
+          <span class="tag pointer-events-none absolute end-3 top-3 z-10 bg-success-soft text-success">{{ 'access.free' | t }}</span>
+        }
+
+        <!-- Locked overlay (paid, or registered-only for guests) -->
+        @if (locked()) {
+          <div class="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-primary/90 to-[#2B1D19]/95 text-white">
+            <span class="grid h-12 w-12 place-items-center rounded-full border border-white/25 bg-white/10">
+              <lucide-icon name="lock" [size]="20" />
+            </span>
+            @if (lecture().access?.type === 'paid') {
+              <span class="font-display text-lg font-bold">{{ 'access.price' | t: { n: lecture().access?.priceEgp ?? 0 } }}</span>
+              <span class="text-xs text-white/75">{{ 'access.buyOnce' | t }}</span>
+            } @else {
+              <span class="font-display text-sm font-semibold">{{ 'access.registeredOnly' | t }}</span>
+            }
+          </div>
+        } @else if (!isPlaying()) {
           <div
             (click)="togglePlay(cardVideo)"
             class="absolute inset-0 z-20 flex cursor-pointer items-center justify-center bg-black/35 backdrop-blur-[1px] transition-all hover:bg-black/20"
@@ -60,14 +79,26 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
           <span class="flex items-center gap-1"><lucide-icon name="file-text" [size]="13" />{{ lecture().resources | loc }}</span>
         </div>
 
-        <button type="button" (click)="onWatch(cardVideo)" class="btn btn-primary mt-4 w-full">
-          <lucide-icon name="circle-play" [size]="16" />
-          {{ 'lectures.catalog.watch' | t }}
-        </button>
-        <button type="button" (click)="downloadPdf()" class="btn btn-soft mt-2 w-full">
-          <lucide-icon name="download" [size]="14" />
-          Download Notes
-        </button>
+        @if (!locked()) {
+          <button type="button" (click)="onWatch(cardVideo)" class="btn btn-primary mt-4 w-full">
+            <lucide-icon name="circle-play" [size]="16" />
+            {{ 'lectures.catalog.watch' | t }}
+          </button>
+          <button type="button" (click)="downloadPdf()" class="btn btn-soft mt-2 w-full">
+            <lucide-icon name="download" [size]="14" />
+            {{ 'access.downloadNotes' | t }}
+          </button>
+        } @else if (lecture().access?.type === 'paid' && auth.user()) {
+          <a [routerLink]="['/checkout', 'lecture', lecture().id]" class="btn btn-primary mt-4 w-full">
+            <lucide-icon name="lock-open" [size]="16" />
+            {{ 'access.unlock' | t: { n: lecture().access?.priceEgp ?? 0 } }}
+          </a>
+        } @else {
+          <a routerLink="/login" class="btn btn-primary mt-4 w-full">
+            <lucide-icon name="lock" [size]="16" />
+            {{ 'access.loginToWatch' | t }}
+          </a>
+        }
       </div>
     </article>
   `,
@@ -77,6 +108,9 @@ export class LectureCardComponent {
   readonly watch = output<Lecture>();
   protected readonly isPlaying = signal(false);
   private readonly pdfNotes = inject(PdfNotesService);
+  private readonly commerce = inject(CommerceService);
+  protected readonly auth = inject(AuthService);
+  protected readonly locked = computed(() => !this.commerce.canAccess(this.lecture().access, 'lecture', this.lecture().id));
 
   protected downloadPdf(): void {
     const lec = this.lecture();

@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
-/** Mutqin English brand mark — the single logo used across all pages. */
+/** Mr. Adel Mostafa brand mark — the single logo used across all pages. */
 @Component({
   selector: 'app-logo',
   imports: [RouterLink, LucideAngularModule, TranslatePipe],

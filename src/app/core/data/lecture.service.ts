@@ -36,6 +36,9 @@ export class LectureService {
           order: l.sort_order,
           thumbnailUrl: l.thumbnail_url ?? undefined,
           videoUrl: l.video_url || RECORDED_LECTURE_VIDEOS[idx % RECORDED_LECTURE_VIDEOS.length],
+          access: l.access_type
+            ? { type: l.access_type, priceEgp: l.price_egp ?? undefined }
+            : undefined,
         }));
       }),
       catchError(() => of(LECTURES_MOCK))

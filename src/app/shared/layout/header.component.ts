@@ -135,6 +135,7 @@ export class HeaderComponent {
   protected readonly nav: NavItem[] = [
     { path: '/', key: 'nav.home', exact: true },
     { path: '/lectures', key: 'nav.lectures' },
+    { path: '/live', key: 'nav.live' },
     { path: '/quizzes', key: 'nav.quizzes' },
     { path: '/progress', key: 'nav.progress' },
   ];

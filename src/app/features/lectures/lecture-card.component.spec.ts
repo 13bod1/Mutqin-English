@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { LectureCardComponent } from './lecture-card.component';
 import { LECTURES_MOCK } from '../../core/mock/lectures.mock';
 import { PdfNotesService } from '../../core/services/pdf-notes.service';
@@ -17,6 +18,7 @@ describe('LectureCardComponent', () => {
       imports: [LectureCardComponent],
       providers: [
         { provide: PdfNotesService, useValue: pdfNotesMock },
+        provideRouter([]),
       ],
     }).compileComponents();
 

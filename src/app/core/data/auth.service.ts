@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { from, map, Observable } from 'rxjs';
 import { AcademicStage } from '../models/lecture';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -22,7 +22,11 @@ export interface AuthUser {
   email: string;
   stage?: AcademicStage;
   initials?: string;
+  /** From profiles.role — 'admin' and 'assistant' can open /admin. Enforced server-side by RLS. */
+  role?: UserRole;
 }
+
+export type UserRole = 'student' | 'assistant' | 'admin';
 
 const STORAGE_KEY = 'mutqin_auth_user';
 
@@ -39,6 +43,10 @@ function extractInitials(name: string): string {
 export class AuthService {
   private readonly supabase = inject(SupabaseService);
   readonly user = signal<AuthUser | null>(this.getStoredUser());
+  readonly isStaff = computed(() => {
+    const role = this.user()?.role;
+    return role === 'admin' || role === 'assistant';
+  });
 
   constructor() {
     this.initUser();
@@ -72,6 +80,7 @@ export class AuthService {
         // Try getting profile from profiles table
         let realName = data.user.user_metadata?.['full_name'];
         let stage = data.user.user_metadata?.['stage'];
+        let role: UserRole | undefined;
 
         try {
           const { data: prof } = await this.supabase
@@ -84,6 +93,7 @@ export class AuthService {
             realName = prof.full_name_en || prof.full_name_ar;
             stage = prof.stage_en || stage;
           }
+          role = prof?.role ?? undefined;
         } catch {}
 
         const finalName = realName || data.user.email?.split('@')[0] || 'Student';
@@ -93,6 +103,7 @@ export class AuthService {
           email: data.user.email || '',
           stage: stage as AcademicStage,
           initials: extractInitials(finalName),
+          role,
         };
         this.user.set(updated);
         this.saveStoredUser(updated);
@@ -116,6 +127,7 @@ export class AuthService {
           email: session.user.email || '',
           stage: (session.user.user_metadata?.['stage'] as AcademicStage) || 'sec3',
           initials: extractInitials(name),
+          role: this.user()?.id === session.user.id ? this.user()?.role : undefined,
         };
         this.user.set(updated);
         this.saveStoredUser(updated);

@@ -233,8 +233,8 @@ export class PdfNotesService {
 <body>
   <div class="header">
     <div class="logo-row">
-      <div class="logo-badge">MUTQIN</div>
-      <div class="logo-sub">متقن إنجليزي · Study Notes</div>
+      <div class="logo-badge">MR. ADEL</div>
+      <div class="logo-sub">مستر عادل مصطفى · Study Notes</div>
     </div>
     <h1>${notes.title}</h1>
     <p class="subtitle">${notes.subtitle}</p>
@@ -248,7 +248,7 @@ export class PdfNotesService {
   ${sectionsHtml}
 
   <div class="footer">
-    <span>© Mutqin English · mutqin-english-amber.vercel.app</span>
+    <span>© Mr. Adel Mostafa · mutqin-english-amber.vercel.app</span>
     <span>Generated: ${new Date().toLocaleString('en-GB')}</span>
   </div>
 </body>

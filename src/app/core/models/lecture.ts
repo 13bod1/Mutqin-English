@@ -1,3 +1,4 @@
+import { Access } from './commerce';
 import { LocalizedText } from './localized';
 
 export type AcademicStage = 'prep' | 'sec1' | 'sec2' | 'sec3' | 'university';
@@ -18,6 +19,8 @@ export interface Lecture {
   order: number;
   thumbnailUrl?: string;
   videoUrl?: string;
+  /** Free, included for registered students (default) or paid individually. */
+  access?: Access;
 }
 
 /** A lecture the signed-in student has started (GET /api/me/continue-watching). */

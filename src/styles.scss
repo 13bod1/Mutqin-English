@@ -160,6 +160,105 @@ lucide-icon > svg {
     @apply h-full rounded-full bg-primary transition-[width] duration-500;
   }
 
+  /* Sprint 2: payments, live, admin */
+  .btn-danger {
+    @apply bg-danger text-white hover:bg-danger/90;
+  }
+  .btn-danger-soft {
+    @apply border border-danger-line bg-danger-soft text-danger hover:bg-danger/10;
+  }
+  .btn-success {
+    @apply bg-success-mid text-white shadow-btn hover:bg-success;
+  }
+  .btn-success-soft {
+    @apply bg-success-soft text-success hover:bg-success/15;
+  }
+  .btn-live {
+    @apply bg-red-600 text-white shadow-btn hover:bg-red-700;
+  }
+  .btn-icon {
+    @apply grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-line bg-white text-ink-soft transition hover:border-primary/40 hover:text-ink;
+  }
+  .input-plain {
+    @apply ps-4;
+  }
+  .kv-box {
+    @apply space-y-3 rounded-card border border-line/60 bg-surface-warm p-4 text-sm sm:p-5;
+  }
+  .kv {
+    @apply flex items-start justify-between gap-4;
+  }
+  .kv > :first-child {
+    @apply text-ink-body;
+  }
+  .kv > :last-child {
+    @apply text-end font-display font-semibold text-ink;
+  }
+  .note {
+    @apply flex items-start gap-3 rounded-card p-4 text-[0.8125rem] leading-5;
+  }
+  .tone-success { @apply bg-success-soft text-success; }
+  .tone-danger { @apply bg-danger-soft text-danger; }
+  .tone-warning { @apply bg-amber-soft text-amber; }
+  .tone-gold { @apply bg-gold-soft text-gold-dark; }
+  .tone-neutral { @apply bg-surface-tint3 text-ink-muted; }
+  .tone-brand { @apply bg-surface-tint text-ink-soft; }
+  .stat-card {
+    @apply card flex flex-col gap-3 p-5;
+  }
+  .stat-label {
+    @apply font-display text-xs font-semibold uppercase tracking-[0.06em] text-ink-soft;
+  }
+  html[lang='ar'] .stat-label {
+    @apply tracking-normal;
+  }
+  .stat-value {
+    @apply font-display text-[1.75rem] font-bold leading-9 text-ink;
+  }
+  .icon-tile {
+    @apply grid h-10 w-10 shrink-0 place-items-center rounded-card bg-surface-tint text-primary;
+  }
+  .seg {
+    @apply inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-line bg-white p-1;
+  }
+  .seg > * {
+    @apply whitespace-nowrap rounded-full px-4 py-1.5 font-display text-[0.8125rem] font-semibold text-ink-body transition hover:text-ink;
+  }
+  .seg > .seg-on {
+    @apply bg-primary text-white hover:text-white;
+  }
+  .table-wrap {
+    @apply card relative overflow-x-auto p-0;
+  }
+  .table {
+    @apply w-full min-w-[720px] border-collapse text-sm;
+  }
+  .table th {
+    @apply whitespace-nowrap border-b border-line/60 bg-surface-warm px-5 py-3 text-start font-display text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ink-soft;
+  }
+  html[lang='ar'] .table th {
+    @apply tracking-normal;
+  }
+  .table td {
+    @apply border-b border-line/60 px-5 py-3.5 align-middle text-ink-body;
+  }
+  .table tr:last-child td {
+    @apply border-b-0;
+  }
+  .switch {
+    @apply relative inline-flex h-[22px] w-10 shrink-0 cursor-pointer items-center rounded-full bg-line p-0.5 transition;
+  }
+  .switch[aria-checked='true'] {
+    @apply bg-primary;
+  }
+  .switch::after {
+    content: '';
+    @apply h-[18px] w-[18px] rounded-full bg-white shadow transition-transform;
+  }
+  .switch[aria-checked='true']::after {
+    @apply translate-x-[18px] rtl:-translate-x-[18px];
+  }
+
   .banner-gradient {
     background-image: linear-gradient(135deg, #4e342e 0%, #6d4c41 55%, #8d6e63 100%);
   }

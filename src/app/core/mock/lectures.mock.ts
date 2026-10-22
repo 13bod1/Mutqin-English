@@ -32,6 +32,7 @@ export const LECTURES_MOCK: Lecture[] = [
   },
   {
     id: 'l2',
+    access: { type: 'free' },
     order: 2,
     stage: 'university',
     topic: 'phonetics',
@@ -70,6 +71,7 @@ export const LECTURES_MOCK: Lecture[] = [
   },
   {
     id: 'l4',
+    access: { type: 'paid', priceEgp: 150 },
     order: 4,
     stage: 'sec3',
     topic: 'exam',
@@ -127,6 +129,7 @@ export const LECTURES_MOCK: Lecture[] = [
   },
   {
     id: 'l7',
+    access: { type: 'paid', priceEgp: 200 },
     order: 7,
     stage: 'sec1',
     topic: 'phrasal',

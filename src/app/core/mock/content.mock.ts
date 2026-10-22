@@ -58,8 +58,8 @@ export const TESTIMONIALS_MOCK: Testimonial[] = [
     location: { en: 'Riyadh, Saudi Arabia', ar: 'الرياض، السعودية' },
     rating: 5,
     quote: {
-      en: 'Mutqin English treated me like an adult learner. Instead of childish drills, we worked on real business communication, and I landed a senior role at a multinational agency.',
-      ar: 'تعامل معي متقن إنجليش كمتعلم ناضج. بدل التمارين الطفولية، عملنا على تواصل حقيقي في بيئة العمل، وحصلت على وظيفة قيادية في شركة دولية.',
+      en: 'Mr. Adel treated me like an adult learner. Instead of childish drills, we worked on real business communication, and I landed a senior role at a multinational agency.',
+      ar: 'تعامل معي مستر عادل كمتعلم ناضج. بدل التمارين الطفولية، عملنا على تواصل حقيقي في بيئة العمل، وحصلت على وظيفة قيادية في شركة دولية.',
     },
   },
 ];

@@ -1,14 +1,17 @@
+import { EN_S2 } from './i18n.s2.en';
+
 /** English UI copy. Keys must stay in sync with i18n.ar.ts. */
 export const EN = {
   brand: {
-    name: 'Mutqin English',
-    academy: 'Mutqin English Academy',
+    name: 'Mr. Adel Mostafa',
+    academy: 'Mr. Adel Mostafa Academy',
     tagline: 'English Academy',
   },
   nav: {
     home: 'Home',
     lectures: 'Recorded Lectures',
     quizzes: 'Quizzes & Exercises',
+    live: 'Live Sessions',
     progress: 'Progress',
     login: 'Log In',
     signup: 'Sign Up',
@@ -29,6 +32,8 @@ export const EN = {
     required: 'Required',
     or: 'or',
     placeholderImage: 'Image placeholder',
+    teacher: 'Mr. Adel Mostafa',
+    close: 'Close',
   },
   footer: {
     description:
@@ -46,7 +51,7 @@ export const EN = {
     youtube: 'YouTube channel',
     podcast: 'Language podcast',
     email: 'Email support',
-    rights: '© {year} Mutqin English Academy. All rights reserved.',
+    rights: '© {year} Mr. Adel Mostafa Academy. All rights reserved.',
   },
   landing: {
     hero: {
@@ -423,10 +428,24 @@ export const EN = {
     quizzes: 'Quizzes & Exercises',
     progress: 'My Progress',
     notFound: 'Page not found',
+    live: 'Live Sessions',
+    studio: 'Live Studio',
+    checkout: 'Checkout',
+    admin: {
+      dashboard: 'Admin · Dashboard',
+      users: 'Admin · Users',
+      lectures: 'Admin · Lectures',
+      live: 'Admin · Live Sessions',
+      payments: 'Admin · Payments',
+      announcements: 'Admin · Announcements',
+      metrics: 'Admin · Assistant Metrics',
+      settings: 'Admin · Settings',
+    },
   },
   notFound: {
     title: 'Page not found',
     text: "The page you're looking for doesn't exist or is coming soon.",
     back: 'Back to home',
   },
+  ...EN_S2,
 };

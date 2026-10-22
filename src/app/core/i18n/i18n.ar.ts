@@ -1,18 +1,20 @@
 import { EN } from './i18n.en';
+import { AR_S2 } from './i18n.s2.ar';
 
 type Dictionary<T> = { [K in keyof T]: T[K] extends string ? string : Dictionary<T[K]> };
 
 /** Arabic UI copy. Typed against EN so a missing key fails the build. */
 export const AR: Dictionary<typeof EN> = {
   brand: {
-    name: 'متقن إنجليش',
-    academy: 'أكاديمية متقن إنجليش',
+    name: 'مستر عادل مصطفى',
+    academy: 'أكاديمية مستر عادل مصطفى',
     tagline: 'أكاديمية اللغة الإنجليزية',
   },
   nav: {
     home: 'الرئيسية',
     lectures: 'المحاضرات المسجلة',
     quizzes: 'الاختبارات والتمارين',
+    live: 'الحصص المباشرة',
     progress: 'تقدّمي',
     login: 'تسجيل الدخول',
     signup: 'إنشاء حساب',
@@ -33,6 +35,8 @@ export const AR: Dictionary<typeof EN> = {
     required: 'مطلوب',
     or: 'أو',
     placeholderImage: 'صورة مؤقتة',
+    teacher: 'مستر عادل مصطفى',
+    close: 'إغلاق',
   },
   footer: {
     description:
@@ -50,7 +54,7 @@ export const AR: Dictionary<typeof EN> = {
     youtube: 'قناة يوتيوب',
     podcast: 'بودكاست اللغة',
     email: 'الدعم عبر البريد',
-    rights: '© {year} أكاديمية متقن إنجليش. جميع الحقوق محفوظة.',
+    rights: '© {year} أكاديمية مستر عادل مصطفى. جميع الحقوق محفوظة.',
   },
   landing: {
     hero: {
@@ -425,10 +429,24 @@ export const AR: Dictionary<typeof EN> = {
     quizzes: 'الاختبارات والتمارين',
     progress: 'تقدّمي',
     notFound: 'الصفحة غير موجودة',
+    live: 'الحصص المباشرة',
+    studio: 'استوديو البث',
+    checkout: 'الدفع',
+    admin: {
+      dashboard: 'الإدارة · الرئيسية',
+      users: 'الإدارة · المستخدمون',
+      lectures: 'الإدارة · المحاضرات',
+      live: 'الإدارة · الحصص المباشرة',
+      payments: 'الإدارة · المدفوعات',
+      announcements: 'الإدارة · الإعلانات',
+      metrics: 'الإدارة · أداء المساعدين',
+      settings: 'الإدارة · الإعدادات',
+    },
   },
   notFound: {
     title: 'الصفحة غير موجودة',
     text: 'الصفحة التي تبحث عنها غير موجودة أو ستتوفر قريبًا.',
     back: 'العودة للرئيسية',
   },
+  ...AR_S2,
 };

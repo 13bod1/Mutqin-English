@@ -1,0 +1,100 @@
+import {
+  AcademySettings,
+  AdminLecture,
+  AdminPayment,
+  AdminStudent,
+  Announcement,
+  AssistantMetric,
+  StaffMember,
+} from '../models/admin';
+
+/** Placeholder admin data — realistic for a 400-seat academy (Oct 2026). */
+export const STUDENTS_MOCK: AdminStudent[] = [
+  { id: 'u1', name: 'Nour Saeed', email: 'nour.saeed@gmail.com', stage: 'sec3', joinedAt: '2026-09-12', lecturesDone: 34, lecturesTotal: 40, avgScore: 92, status: 'active' },
+  { id: 'u2', name: 'Youssef Hany', email: 'youssef.h@gmail.com', stage: 'sec3', joinedAt: '2026-09-14', lecturesDone: 29, lecturesTotal: 40, avgScore: 85, status: 'active' },
+  { id: 'u3', name: 'Mariam Ali', email: 'mariam.ali@yahoo.com', stage: 'sec2', joinedAt: '2026-09-18', lecturesDone: 22, lecturesTotal: 36, avgScore: 88, status: 'active' },
+  { id: 'u4', name: 'Karim Samy', email: 'karim.samy@gmail.com', stage: 'sec3', joinedAt: '2026-10-02', lecturesDone: 9, lecturesTotal: 40, avgScore: 61, status: 'active' },
+  { id: 'u5', name: 'Habiba Mahmoud', email: 'habiba.m@gmail.com', stage: 'sec1', joinedAt: '2026-10-05', lecturesDone: 6, lecturesTotal: 30, avgScore: 74, status: 'invited' },
+  { id: 'u6', name: 'Omar Tarek', email: 'omar.tarek@example.com', stage: 'sec3', joinedAt: '2026-10-09', lecturesDone: 15, lecturesTotal: 40, avgScore: 79, status: 'active' },
+  { id: 'u7', name: 'Salma Adel', email: 'salma.adel@gmail.com', stage: 'prep', joinedAt: '2026-10-11', lecturesDone: 3, lecturesTotal: 24, avgScore: null, status: 'suspended' },
+  { id: 'u8', name: 'Ahmed Fawzy', email: 'ahmed.fawzy@gmail.com', stage: 'sec2', joinedAt: '2026-10-14', lecturesDone: 11, lecturesTotal: 36, avgScore: 83, status: 'active' },
+];
+
+export const STAFF_MOCK: StaffMember[] = [
+  { id: 's0', name: 'Mr. Adel Mostafa', email: 'adel@adelmostafa.com', initials: 'AM', role: 'owner', scopes: [] },
+  { id: 's1', name: 'Sara Hassan', email: 'sara@adelmostafa.com', initials: 'SH', role: 'assistant', scopes: ['payments', 'qa'] },
+  { id: 's2', name: 'Ahmed Kamal', email: 'ahmed.k@adelmostafa.com', initials: 'AK', role: 'assistant', scopes: ['qa'] },
+  { id: 's3', name: 'Mona Fathy', email: 'mona@adelmostafa.com', initials: 'MF', role: 'assistant', scopes: ['payments'] },
+  { id: 's4', name: 'Khaled Reda', email: 'khaled@adelmostafa.com', initials: 'KR', role: 'assistant', scopes: ['chat'] },
+];
+
+const AG = { en: 'Live · Advanced Grammar', ar: 'بث مباشر · قواعد متقدمة' };
+const RS = { en: 'Live · Reading Skills', ar: 'بث مباشر · مهارات القراءة' };
+const ESSAY = { en: 'Lecture · Opinion Essays', ar: 'محاضرة · مقال الرأي' };
+
+export const PAYMENTS_MOCK: AdminPayment[] = [
+  { id: 'p1', student: 'Mariam Ali', initials: 'MA', email: 'mariam.ali@yahoo.com', kind: 'live', item: AG, method: 'instapay', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-22T18:30:00Z', status: 'pending', reference: 'IP-88412097', senderPhone: '010 1234 5678', receiptFile: 'instapay-receipt-0411.jpg' },
+  { id: 'p2', student: 'Karim Samy', initials: 'KS', email: 'karim.samy@gmail.com', kind: 'live', item: AG, method: 'vodafone', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-22T17:12:00Z', status: 'pending', reference: 'VC-55120934', senderPhone: '011 9876 5432', receiptFile: 'vodafone-cash.png' },
+  { id: 'p3', student: 'Ahmed Fawzy', initials: 'AF', email: 'ahmed.fawzy@gmail.com', kind: 'lecture', item: ESSAY, method: 'instapay', amountEgp: 150, expectedEgp: 200, submittedAt: '2026-10-22T09:05:00Z', status: 'pending', reference: 'IP-88301122', senderPhone: '012 2222 3344', receiptFile: 'receipt.pdf' },
+  { id: 'p4', student: 'Nour Saeed', initials: 'NS', email: 'nour.saeed@gmail.com', kind: 'live', item: AG, method: 'card', methodDetail: 'Visa •••• 4242', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-22T16:05:00Z', status: 'paid', reference: 'ME-2026-10-04821' },
+  { id: 'p5', student: 'Youssef Hany', initials: 'YH', email: 'youssef.h@gmail.com', kind: 'live', item: RS, method: 'instapay', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-21T19:41:00Z', status: 'approved', reference: 'IP-87990013' },
+  { id: 'p6', student: 'Habiba Mahmoud', initials: 'HM', email: 'habiba.m@gmail.com', kind: 'live', item: RS, method: 'vodafone', amountEgp: 300, expectedEgp: 350, submittedAt: '2026-10-21T14:20:00Z', status: 'rejected', reference: 'VC-55011876', note: 'Amount doesn’t match the session fee' },
+  { id: 'p7', student: 'Omar Tarek', initials: 'OT', email: 'omar.tarek@example.com', kind: 'live', item: AG, method: 'card', methodDetail: 'Card', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-20T18:14:00Z', status: 'failed', reference: 'ME-2026-10-04822' },
+  { id: 'p8', student: 'Salma Adel', initials: 'SA', email: 'salma.adel@gmail.com', kind: 'live', item: AG, method: 'instapay', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-19T12:00:00Z', status: 'pending', reference: 'IP-87990013', senderPhone: '015 5555 0101', receiptFile: 'screenshot.jpg', duplicateOf: 'Youssef Hany · 21 Oct' },
+];
+
+export const ADMIN_LECTURES_MOCK: AdminLecture[] = [
+  { id: 'l1', title: { en: 'Advanced Collocations for Thanawya Amma', ar: 'متلازمات متقدمة للثانوية العامة' }, topic: 'grammar', stage: 'sec3', durationMin: 24, views: 1204, state: 'published', access: { type: 'included' } },
+  { id: 'l2', title: { en: 'The Schwa /ə/ and Stress Patterns', ar: 'صوت الشوا وأنماط النبر' }, topic: 'phonetics', stage: 'university', durationMin: 19, views: 986, state: 'published', access: { type: 'free' } },
+  { id: 'l4', title: { en: 'Reading Skills: Skimming & Scanning', ar: 'مهارات القراءة: القراءة السريعة والمسح' }, topic: 'exam', stage: 'sec2', durationMin: 35, views: 744, state: 'published', access: { type: 'paid', priceEgp: 150 } },
+  { id: 'l10', title: { en: 'Essay Writing: Opinion Essays', ar: 'كتابة المقال: مقال الرأي' }, topic: 'exam', stage: 'sec3', durationMin: null, views: null, state: 'processing', access: { type: 'paid', priceEgp: 200 }, uploadPercent: 64 },
+  { id: 'l11', title: { en: 'Phrasal Verbs with “get”', ar: 'الأفعال المركبة مع get' }, topic: 'phrasal', stage: 'sec1', durationMin: 27, views: null, state: 'scheduled', access: { type: 'included' }, publishAt: '2026-10-25T16:00:00Z' },
+  { id: 'l12', title: { en: 'Passive Voice Review', ar: 'مراجعة المبني للمجهول' }, topic: 'grammar', stage: 'prep', durationMin: 31, views: null, state: 'draft', access: { type: 'included' } },
+];
+
+export const ANNOUNCEMENTS_MOCK: Announcement[] = [
+  { id: 'a1', icon: 'radio', title: 'Live session this Thursday 🎙️', body: 'Advanced Grammar: Conditionals & Inversions — Thu 5 Nov, 7:00 PM. Enroll before Wednesday to secure your seat.', audience: 'sec3', channels: ['inApp', 'email'], state: 'scheduled', at: '2026-10-31T08:00:00Z' },
+  { id: 'a2', icon: 'megaphone', title: 'New lecture: Mixed Conditionals', body: 'The new recorded lecture is live in your library with a 15-question quiz.', audience: 'all', channels: ['inApp'], state: 'sent', at: '2026-10-21T15:00:00Z', seen: 268, reach: 347 },
+  { id: 'a3', icon: 'pin', title: 'Midterm revision plan', body: 'Week-by-week plan for Secondary 3 midterms, with links to lectures.', audience: 'sec3', channels: ['inApp', 'email'], state: 'sent', pinned: true, at: '2026-10-15T10:00:00Z', seen: 201, reach: 214 },
+  { id: 'a4', icon: 'circle-alert', title: 'Payment reminder', body: 'Manual transfers must include the reference number to be approved.', audience: 'pending', channels: ['inApp'], state: 'sent', at: '2026-10-10T12:00:00Z', seen: 12, reach: 14 },
+  { id: 'a5', icon: 'square-pen', title: 'Holiday schedule', body: 'Support desk hours during the 6 October holiday…', audience: 'all', channels: ['inApp'], state: 'draft', at: '2026-10-20T09:00:00Z' },
+];
+
+export const ASSISTANT_METRICS_MOCK: AssistantMetric[] = [
+  { id: 's1', name: 'Sara Hassan', initials: 'SH', scopes: ['qa', 'payments'], questions: 214, receipts: 63, avgResponse: { en: '38 min', ar: '38 دقيقة' }, rating: 4.9, presence: 'online' },
+  { id: 's2', name: 'Ahmed Kamal', initials: 'AK', scopes: ['qa'], questions: 188, receipts: null, avgResponse: { en: '52 min', ar: '52 دقيقة' }, rating: 4.7, presence: 'online' },
+  { id: 's3', name: 'Mona Fathy', initials: 'MF', scopes: ['payments'], questions: 41, receipts: 97, avgResponse: { en: '1h 10m', ar: 'ساعة و10 د' }, rating: 4.8, presence: 'away' },
+  { id: 's4', name: 'Khaled Reda', initials: 'KR', scopes: ['chat'], questions: 132, receipts: null, avgResponse: { en: '4 min (live)', ar: '4 د (مباشر)' }, rating: 4.6, presence: 'offline' },
+];
+
+/** Questions answered / receipts reviewed, Sat → Fri (17–23 Oct 2026). */
+export const WEEKLY_ACTIVITY_MOCK = {
+  questions: [42, 58, 61, 49, 73, 88, 12],
+  receipts: [9, 14, 11, 8, 16, 19, 2],
+};
+
+/** Paid enrollments per week, last 12 weeks. */
+export const ENROLLMENTS_MOCK = [22, 31, 28, 40, 36, 52, 47, 61, 58, 66, 72, 69];
+
+export const SETTINGS_MOCK: AcademySettings = {
+  name: 'Mr. Adel Mostafa',
+  whatsapp: '+20 10 2345 6789',
+  supportEmail: 'support@adelmostafa.com',
+  supportHours: 'Sat – Thu · 9:00 AM – 8:00 PM',
+  defaultLivePriceEgp: 350,
+  defaultLectureAccess: 'included',
+  defaultLecturePriceEgp: 150,
+  seatHoldMinutes: 15,
+  providerConnected: false,
+  manualEnabled: true,
+  instapayAddress: 'adelmostafa@instapay',
+  vodafoneNumber: '010 2345 6789',
+  flagDuplicates: true,
+  muxConnected: false,
+  maxViewers: 400,
+  joinOpensMin: 10,
+  recordReplays: true,
+  slowMode: false,
+  defaultLang: 'en',
+  showLangSwitch: true,
+};
