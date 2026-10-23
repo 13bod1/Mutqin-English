@@ -83,6 +83,7 @@ export const PAYMENT_SETTINGS_MOCK: PaymentSettings = {
   manualEnabled: true,
   instapayAddress: 'adelmostafa@instapay',
   vodafoneNumber: '010 2345 6789',
+  etisalatNumber: '01100764511',
   seatHoldMinutes: 15,
   defaultLivePriceEgp: 350,
 };

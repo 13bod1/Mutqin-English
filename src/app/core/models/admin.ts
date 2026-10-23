@@ -46,6 +46,7 @@ export interface AdminPayment {
   reference: string;
   senderPhone?: string;
   receiptFile?: string;
+  receiptFiles?: string[];
   duplicateOf?: string;
   note?: string;
 }
@@ -93,6 +94,18 @@ export interface AssistantMetric {
   presence: 'online' | 'away' | 'offline';
 }
 
+export type SiteTheme = 'light' | 'dark' | 'system';
+
+export interface PopupMessageSettings {
+  enabled: boolean;
+  title: string;
+  message: string;
+  type: 'info' | 'announcement' | 'warning' | 'success';
+  dismissible: boolean;
+  linkText?: string;
+  linkUrl?: string;
+}
+
 export interface AcademySettings {
   name: string;
   whatsapp: string;
@@ -106,6 +119,7 @@ export interface AcademySettings {
   manualEnabled: boolean;
   instapayAddress: string;
   vodafoneNumber: string;
+  etisalatNumber: string;
   flagDuplicates: boolean;
   muxConnected: boolean;
   maxViewers: number;
@@ -114,4 +128,6 @@ export interface AcademySettings {
   slowMode: boolean;
   defaultLang: 'en' | 'ar';
   showLangSwitch: boolean;
+  theme: SiteTheme;
+  popupMessage: PopupMessageSettings;
 }

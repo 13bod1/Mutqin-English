@@ -62,6 +62,11 @@ import { TranslatePipe } from '../../core/i18n/translate.pipe';
           </label>
         </div>
         <div class="flex shrink-0 items-center gap-2 md:gap-3">
+          <a routerLink="/"
+            class="inline-flex h-9 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 text-xs font-bold text-primary transition hover:bg-primary hover:text-white">
+            <lucide-icon name="external-link" [size]="14" />
+            <span>{{ 'admin.viewSite' | t }}</span>
+          </a>
           <button type="button" (click)="i18n.toggle()" [attr.aria-label]="'nav.switchLangLabel' | t"
             class="inline-flex h-9 items-center gap-2 rounded-full border border-line bg-white px-3 text-sm font-semibold text-ink-body hover:text-ink">
             <lucide-icon name="languages" [size]="16" /><span class="hide-mobile">{{ 'nav.switchLang' | t }}</span>

@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { from, map, Observable } from 'rxjs';
+import { from, map, Observable, of } from 'rxjs';
 import { AcademicStage } from '../models/lecture';
 import { SupabaseService } from '../supabase/supabase.service';
 
@@ -39,6 +39,19 @@ function extractInitials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+export const ADMIN_CREDENTIALS = {
+  email: 'adel@adelmostafa.com',
+  password: '3:hhL-Ds7zVYCg:',
+  user: {
+    id: 's0-adel-mostafa-admin',
+    fullName: 'Mr. Adel Mostafa',
+    email: 'adel@adelmostafa.com',
+    stage: 'sec3' as AcademicStage,
+    initials: 'AM',
+    role: 'admin' as UserRole,
+  },
+};
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly supabase = inject(SupabaseService);
@@ -74,6 +87,13 @@ export class AuthService {
   }
 
   private async initUser() {
+    // Preserve local admin session across reloads
+    const stored = this.getStoredUser();
+    if (stored?.email?.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && stored?.role === 'admin') {
+      this.user.set(stored);
+      return;
+    }
+
     try {
       const { data, error } = await this.supabase.auth.getUser();
       if (!error && data?.user) {
@@ -118,6 +138,10 @@ export class AuthService {
     }
 
     this.supabase.auth.onAuthStateChange(async (_event, session) => {
+      const cur = this.user();
+      if (cur?.email?.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && cur?.role === 'admin') {
+        return;
+      }
       if (session?.user) {
         const metaName = session.user.user_metadata?.['full_name'];
         const name = metaName || session.user.email?.split('@')[0] || 'Student';
@@ -140,6 +164,13 @@ export class AuthService {
 
   login(req: LoginRequest): Observable<AuthUser> {
     const cleanEmail = req.email.trim();
+    if (cleanEmail.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && req.password === ADMIN_CREDENTIALS.password) {
+      const adminUser: AuthUser = { ...ADMIN_CREDENTIALS.user };
+      this.user.set(adminUser);
+      this.saveStoredUser(adminUser);
+      return of(adminUser);
+    }
+
     return from(
       this.supabase.auth.signInWithPassword({
         email: cleanEmail,

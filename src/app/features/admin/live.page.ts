@@ -82,8 +82,13 @@ type Tab = 'upcoming' | 'past';
         <label class="block"><span class="field-label">{{ 'admin.lectures.titleAr' | t }}</span>
           <input class="input input-plain" dir="rtl" lang="ar" [ngModel]="d.title.ar" (ngModelChange)="patch({ title: { en: d.title.en, ar: $event } })" /></label>
         <div class="grid grid-cols-2 gap-4">
-          <label class="block"><span class="field-label">{{ 'admin.live.startsAt' | t }}</span>
-            <input type="datetime-local" class="input input-plain text-sm" [ngModel]="local(d.startsAt)" (ngModelChange)="patch({ startsAt: iso($event) })" /></label>
+          <label class="block col-span-2">
+            <span class="field-label">{{ 'admin.live.startsAt' | t }}</span>
+            <input type="datetime-local" class="input input-plain text-sm" [ngModel]="local(d.startsAt)" (ngModelChange)="patch({ startsAt: iso($event) })" />
+            @if (!startInFuture()) {
+              <span class="mt-1 flex items-center gap-1 text-xs font-semibold text-danger"><lucide-icon name="triangle-alert" [size]="13" />Start time must be in the future.</span>
+            }
+          </label>
           <label class="block"><span class="field-label">{{ 'admin.live.duration' | t }}</span>
             <input type="number" min="15" step="15" class="input input-plain" [ngModel]="d.durationMin" (ngModelChange)="patch({ durationMin: +$event })" /></label>
           <label class="block"><span class="field-label">{{ 'admin.cols.stage' | t }}</span>
@@ -93,6 +98,15 @@ type Tab = 'upcoming' | 'past';
           <label class="block"><span class="field-label">{{ 'admin.live.maxSeats' | t }}</span>
             <input type="number" min="1" max="400" class="input input-plain" [ngModel]="d.maxSeats" (ngModelChange)="patch({ maxSeats: +$event })" /></label>
         </div>
+        <label class="block">
+          <span class="field-label">{{ 'admin.live.streamUrl' | t }}</span>
+          <input type="url" class="input input-plain [unicode-bidi:plaintext]" dir="ltr" placeholder="https://www.youtube.com/embed/…"
+            [ngModel]="d.playbackUrl ?? ''" (ngModelChange)="patch({ playbackUrl: $event || undefined })" />
+          @if (d.playbackUrl && !urlValid()) {
+            <span class="mt-1 flex items-center gap-1 text-xs font-semibold text-danger"><lucide-icon name="triangle-alert" [size]="13" />Enter a valid URL (https://…).</span>
+          }
+          <span class="mt-1 block text-xs text-ink-muted">Optional. Only shown to enrolled students while the session is live.</span>
+        </label>
         <app-access-editor [value]="d.access" (valueChange)="patch({ access: $event })" [defaultPrice]="350" />
         <button footer type="button" class="btn btn-soft" (click)="draft.set(null)">{{ 'admin.cancel' | t }}</button>
         <button footer type="button" class="btn btn-primary" [disabled]="!valid()" (click)="save()">{{ 'admin.save' | t }}</button>
@@ -122,7 +136,32 @@ export class AdminLivePage {
   });
   protected readonly valid = computed(() => {
     const d = this.draft();
-    return !!d && !!d.title.en.trim() && d.maxSeats > 0 && (d.access.type !== 'paid' || (d.access.priceEgp ?? 0) > 0);
+    if (!d) return false;
+    const titleOk = !!d.title.en.trim();
+    const seatsOk = d.maxSeats > 0;
+    const pricedOk = d.access.type !== 'paid' || (d.access.priceEgp ?? 0) > 0;
+    return titleOk && seatsOk && pricedOk && this.startInFuture() && this.urlValid();
+  });
+
+  /** True when the draft start time is in the future (new sessions only). */
+  protected readonly startInFuture = computed(() => {
+    const d = this.draft();
+    if (!d) return true;
+    // Skip check for existing live/ended sessions (already started)
+    if (!this.isNew() && (d.status === 'live' || d.status === 'ended')) return true;
+    return new Date(d.startsAt) > new Date();
+  });
+
+  /** True if no URL is set, or if the URL is a valid https:// URL. */
+  protected readonly urlValid = computed(() => {
+    const url = this.draft()?.playbackUrl;
+    if (!url) return true;
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
   });
 
   protected label(s: LiveClass): string {

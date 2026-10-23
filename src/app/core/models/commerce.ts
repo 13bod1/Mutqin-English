@@ -33,7 +33,7 @@ export interface Purchasable {
 /** Statuses the payment provider redirects back with (or that our UI produces). */
 export type CheckoutStatus = 'processing' | 'success' | 'failed' | 'cancelled' | 'submitted' | 'duplicate';
 
-export type ManualMethod = 'instapay' | 'vodafone';
+export type ManualMethod = 'instapay' | 'vodafone' | 'etisalat';
 
 export interface ManualReceipt {
   kind: PurchasableKind;
@@ -51,6 +51,7 @@ export interface PaymentSettings {
   manualEnabled: boolean;
   instapayAddress: string;
   vodafoneNumber: string;
+  etisalatNumber: string;
   seatHoldMinutes: number;
   defaultLivePriceEgp: number;
 }

@@ -7,19 +7,19 @@ import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { UserStatus } from '../../core/models/admin';
 import { AcademicStage } from '../../core/models/lecture';
-import { AdminHeaderComponent, InitialsComponent, StatComponent } from './admin-ui';
+import { AdminHeaderComponent, DrawerComponent, InitialsComponent, StatComponent } from './admin-ui';
 
 type Tab = 'students' | 'staff';
 const STATUS_TONE: Record<UserStatus, string> = { active: 'tone-success', invited: 'tone-warning', suspended: 'tone-danger' };
 
 @Component({
   selector: 'app-admin-users',
-  imports: [FormsModule, LucideAngularModule, TranslatePipe, DatePipe, AdminHeaderComponent, StatComponent, InitialsComponent],
+  imports: [FormsModule, LucideAngularModule, TranslatePipe, DatePipe, AdminHeaderComponent, StatComponent, InitialsComponent, DrawerComponent],
   template: `
     <div class="space-y-6">
       <app-admin-header [title]="'admin.users.title' | t" [subtitle]="'admin.users.subtitle' | t: { n: tot.students, max: tot.maxSeats }">
         <button type="button" class="btn btn-soft" (click)="exportCsv()"><lucide-icon name="download" [size]="16" />{{ 'admin.exportCsv' | t }}</button>
-        <button type="button" class="btn btn-primary"><lucide-icon name="plus" [size]="16" />{{ 'admin.users.invite' | t }}</button>
+        <button type="button" class="btn btn-primary" (click)="openInvite.set(true)"><lucide-icon name="plus" [size]="16" />{{ 'admin.users.invite' | t }}</button>
       </app-admin-header>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -72,8 +72,12 @@ const STATUS_TONE: Record<UserStatus, string> = { active: 'tone-success', invite
                   <td class="whitespace-nowrap">{{ u.joinedAt | date: 'd MMM y' : undefined : i18n.lang() }}</td>
                   <td dir="ltr" class="text-start">{{ u.lecturesDone }} / {{ u.lecturesTotal }}</td>
                   <td class="font-display font-semibold text-ink">{{ u.avgScore === null ? '—' : u.avgScore + '%' }}</td>
-                  <td><span class="tag" [class]="tone[u.status]">{{ 'admin.status.' + u.status | t }}</span></td>
-                  <td class="text-end"><button type="button" class="btn-icon" [attr.aria-label]="'admin.more' | t"><lucide-icon name="ellipsis" [size]="16" /></button></td>
+                   <td><span class="tag" [class]="tone[u.status]">{{ 'admin.status.' + u.status | t }}</span></td>
+                  <td class="text-end">
+                    <button type="button" (click)="toggleStatus(u.id, u.status)" class="btn btn-ghost btn-sm" [title]="u.status === 'active' ? 'Suspend' : 'Activate'">
+                      <lucide-icon [name]="u.status === 'active' ? 'ban' : 'circle-check'" [size]="15" [class]="u.status === 'active' ? 'text-danger' : 'text-success'" />
+                    </button>
+                  </td>
                 </tr>
               } @empty {
                 <tr><td colspan="7" class="py-10 text-center text-ink-muted">{{ 'admin.noResults' | t }}</td></tr>
@@ -103,6 +107,33 @@ const STATUS_TONE: Record<UserStatus, string> = { active: 'tone-success', invite
           </table>
         </div>
       }
+
+      @if (openInvite()) {
+        <app-drawer [title]="'admin.users.invite' | t" [subtitle]="'admin.users.subtitle' | t: { n: tot.students, max: tot.maxSeats }" (closed)="openInvite.set(false)">
+          <div class="space-y-4">
+            <label class="block">
+              <span class="field-label">{{ 'admin.cols.student' | t }}</span>
+              <input type="text" class="input" [ngModel]="newStudentName()" (ngModelChange)="newStudentName.set($event)" placeholder="e.g. Youssef Ahmed" />
+            </label>
+            <label class="block">
+              <span class="field-label">Email</span>
+              <input type="email" class="input" [ngModel]="newStudentEmail()" (ngModelChange)="newStudentEmail.set($event)" placeholder="student@example.com" />
+            </label>
+            <label class="block">
+              <span class="field-label">{{ 'admin.cols.stage' | t }}</span>
+              <select class="input" [ngModel]="newStudentStage()" (ngModelChange)="newStudentStage.set($event)">
+                @for (s of stages; track s) { <option [value]="s">{{ 'stagesShort.' + s | t }}</option> }
+              </select>
+            </label>
+          </div>
+          <div footer class="flex gap-2">
+            <button type="button" class="btn btn-ghost flex-1" (click)="openInvite.set(false)">{{ 'common.close' | t }}</button>
+            <button type="button" class="btn btn-primary flex-1" [disabled]="!newStudentName().trim() || !newStudentEmail().trim()" (click)="saveStudent()">
+              {{ 'admin.users.invite' | t }}
+            </button>
+          </div>
+        </app-drawer>
+      }
     </div>
   `,
 })
@@ -119,6 +150,11 @@ export class AdminUsersPage {
   protected readonly stage = signal('');
   protected readonly status = signal('');
 
+  protected readonly openInvite = signal(false);
+  protected readonly newStudentName = signal('');
+  protected readonly newStudentEmail = signal('');
+  protected readonly newStudentStage = signal<AcademicStage>('sec3');
+
   protected readonly filtered = computed(() => {
     const q = this.query().trim().toLowerCase();
     return this.admin.students().filter(
@@ -132,6 +168,33 @@ export class AdminUsersPage {
   protected initials(name: string): string {
     const p = name.split(/\s+/);
     return (p[0][0] + (p[1]?.[0] ?? '')).toUpperCase();
+  }
+
+  protected toggleStatus(id: string, current: UserStatus): void {
+    const next: UserStatus = current === 'active' ? 'suspended' : 'active';
+    this.admin.updateStudentStatus(id, next);
+  }
+
+  protected saveStudent(): void {
+    const name = this.newStudentName().trim();
+    const email = this.newStudentEmail().trim();
+    if (!name || !email) return;
+
+    this.admin.addStudent({
+      id: 'u-' + Date.now(),
+      name,
+      email,
+      stage: this.newStudentStage(),
+      joinedAt: new Date().toISOString().slice(0, 10),
+      lecturesDone: 0,
+      lecturesTotal: 40,
+      avgScore: null,
+      status: 'active',
+    });
+
+    this.newStudentName.set('');
+    this.newStudentEmail.set('');
+    this.openInvite.set(false);
   }
 
   protected exportCsv(): void {

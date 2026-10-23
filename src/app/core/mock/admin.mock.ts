@@ -33,14 +33,14 @@ const RS = { en: 'Live · Reading Skills', ar: 'بث مباشر · مهارات 
 const ESSAY = { en: 'Lecture · Opinion Essays', ar: 'محاضرة · مقال الرأي' };
 
 export const PAYMENTS_MOCK: AdminPayment[] = [
-  { id: 'p1', student: 'Mariam Ali', initials: 'MA', email: 'mariam.ali@yahoo.com', kind: 'live', item: AG, method: 'instapay', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-22T18:30:00Z', status: 'pending', reference: 'IP-88412097', senderPhone: '010 1234 5678', receiptFile: 'instapay-receipt-0411.jpg' },
-  { id: 'p2', student: 'Karim Samy', initials: 'KS', email: 'karim.samy@gmail.com', kind: 'live', item: AG, method: 'vodafone', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-22T17:12:00Z', status: 'pending', reference: 'VC-55120934', senderPhone: '011 9876 5432', receiptFile: 'vodafone-cash.png' },
+  { id: 'p1', student: 'Mariam Ali', initials: 'MA', email: 'mariam.ali@yahoo.com', kind: 'live', item: AG, method: 'instapay', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-22T18:30:00Z', status: 'pending', reference: 'IP-88412097', senderPhone: '010 1234 5678', receiptFile: '/receipts/instapay-mariam-ali.png', receiptFiles: ['/receipts/instapay-mariam-ali.png'] },
+  { id: 'p2', student: 'Karim Samy', initials: 'KS', email: 'karim.samy@gmail.com', kind: 'live', item: AG, method: 'etisalat', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-22T17:12:00Z', status: 'pending', reference: 'EC-01100764511', senderPhone: '011 9876 5432', receiptFile: '/receipts/etisalat-cash-success.png', receiptFiles: ['/receipts/etisalat-cash-success.png', '/receipts/etisalat-cash-transfer.png'] },
   { id: 'p3', student: 'Ahmed Fawzy', initials: 'AF', email: 'ahmed.fawzy@gmail.com', kind: 'lecture', item: ESSAY, method: 'instapay', amountEgp: 150, expectedEgp: 200, submittedAt: '2026-10-22T09:05:00Z', status: 'pending', reference: 'IP-88301122', senderPhone: '012 2222 3344', receiptFile: 'receipt.pdf' },
   { id: 'p4', student: 'Nour Saeed', initials: 'NS', email: 'nour.saeed@gmail.com', kind: 'live', item: AG, method: 'card', methodDetail: 'Visa •••• 4242', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-22T16:05:00Z', status: 'paid', reference: 'ME-2026-10-04821' },
-  { id: 'p5', student: 'Youssef Hany', initials: 'YH', email: 'youssef.h@gmail.com', kind: 'live', item: RS, method: 'instapay', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-21T19:41:00Z', status: 'approved', reference: 'IP-87990013' },
+  { id: 'p5', student: 'Youssef Hany', initials: 'YH', email: 'youssef.h@gmail.com', kind: 'live', item: RS, method: 'etisalat', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-21T19:41:00Z', status: 'approved', reference: 'EC-01100764511', senderPhone: '011 5544 3322', receiptFile: '/receipts/etisalat-cash-transfer.png', receiptFiles: ['/receipts/etisalat-cash-transfer.png'] },
   { id: 'p6', student: 'Habiba Mahmoud', initials: 'HM', email: 'habiba.m@gmail.com', kind: 'live', item: RS, method: 'vodafone', amountEgp: 300, expectedEgp: 350, submittedAt: '2026-10-21T14:20:00Z', status: 'rejected', reference: 'VC-55011876', note: 'Amount doesn’t match the session fee' },
   { id: 'p7', student: 'Omar Tarek', initials: 'OT', email: 'omar.tarek@example.com', kind: 'live', item: AG, method: 'card', methodDetail: 'Card', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-20T18:14:00Z', status: 'failed', reference: 'ME-2026-10-04822' },
-  { id: 'p8', student: 'Salma Adel', initials: 'SA', email: 'salma.adel@gmail.com', kind: 'live', item: AG, method: 'instapay', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-19T12:00:00Z', status: 'pending', reference: 'IP-87990013', senderPhone: '015 5555 0101', receiptFile: 'screenshot.jpg', duplicateOf: 'Youssef Hany · 21 Oct' },
+  { id: 'p8', student: 'Salma Adel', initials: 'SA', email: 'salma.adel@gmail.com', kind: 'live', item: AG, method: 'instapay', amountEgp: 350, expectedEgp: 350, submittedAt: '2026-10-19T12:00:00Z', status: 'pending', reference: 'IP-87990013', senderPhone: '015 5555 0101', receiptFile: '/receipts/instapay-salma-adel.png', receiptFiles: ['/receipts/instapay-salma-adel.png'], duplicateOf: 'Youssef Hany · 21 Oct' },
 ];
 
 export const ADMIN_LECTURES_MOCK: AdminLecture[] = [
@@ -89,6 +89,7 @@ export const SETTINGS_MOCK: AcademySettings = {
   manualEnabled: true,
   instapayAddress: 'adelmostafa@instapay',
   vodafoneNumber: '010 2345 6789',
+  etisalatNumber: '01100764511',
   flagDuplicates: true,
   muxConnected: false,
   maxViewers: 400,
@@ -97,4 +98,14 @@ export const SETTINGS_MOCK: AcademySettings = {
   slowMode: false,
   defaultLang: 'en',
   showLangSwitch: true,
+  theme: 'light',
+  popupMessage: {
+    enabled: true,
+    title: 'New Term Registrations Open',
+    message: 'Welcome to the new academic term! Book your live sessions early to secure your seat.',
+    type: 'announcement',
+    dismissible: true,
+    linkText: 'Explore sessions',
+    linkUrl: '/live',
+  },
 };

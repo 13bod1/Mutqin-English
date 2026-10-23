@@ -47,7 +47,7 @@ const TONE: Record<AnnouncementState, string> = { scheduled: 'tone-gold', sent: 
                     @if (a.seen !== undefined) { · {{ 'admin.ann.seen' | t: { n: a.seen, total: a.reach ?? 0, pct: pct(a) } }} }
                   </p>
                 </div>
-                <button type="button" class="btn-icon" [attr.aria-label]="'admin.more' | t"><lucide-icon name="ellipsis" [size]="16" /></button>
+                <button type="button" class="btn-icon text-danger hover:bg-red-50" (click)="admin.deleteAnnouncement(a.id)" title="Delete announcement"><lucide-icon name="trash-2" [size]="16" /></button>
               </li>
             } @empty {
               <li class="px-5 py-12 text-center text-ink-muted">{{ 'admin.noResults' | t }}</li>

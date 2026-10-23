@@ -101,12 +101,18 @@ export class AdminDashboardPage {
   protected readonly max = computed(() => Math.max(...this.admin.enrollments));
   protected readonly last = computed(() => this.admin.enrollments[this.admin.enrollments.length - 1]);
 
-  protected readonly attention = computed(() => [
-    { icon: 'receipt', tone: 'tone-warning', title: 'admin.dash.att.receipts', params: { n: this.admin.pendingCount() }, sub: 'admin.dash.att.receiptsSub', link: '/admin/payments' },
-    { icon: 'message-square', tone: '', title: 'admin.dash.att.questions', params: { n: 23 }, sub: 'admin.dash.att.questionsSub', link: '/admin/metrics' },
-    { icon: 'monitor-play', tone: 'tone-gold', title: 'admin.dash.att.processing', params: { n: 1 }, sub: 'admin.dash.att.processingSub', link: '/admin/lectures' },
-    { icon: 'user-x', tone: 'tone-danger', title: 'admin.dash.att.suspended', params: { n: this.tot.suspended }, sub: 'admin.dash.att.suspendedSub', link: '/admin/users' },
-  ]);
+  protected readonly attention = computed(() => {
+    const processingCount = this.admin.lectures().filter((l) => l.state === 'processing').length;
+    const questionsCount = this.admin.assistants().reduce((sum, a) => sum + (a.questions || 0), 0);
+    const suspendedCount = this.admin.students().filter((s) => s.status === 'suspended').length;
+
+    return [
+      { icon: 'receipt', tone: 'tone-warning', title: 'admin.dash.att.receipts', params: { n: this.admin.pendingCount() }, sub: 'admin.dash.att.receiptsSub', link: '/admin/payments' },
+      { icon: 'message-square', tone: '', title: 'admin.dash.att.questions', params: { n: questionsCount }, sub: 'admin.dash.att.questionsSub', link: '/admin/metrics' },
+      { icon: 'monitor-play', tone: 'tone-gold', title: 'admin.dash.att.processing', params: { n: processingCount }, sub: 'admin.dash.att.processingSub', link: '/admin/lectures' },
+      { icon: 'user-x', tone: 'tone-danger', title: 'admin.dash.att.suspended', params: { n: suspendedCount }, sub: 'admin.dash.att.suspendedSub', link: '/admin/users' },
+    ];
+  });
 
   protected readonly activity = [
     { who: 'NS', text: 'admin.dash.act.a1', when: 'admin.dash.act.t1' },

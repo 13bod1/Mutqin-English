@@ -12,6 +12,7 @@ import {
   Purchase,
 } from '../models/commerce';
 import { AuthService } from './auth.service';
+import { AdminService } from './admin.service';
 import { LectureService } from './lecture.service';
 import { LiveClassService } from './live-class.service';
 import { mockResponse } from './mock-response';
@@ -33,6 +34,7 @@ export interface OnlinePaymentStart {
 @Injectable({ providedIn: 'root' })
 export class CommerceService {
   private readonly auth = inject(AuthService);
+  private readonly admin = inject(AdminService);
   private readonly lectures = inject(LectureService);
   private readonly live = inject(LiveClassService);
 
@@ -41,7 +43,15 @@ export class CommerceService {
 
   /** GET /api/payment-settings */
   getSettings(): Observable<PaymentSettings> {
-    return mockResponse(PAYMENT_SETTINGS_MOCK);
+    return this.admin.getSettings().pipe(
+      map((s) => ({
+        ...PAYMENT_SETTINGS_MOCK,
+        instapayAddress: s.instapayAddress || PAYMENT_SETTINGS_MOCK.instapayAddress,
+        vodafoneNumber: s.vodafoneNumber || PAYMENT_SETTINGS_MOCK.vodafoneNumber,
+        etisalatNumber: s.etisalatNumber || PAYMENT_SETTINGS_MOCK.etisalatNumber,
+        manualEnabled: s.manualEnabled ?? true,
+      }))
+    );
   }
 
   owns(kind: PurchasableKind, id: string): boolean {
@@ -109,7 +119,30 @@ export class CommerceService {
 
   /** POST /api/receipts (multipart) — manual InstaPay / Vodafone Cash transfer for review. */
   submitReceipt(receipt: ManualReceipt): Observable<{ reference: string }> {
-    return mockResponse({ reference: newReference() });
+    const ref = newReference();
+    const u = this.auth.user();
+    const name = u?.fullName || 'Student';
+    const initials = u?.initials || 'ST';
+    const email = u?.email || 'student@example.com';
+
+    this.admin.addPayment({
+      id: 'pay-' + Date.now(),
+      student: name,
+      initials: initials,
+      email: email,
+      kind: receipt.kind,
+      item: { en: receipt.kind === 'lecture' ? 'Lecture Access' : 'Live Class', ar: receipt.kind === 'lecture' ? 'حصة مسجلة' : 'بث مباشر' },
+      method: receipt.method,
+      amountEgp: 350,
+      expectedEgp: 350,
+      submittedAt: new Date().toISOString(),
+      status: 'pending',
+      reference: receipt.reference || ref,
+      senderPhone: receipt.senderPhone,
+      receiptFile: receipt.fileName || 'receipt.jpg',
+    });
+
+    return mockResponse({ reference: ref });
   }
 }
 

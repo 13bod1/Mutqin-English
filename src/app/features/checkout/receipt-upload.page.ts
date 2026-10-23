@@ -180,6 +180,7 @@ export class ReceiptUploadPage {
     return [
       { method: 'instapay' as ManualMethod, icon: 'landmark', value: s.instapayAddress },
       { method: 'vodafone' as ManualMethod, icon: 'smartphone', value: s.vodafoneNumber },
+      { method: 'etisalat' as ManualMethod, icon: 'smartphone', value: s.etisalatNumber },
     ];
   });
 

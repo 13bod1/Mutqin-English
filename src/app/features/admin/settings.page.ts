@@ -9,7 +9,7 @@ import { AcademySettings } from '../../core/models/admin';
 import { AccessEditorComponent } from './access-editor.component';
 import { AdminHeaderComponent, InitialsComponent } from './admin-ui';
 
-type BoolKey = { [K in keyof AcademySettings]: AcademySettings[K] extends boolean ? K : never }[keyof AcademySettings];
+type BoolKey = { [K in keyof AcademySettings]-?: NonNullable<AcademySettings[K]> extends boolean ? K : never }[keyof AcademySettings];
 
 @Component({
   selector: 'app-admin-settings',
@@ -48,6 +48,62 @@ type BoolKey = { [K in keyof AcademySettings]: AcademySettings[K] extends boolea
               </div>
             </section>
 
+            <!-- Theme & Announcement Popup -->
+            <section id="appearance" class="card scroll-mt-24 space-y-5 p-5 sm:p-6">
+              <ng-container *ngTemplateOutlet="head; context: { icon: 'palette', id: 'appearance' }" />
+
+              <div>
+                <label class="block font-display text-sm font-semibold text-ink mb-2">{{ 'admin.settings.themeMode' | t }}</label>
+                <div class="seg max-w-sm">
+                  <button type="button" [class.seg-on]="(f.theme || 'light') === 'light'" (click)="set('theme', 'light')">{{ 'admin.settings.themeLight' | t }}</button>
+                  <button type="button" [class.seg-on]="f.theme === 'dark'" (click)="set('theme', 'dark')">{{ 'admin.settings.themeDark' | t }}</button>
+                  <button type="button" [class.seg-on]="f.theme === 'system'" (click)="set('theme', 'system')">{{ 'admin.settings.themeSystem' | t }}</button>
+                </div>
+              </div>
+
+              <div class="rounded-card-lg border border-line/70 p-4 space-y-4">
+                <div class="flex items-center justify-between gap-4">
+                  <div>
+                    <h3 class="font-display text-sm font-semibold text-ink">{{ 'admin.settings.popupTitle' | t }}</h3>
+                    <p class="text-xs text-ink-muted">{{ 'admin.settings.popupHint' | t }}</p>
+                  </div>
+                  <button type="button" role="switch" class="switch" [attr.aria-checked]="f.popupMessage.enabled" (click)="togglePopup()">
+                    <span class="sr-only">{{ 'admin.settings.popupTitle' | t }}</span>
+                  </button>
+                </div>
+
+                @if (f.popupMessage.enabled) {
+                  <div class="grid gap-4 sm:grid-cols-2 pt-2">
+                    <label class="block">
+                      <span class="field-label">{{ 'admin.settings.bannerTitle' | t }}</span>
+                      <input class="input input-plain" [ngModel]="f.popupMessage.title" (ngModelChange)="setPopupField('title', $event)" />
+                    </label>
+                    <label class="block">
+                      <span class="field-label">{{ 'admin.settings.bannerType' | t }}</span>
+                      <select class="input input-plain" [ngModel]="f.popupMessage.type" (ngModelChange)="setPopupField('type', $event)">
+                        <option value="announcement">Announcement (Brand)</option>
+                        <option value="info">Information (Blue)</option>
+                        <option value="warning">Warning (Amber)</option>
+                        <option value="success">Success (Green)</option>
+                      </select>
+                    </label>
+                    <label class="block sm:col-span-2">
+                      <span class="field-label">{{ 'admin.settings.bannerMsg' | t }}</span>
+                      <input class="input input-plain" [ngModel]="f.popupMessage.message" (ngModelChange)="setPopupField('message', $event)" />
+                    </label>
+                    <label class="block">
+                      <span class="field-label">{{ 'admin.settings.bannerLinkText' | t }}</span>
+                      <input class="input input-plain" [ngModel]="f.popupMessage.linkText" (ngModelChange)="setPopupField('linkText', $event)" />
+                    </label>
+                    <label class="block">
+                      <span class="field-label">{{ 'admin.settings.bannerLinkUrl' | t }}</span>
+                      <input class="input input-plain" [ngModel]="f.popupMessage.linkUrl" (ngModelChange)="setPopupField('linkUrl', $event)" />
+                    </label>
+                  </div>
+                }
+              </div>
+            </section>
+
             <!-- Pricing & payments -->
             <section id="payments" class="card scroll-mt-24 space-y-5 p-5 sm:p-6">
               <ng-container *ngTemplateOutlet="head; context: { icon: 'banknote', id: 'payments' }" />
@@ -68,9 +124,10 @@ type BoolKey = { [K in keyof AcademySettings]: AcademySettings[K] extends boolea
               </div>
               <ng-container *ngTemplateOutlet="toggle; context: { key: 'manualEnabled', label: 'admin.settings.manual', hint: 'admin.settings.manualHint' }" />
               @if (f.manualEnabled) {
-                <div class="grid gap-5 sm:grid-cols-2">
+                <div class="grid gap-5 sm:grid-cols-3">
                   <label class="block"><span class="field-label">{{ 'admin.settings.instapay' | t }}</span><input class="input input-plain [unicode-bidi:plaintext]" [ngModel]="f.instapayAddress" (ngModelChange)="set('instapayAddress', $event)" /></label>
                   <label class="block"><span class="field-label">{{ 'admin.settings.vodafone' | t }}</span><input class="input input-plain [unicode-bidi:plaintext]" [ngModel]="f.vodafoneNumber" (ngModelChange)="set('vodafoneNumber', $event)" /></label>
+                  <label class="block"><span class="field-label">{{ 'admin.settings.etisalat' | t }}</span><input class="input input-plain [unicode-bidi:plaintext]" [ngModel]="f.etisalatNumber" (ngModelChange)="set('etisalatNumber', $event)" /></label>
                 </div>
               }
               <ng-container *ngTemplateOutlet="toggle; context: { key: 'flagDuplicates', label: 'admin.settings.duplicates', hint: 'admin.settings.duplicatesHint' }" />
@@ -166,6 +223,7 @@ export class AdminSettingsPage {
 
   protected readonly sections = [
     { id: 'general', icon: 'settings' },
+    { id: 'appearance', icon: 'palette' },
     { id: 'payments', icon: 'banknote' },
     { id: 'live', icon: 'radio' },
     { id: 'languages', icon: 'languages' },
@@ -175,6 +233,28 @@ export class AdminSettingsPage {
   protected set<K extends keyof AcademySettings>(key: K, value: AcademySettings[K]): void {
     this.saved.set(false);
     this.form.update((f) => (f ? { ...f, [key]: value } : f));
+  }
+
+  protected togglePopup(): void {
+    const cur = this.form()?.popupMessage ?? {
+      enabled: false,
+      title: 'Announcement',
+      message: '',
+      type: 'announcement',
+      dismissible: true,
+    };
+    this.set('popupMessage', { ...cur, enabled: !cur.enabled });
+  }
+
+  protected setPopupField(key: string, val: any): void {
+    const cur = this.form()?.popupMessage ?? {
+      enabled: true,
+      title: '',
+      message: '',
+      type: 'announcement',
+      dismissible: true,
+    };
+    this.set('popupMessage', { ...cur, [key]: val });
   }
 
   protected isOn(key: BoolKey): boolean {

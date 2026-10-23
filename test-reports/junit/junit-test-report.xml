@@ -1,154 +1,172 @@
 <?xml version="1.0"?>
-<testsuite name="Chrome Headless 155.0.0.0 (Windows 10)" package="" timestamp="2026-10-20T03:18:40" id="0" hostname="HAZEM" tests="130" errors="0" failures="0" time="2.654">
+<testsuite name="Chrome Headless 126.0.6478.182 (Windows 10)" package="" timestamp="2026-10-22T23:49:18" id="0" hostname="3bod" tests="138" errors="0" failures="0" time="4.137">
   <properties>
-    <property name="browser.fullName" value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36"/>
+    <property name="browser.fullName" value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/126.0.6478.182 Safari/537.36"/>
   </properties>
-  <testcase name="LectureService &amp; Helper Functions durationBucket should categorize minutes into short, medium, and long buckets" time="0.006" classname="LectureService &amp; Helper Functions durationBucket"/>
-  <testcase name="LectureService &amp; Helper Functions should return featured lecture mock on error" time="0.002" classname="LectureService &amp; Helper Functions"/>
-  <testcase name="LectureService &amp; Helper Functions should return continue watching mock" time="0.001" classname="LectureService &amp; Helper Functions"/>
-  <testcase name="LectureService &amp; Helper Functions should return lectures mock on error" time="0.001" classname="LectureService &amp; Helper Functions"/>
-  <testcase name="LectureService &amp; Helper Functions filterLectures should filter by topic" time="0.001" classname="LectureService &amp; Helper Functions filterLectures"/>
-  <testcase name="LectureService &amp; Helper Functions filterLectures should filter by stage" time="0.001" classname="LectureService &amp; Helper Functions filterLectures"/>
-  <testcase name="LectureService &amp; Helper Functions filterLectures should filter by query" time="0" classname="LectureService &amp; Helper Functions filterLectures"/>
-  <testcase name="LectureService &amp; Helper Functions filterLectures should filter by duration" time="0" classname="LectureService &amp; Helper Functions filterLectures"/>
-  <testcase name="LogoComponent should render brand logo link" time="0.017" classname="LogoComponent"/>
-  <testcase name="AvatarComponent should render initials when src is not provided" time="0.007" classname="AvatarComponent"/>
-  <testcase name="AvatarComponent should render single initial for single name" time="0.001" classname="AvatarComponent"/>
-  <testcase name="AvatarComponent should render img tag when src is provided" time="0.002" classname="AvatarComponent"/>
-  <testcase name="QuizzesPage should reset result on retry" time="0.083" classname="QuizzesPage"/>
-  <testcase name="QuizzesPage should create QuizzesPage" time="0.003" classname="QuizzesPage"/>
-  <testcase name="QuizzesPage should filter modules by category" time="0.005" classname="QuizzesPage"/>
-  <testcase name="QuizzesPage should submit quiz attempt and receive result" time="0.005" classname="QuizzesPage"/>
-  <testcase name="AuthService should be created and start with null user if no storage" time="0.001" classname="AuthService"/>
-  <testcase name="AuthService should handle login successfully" time="0.001" classname="AuthService"/>
-  <testcase name="AuthService should reject login on Supabase auth error and not fallback to demo user" time="0.001" classname="AuthService"/>
-  <testcase name="AuthService should throw error on invalid credentials" time="0" classname="AuthService"/>
-  <testcase name="AuthService should logout user and clear state" time="0.001" classname="AuthService"/>
-  <testcase name="AuthService should signup a new user" time="0.001" classname="AuthService"/>
-  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Scheduled Countdown Logic (AG-69) TC-LIVE-04: should calculate accurate countdown to scheduled session time in Cairo timezone" time="0.008" classname="LiveSessionService (QA Automated Test Suite - AG-69) Scheduled Countdown Logic (AG-69)"/>
-  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Scheduled Countdown Logic (AG-69) TC-LIVE-05: should mark hasStarted as true when current time meets or passes scheduled start" time="0.001" classname="LiveSessionService (QA Automated Test Suite - AG-69) Scheduled Countdown Logic (AG-69)"/>
-  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69) TC-LIVE-02: should grant access and expose stream URL only to authorized cohort students" time="0.001" classname="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69)"/>
-  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69) TC-LIVE-03: should allow dynamic access grant (e.g. after successful payment checkout)" time="0.001" classname="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69)"/>
-  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69) TC-LIVE-01: should deny access and withhold stream URL from unauthorized students" time="0.001" classname="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69)"/>
-  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Mobile Viewport &amp; Cross-Device Compatibility (AG-69) TC-LIVE-08: should validate layout compatibility at 360px mobile viewport without horizontal scroll" time="0.001" classname="LiveSessionService (QA Automated Test Suite - AG-69) Mobile Viewport &amp; Cross-Device Compatibility (AG-69)"/>
-  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Mobile Viewport &amp; Cross-Device Compatibility (AG-69) TC-LIVE-09: should support tablet and desktop viewports seamlessly" time="0" classname="LiveSessionService (QA Automated Test Suite - AG-69) Mobile Viewport &amp; Cross-Device Compatibility (AG-69)"/>
-  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) should be created" time="0.001" classname="LiveSessionService (QA Automated Test Suite - AG-69)"/>
-  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Reactive State Transitions Without Full Reload (AG-69) TC-LIVE-06: should reactively transition from scheduled to live state when teacher starts session" time="0.001" classname="LiveSessionService (QA Automated Test Suite - AG-69) Reactive State Transitions Without Full Reload (AG-69)"/>
-  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Reactive State Transitions Without Full Reload (AG-69) TC-LIVE-07: should reactively transition to ended state when teacher ends session" time="0" classname="LiveSessionService (QA Automated Test Suite - AG-69) Reactive State Transitions Without Full Reload (AG-69)"/>
-  <testcase name="App Component should create the app root component" time="0.003" classname="App Component"/>
-  <testcase name="App Component should render router outlet" time="0.001" classname="App Component"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68) TC-SEC-03: should guarantee idempotency when identical webhook event is replayed twice" time="0.001" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68) TC-SEC-02: should activate session when valid webhook signature is supplied" time="0.001" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68) TC-SEC-01: should reject tampered or unsigned webhook requests (invalid signature)" time="0.001" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68) TC-SEC-04: should never expose live payment gateway secrets (sk_live) in client environment or storage" time="0.001" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68) TC-RCP-03: should reject unaccepted receipt file extensions" time="0.001" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68) TC-RCP-02: should reject receipt submission with invalid non-Egyptian phone number" time="0.001" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68) TC-RCP-01: should accept valid InstaPay submission with Egyptian phone format and reference" time="0" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) should be created" time="0.001" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-01: should initiate a checkout session with pending status and 15-minute expiration" time="0.001" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-04: should handle user payment cancellation cleanly" time="0.001" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-03: should transition to failed status when card is declined and increment retry count" time="0.002" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-06: should prevent creating new session if student already owns active session (duplicate prevention)" time="0" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-02: should successfully process valid payment and activate the session" time="0" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
-  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-05: should mark session as expired if payment is processed past the expiration window" time="0.001" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
-  <testcase name="GoogleIconComponent should render SVG element" time="0.003" classname="GoogleIconComponent"/>
-  <testcase name="ProgressService should return leaderboard with Egyptian cohort and current user" time="0.001" classname="ProgressService"/>
-  <testcase name="ProgressService should return default summary for new user" time="0.001" classname="ProgressService"/>
-  <testcase name="ProgressService should return empty achievements for guest user" time="0.001" classname="ProgressService"/>
-  <testcase name="ProgressService should return local profile for guest user" time="0.001" classname="ProgressService"/>
-  <testcase name="ProgressService should be created" time="0.001" classname="ProgressService"/>
-  <testcase name="FooterComponent should render footer content and WhatsApp contact" time="0.013" classname="FooterComponent"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 2: Recorded Lectures Library (Sprint 1 Regression) TC-REG-04: should retrieve active lectures catalog and verify instructor name" time="0.766" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 2: Recorded Lectures Library (Sprint 1 Regression)"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 2: Recorded Lectures Library (Sprint 1 Regression) TC-REG-05: should retrieve featured revision lecture metadata for Thanawya Amma" time="0.308" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 2: Recorded Lectures Library (Sprint 1 Regression)"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 3: Quizzes &amp; Interactive Diagnostic Engine (Sprint 1 Regression) TC-REG-07: should grade quiz answers accurately and award XP bonus" time="0.45" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 3: Quizzes &amp; Interactive Diagnostic Engine (Sprint 1 Regression)"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 3: Quizzes &amp; Interactive Diagnostic Engine (Sprint 1 Regression) TC-REG-06: should load quiz modules with questions count and difficulty level" time="0.136" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 3: Quizzes &amp; Interactive Diagnostic Engine (Sprint 1 Regression)"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression) TC-REG-01: should initialize with a null user when unauthenticated guest visits" time="0.001" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression)"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression) TC-REG-02: should validate student login flow signature" time="0.264" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression)"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression) TC-REG-03: should validate student signup structure with Thanawya Amma stage" time="0.249" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression)"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 4: Gamification, XP &amp; National Leaderboard (Sprint 1 Regression) TC-REG-09: should retrieve Egyptian national ranking leaderboard sorted by XP" time="0.003" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 4: Gamification, XP &amp; National Leaderboard (Sprint 1 Regression)"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 4: Gamification, XP &amp; National Leaderboard (Sprint 1 Regression) TC-REG-08: should retrieve student progress summary with streak and completion metrics" time="0.002" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 4: Gamification, XP &amp; National Leaderboard (Sprint 1 Regression)"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 5: Brand Identity &amp; Title Strategy (AG-70 &amp; PBI-11 Verification) TC-REG-11: should update document title with active brand name" time="0.002" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 5: Brand Identity &amp; Title Strategy (AG-70 &amp; PBI-11 Verification)"/>
-  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 5: Brand Identity &amp; Title Strategy (AG-70 &amp; PBI-11 Verification) TC-REG-10: should verify bilingual language service toggles between Arabic (RTL) and English (LTR)" time="0.001" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 5: Brand Identity &amp; Title Strategy (AG-70 &amp; PBI-11 Verification)"/>
-  <testcase name="MediaComponent should render fallback placeholder when src is absent" time="0.005" classname="MediaComponent"/>
-  <testcase name="MediaComponent should render image when src is provided" time="0.002" classname="MediaComponent"/>
-  <testcase name="SectionHeaderComponent should render title, eyebrow, and subtitle" time="0.002" classname="SectionHeaderComponent"/>
-  <testcase name="CtaBannerComponent should render title and text" time="0.002" classname="CtaBannerComponent"/>
-  <testcase name="NotFoundPage should render 404 title and home link" time="0.003" classname="NotFoundPage"/>
-  <testcase name="VideoSyncService should be created" time="0.001" classname="VideoSyncService"/>
-  <testcase name="VideoSyncService should pause other playing videos when a video play event fires" time="0.002" classname="VideoSyncService"/>
-  <testcase name="ShellComponent should render header, main router outlet container, and footer" time="0.014" classname="ShellComponent"/>
-  <testcase name="ContentService should return platform stats fallback on DB error" time="0.001" classname="ContentService"/>
-  <testcase name="ContentService should return introductory video fallback on DB error" time="0.001" classname="ContentService"/>
-  <testcase name="ContentService should be created" time="0" classname="ContentService"/>
-  <testcase name="ContentService should return testimonials mock fallback on DB error" time="0.001" classname="ContentService"/>
-  <testcase name="ContentService should return featured instructor fallback on DB error" time="0" classname="ContentService"/>
-  <testcase name="QuizRunnerComponent should emit submitted when all questions are answered" time="0.002" classname="QuizRunnerComponent"/>
-  <testcase name="QuizRunnerComponent should show unanswered alert on submit if questions remain unanswered" time="0.002" classname="QuizRunnerComponent"/>
-  <testcase name="QuizRunnerComponent should select option when option button is clicked" time="0.002" classname="QuizRunnerComponent"/>
-  <testcase name="QuizRunnerComponent should render question prompt and options" time="0.002" classname="QuizRunnerComponent"/>
-  <testcase name="LoginPage should trigger Google OAuth on google() call" time="0.013" classname="LoginPage"/>
-  <testcase name="LoginPage should show authError on failed login" time="0.003" classname="LoginPage"/>
-  <testcase name="LoginPage should create LoginPage" time="0.002" classname="LoginPage"/>
-  <testcase name="LoginPage should mark controls as touched on invalid submit" time="0.003" classname="LoginPage"/>
-  <testcase name="LoginPage should submit valid credentials and navigate to progress" time="0.003" classname="LoginPage"/>
-  <testcase name="QuizService should grade a quiz attempt accurately" time="0.001" classname="QuizService"/>
-  <testcase name="QuizService should return modules mock on error" time="0.001" classname="QuizService"/>
-  <testcase name="QuizService should return questions mock on error" time="0.001" classname="QuizService"/>
-  <testcase name="QuizService should be created" time="0.001" classname="QuizService"/>
-  <testcase name="QuizResultsComponent should emit retry output when retry button is clicked" time="0.003" classname="QuizResultsComponent"/>
-  <testcase name="QuizResultsComponent should render score and elapsed time" time="0.003" classname="QuizResultsComponent"/>
-  <testcase name="LecturePlayerComponent should cycle video quality" time="0.015" classname="LecturePlayerComponent"/>
-  <testcase name="LecturePlayerComponent should format seconds into M:SS" time="0.003" classname="LecturePlayerComponent"/>
-  <testcase name="LecturePlayerComponent should render featured lecture title" time="0.004" classname="LecturePlayerComponent"/>
-  <testcase name="LandingPage should create LandingPage" time="0.024" classname="LandingPage"/>
-  <testcase name="LandingPage should render hero section and stats" time="0.008" classname="LandingPage"/>
-  <testcase name="WeeklyChartComponent should calculate bar heights and highlight peak day" time="0.005" classname="WeeklyChartComponent"/>
-  <testcase name="TranslatedTitleStrategy should create strategy and update title on route update" time="0.001" classname="TranslatedTitleStrategy"/>
-  <testcase name="HeaderComponent should render header with navigation links for guest" time="0.002" classname="HeaderComponent"/>
-  <testcase name="HeaderComponent should render user avatar when logged in" time="0.003" classname="HeaderComponent"/>
-  <testcase name="ProgressRingComponent should calculate SVG ring parameters correctly" time="0.002" classname="ProgressRingComponent"/>
-  <testcase name="TranslatePipe &amp; LocalizePipe LocalizePipe should pick text based on active language" time="0" classname="TranslatePipe &amp; LocalizePipe"/>
-  <testcase name="TranslatePipe &amp; LocalizePipe LocalizePipe should return empty string for null or undefined" time="0" classname="TranslatePipe &amp; LocalizePipe"/>
-  <testcase name="TranslatePipe &amp; LocalizePipe TranslatePipe should translate key via LanguageService" time="0.001" classname="TranslatePipe &amp; LocalizePipe"/>
-  <testcase name="TranslatePipe &amp; LocalizePipe TranslatePipe should handle params" time="0.001" classname="TranslatePipe &amp; LocalizePipe"/>
-  <testcase name="LectureCardComponent should render lecture details" time="0.007" classname="LectureCardComponent"/>
-  <testcase name="LectureCardComponent should call pdfNotes.downloadNotes when download button is clicked" time="0.002" classname="LectureCardComponent"/>
-  <testcase name="ProgressPage should create ProgressPage" time="0.024" classname="ProgressPage"/>
-  <testcase name="ProgressPage should identify rival for XP nudge" time="0.006" classname="ProgressPage"/>
-  <testcase name="ProgressPage should compute syllabus percentage and average minutes correctly" time="0.004" classname="ProgressPage"/>
-  <testcase name="SignupPage should validate matching passwords and strong password rule" time="0.014" classname="SignupPage"/>
-  <testcase name="SignupPage should reject invalid form submit" time="0.004" classname="SignupPage"/>
-  <testcase name="SignupPage should create SignupPage" time="0.003" classname="SignupPage"/>
-  <testcase name="SupabaseService should generate storage public url" time="0.001" classname="SupabaseService"/>
-  <testcase name="SupabaseService should be created and expose client getters" time="0" classname="SupabaseService"/>
-  <testcase name="PdfNotesService should handle downloadNotes without error (using fallback window/blob)" time="0.002" classname="PdfNotesService"/>
-  <testcase name="PdfNotesService should be created" time="0.001" classname="PdfNotesService"/>
-  <testcase name="LecturesPage should clear all filters" time="0.023" classname="LecturesPage"/>
-  <testcase name="LecturesPage should play selected lecture in player" time="0.031" classname="LecturesPage"/>
-  <testcase name="LecturesPage should create LecturesPage" time="0.003" classname="LecturesPage"/>
-  <testcase name="LecturesPage should filter lectures by topic" time="0.008" classname="LecturesPage"/>
-  <testcase name="LanguageService should pick localized text according to active language" time="0" classname="LanguageService"/>
-  <testcase name="LanguageService should interpolate translation params" time="0" classname="LanguageService"/>
-  <testcase name="LanguageService should be created and default to English" time="0.001" classname="LanguageService"/>
-  <testcase name="LanguageService should set language to ar and update direction signals" time="0" classname="LanguageService"/>
-  <testcase name="LanguageService should toggle language back and forth" time="0.001" classname="LanguageService"/>
-  <testcase name="LanguageService should translate dotted keys correctly" time="0" classname="LanguageService"/>
+  <testcase name="CtaBannerComponent should render title and text" time="0.085" classname="CtaBannerComponent"/>
+  <testcase name="SupabaseService should be created and expose client getters" time="0.021" classname="SupabaseService"/>
+  <testcase name="SupabaseService should generate storage public url" time="0.009" classname="SupabaseService"/>
+  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Scheduled Countdown Logic (AG-69) TC-LIVE-04: should calculate accurate countdown to scheduled session time in Cairo timezone" time="0.029" classname="LiveSessionService (QA Automated Test Suite - AG-69) Scheduled Countdown Logic (AG-69)"/>
+  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Scheduled Countdown Logic (AG-69) TC-LIVE-05: should mark hasStarted as true when current time meets or passes scheduled start" time="0.006" classname="LiveSessionService (QA Automated Test Suite - AG-69) Scheduled Countdown Logic (AG-69)"/>
+  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69) TC-LIVE-01: should deny access and withhold stream URL from unauthorized students" time="0.004" classname="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69)"/>
+  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69) TC-LIVE-03: should allow dynamic access grant (e.g. after successful payment checkout)" time="0.005" classname="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69)"/>
+  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69) TC-LIVE-02: should grant access and expose stream URL only to authorized cohort students" time="0.004" classname="LiveSessionService (QA Automated Test Suite - AG-69) Access Control &amp; Stream Link Protection (AG-69)"/>
+  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Reactive State Transitions Without Full Reload (AG-69) TC-LIVE-07: should reactively transition to ended state when teacher ends session" time="0.005" classname="LiveSessionService (QA Automated Test Suite - AG-69) Reactive State Transitions Without Full Reload (AG-69)"/>
+  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Reactive State Transitions Without Full Reload (AG-69) TC-LIVE-06: should reactively transition from scheduled to live state when teacher starts session" time="0.005" classname="LiveSessionService (QA Automated Test Suite - AG-69) Reactive State Transitions Without Full Reload (AG-69)"/>
+  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Mobile Viewport &amp; Cross-Device Compatibility (AG-69) TC-LIVE-08: should validate layout compatibility at 360px mobile viewport without horizontal scroll" time="0.004" classname="LiveSessionService (QA Automated Test Suite - AG-69) Mobile Viewport &amp; Cross-Device Compatibility (AG-69)"/>
+  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) Mobile Viewport &amp; Cross-Device Compatibility (AG-69) TC-LIVE-09: should support tablet and desktop viewports seamlessly" time="0.003" classname="LiveSessionService (QA Automated Test Suite - AG-69) Mobile Viewport &amp; Cross-Device Compatibility (AG-69)"/>
+  <testcase name="LiveSessionService (QA Automated Test Suite - AG-69) should be created" time="0.004" classname="LiveSessionService (QA Automated Test Suite - AG-69)"/>
+  <testcase name="App Component should render router outlet" time="0.014" classname="App Component"/>
+  <testcase name="App Component should create the app root component" time="0.004" classname="App Component"/>
+  <testcase name="LecturesPage should create LecturesPage" time="0.239" classname="LecturesPage"/>
+  <testcase name="LecturesPage should clear all filters" time="0.097" classname="LecturesPage"/>
+  <testcase name="LecturesPage should play selected lecture in player" time="0.195" classname="LecturesPage"/>
+  <testcase name="LecturesPage should filter lectures by topic" time="0.06" classname="LecturesPage"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) should be created" time="0.005" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-01: should initiate a checkout session with pending status and 15-minute expiration" time="0.003" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-02: should successfully process valid payment and activate the session" time="0.004" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-05: should mark session as expired if payment is processed past the expiration window" time="0.004" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-04: should handle user payment cancellation cleanly" time="0.003" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-06: should prevent creating new session if student already owns active session (duplicate prevention)" time="0.003" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67) TC-PAY-03: should transition to failed status when card is declined and increment retry count" time="0.005" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Checkout Lifecycle &amp; State Machine (AG-67)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68) TC-RCP-01: should accept valid InstaPay submission with Egyptian phone format and reference" time="0.004" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68) TC-RCP-03: should reject unaccepted receipt file extensions" time="0.003" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68) TC-RCP-02: should reject receipt submission with invalid non-Egyptian phone number" time="0.007" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) InstaPay / Cash Receipt Fallback Checks (AG-67 &amp; AG-68)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68) TC-SEC-04: should never expose live payment gateway secrets (sk_live) in client environment or storage" time="0.003" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68) TC-SEC-01: should reject tampered or unsigned webhook requests (invalid signature)" time="0.003" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68) TC-SEC-02: should activate session when valid webhook signature is supplied" time="0.003" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68)"/>
+  <testcase name="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68) TC-SEC-03: should guarantee idempotency when identical webhook event is replayed twice" time="0.003" classname="PaymentService (QA Automated Test Suite - AG-67 &amp; AG-68) Webhook Security &amp; Idempotency Checks (AG-68)"/>
+  <testcase name="AdminService (receipt review) rejecting keeps the note for the student" time="0.003" classname="AdminService (receipt review)"/>
+  <testcase name="AdminService (receipt review) approving a receipt removes it from the review queue" time="0.004" classname="AdminService (receipt review)"/>
+  <testcase name="TranslatePipe &amp; LocalizePipe TranslatePipe should translate key via LanguageService" time="0.003" classname="TranslatePipe &amp; LocalizePipe"/>
+  <testcase name="TranslatePipe &amp; LocalizePipe TranslatePipe should handle params" time="0.004" classname="TranslatePipe &amp; LocalizePipe"/>
+  <testcase name="TranslatePipe &amp; LocalizePipe LocalizePipe should pick text based on active language" time="0.003" classname="TranslatePipe &amp; LocalizePipe"/>
+  <testcase name="TranslatePipe &amp; LocalizePipe LocalizePipe should return empty string for null or undefined" time="0.003" classname="TranslatePipe &amp; LocalizePipe"/>
+  <testcase name="AvatarComponent should render img tag when src is provided" time="0.014" classname="AvatarComponent"/>
+  <testcase name="AvatarComponent should render single initial for single name" time="0.005" classname="AvatarComponent"/>
+  <testcase name="AvatarComponent should render initials when src is not provided" time="0.004" classname="AvatarComponent"/>
+  <testcase name="SignupPage should create SignupPage" time="0.085" classname="SignupPage"/>
+  <testcase name="SignupPage should reject invalid form submit" time="0.017" classname="SignupPage"/>
+  <testcase name="SignupPage should validate matching passwords and strong password rule" time="0.015" classname="SignupPage"/>
+  <testcase name="AuthService should logout user and clear state" time="0.003" classname="AuthService"/>
+  <testcase name="AuthService should be created and start with null user if no storage" time="0.003" classname="AuthService"/>
+  <testcase name="AuthService should throw error on invalid credentials" time="0.003" classname="AuthService"/>
+  <testcase name="AuthService should handle login successfully" time="0.004" classname="AuthService"/>
+  <testcase name="AuthService should signup a new user" time="0.004" classname="AuthService"/>
+  <testcase name="AuthService should reject login on Supabase auth error and not fallback to demo user" time="0.004" classname="AuthService"/>
+  <testcase name="LecturePlayerComponent should cycle video quality" time="0.016" classname="LecturePlayerComponent"/>
+  <testcase name="LecturePlayerComponent should render featured lecture title" time="0.016" classname="LecturePlayerComponent"/>
+  <testcase name="LecturePlayerComponent should format seconds into M:SS" time="0.009" classname="LecturePlayerComponent"/>
+  <testcase name="TranslatedTitleStrategy should create strategy and update title on route update" time="0.005" classname="TranslatedTitleStrategy"/>
+  <testcase name="LogoComponent should render brand logo link" time="0.013" classname="LogoComponent"/>
+  <testcase name="QuizRunnerComponent should select option when option button is clicked" time="0.046" classname="QuizRunnerComponent"/>
+  <testcase name="QuizRunnerComponent should show unanswered alert on submit if questions remain unanswered" time="0.012" classname="QuizRunnerComponent"/>
+  <testcase name="QuizRunnerComponent should emit submitted when all questions are answered" time="0.011" classname="QuizRunnerComponent"/>
+  <testcase name="QuizRunnerComponent should render question prompt and options" time="0.01" classname="QuizRunnerComponent"/>
+  <testcase name="QuizResultsComponent should render score and elapsed time" time="0.055" classname="QuizResultsComponent"/>
+  <testcase name="QuizResultsComponent should emit retry output when retry button is clicked" time="0.012" classname="QuizResultsComponent"/>
+  <testcase name="QuizzesPage should create QuizzesPage" time="0.045" classname="QuizzesPage"/>
+  <testcase name="QuizzesPage should filter modules by category" time="0.024" classname="QuizzesPage"/>
+  <testcase name="QuizzesPage should reset result on retry" time="0.05" classname="QuizzesPage"/>
+  <testcase name="QuizzesPage should submit quiz attempt and receive result" time="0.019" classname="QuizzesPage"/>
+  <testcase name="LectureService &amp; Helper Functions should return featured lecture mock on error" time="0.004" classname="LectureService &amp; Helper Functions"/>
+  <testcase name="LectureService &amp; Helper Functions durationBucket should categorize minutes into short, medium, and long buckets" time="0.003" classname="LectureService &amp; Helper Functions durationBucket"/>
+  <testcase name="LectureService &amp; Helper Functions filterLectures should filter by query" time="0.003" classname="LectureService &amp; Helper Functions filterLectures"/>
+  <testcase name="LectureService &amp; Helper Functions filterLectures should filter by stage" time="0.003" classname="LectureService &amp; Helper Functions filterLectures"/>
+  <testcase name="LectureService &amp; Helper Functions filterLectures should filter by topic" time="0.004" classname="LectureService &amp; Helper Functions filterLectures"/>
+  <testcase name="LectureService &amp; Helper Functions filterLectures should filter by duration" time="0.003" classname="LectureService &amp; Helper Functions filterLectures"/>
+  <testcase name="LectureService &amp; Helper Functions should return lectures mock on error" time="0.004" classname="LectureService &amp; Helper Functions"/>
+  <testcase name="LectureService &amp; Helper Functions should return continue watching mock" time="0.005" classname="LectureService &amp; Helper Functions"/>
+  <testcase name="AccessEditorComponent switching to paid applies the default price" time="0.022" classname="AccessEditorComponent"/>
+  <testcase name="NotFoundPage should render 404 title and home link" time="0.011" classname="NotFoundPage"/>
+  <testcase name="LanguageService should be created and default to English" time="0.003" classname="LanguageService"/>
+  <testcase name="LanguageService should pick localized text according to active language" time="0.003" classname="LanguageService"/>
+  <testcase name="LanguageService should interpolate translation params" time="0.004" classname="LanguageService"/>
+  <testcase name="LanguageService should translate dotted keys correctly" time="0.003" classname="LanguageService"/>
+  <testcase name="LanguageService should set language to ar and update direction signals" time="0.006" classname="LanguageService"/>
+  <testcase name="LanguageService should toggle language back and forth" time="0.003" classname="LanguageService"/>
+  <testcase name="LoginPage should submit valid credentials and navigate to progress" time="0.054" classname="LoginPage"/>
+  <testcase name="LoginPage should show authError on failed login" time="0.012" classname="LoginPage"/>
+  <testcase name="LoginPage should create LoginPage" time="0.012" classname="LoginPage"/>
+  <testcase name="LoginPage should trigger Google OAuth on google() call" time="0.011" classname="LoginPage"/>
+  <testcase name="LoginPage should mark controls as touched on invalid submit" time="0.012" classname="LoginPage"/>
+  <testcase name="HeaderComponent should render user avatar when logged in" time="0.056" classname="HeaderComponent"/>
+  <testcase name="HeaderComponent should render header with navigation links for guest" time="0.012" classname="HeaderComponent"/>
+  <testcase name="LandingPage should render hero section and stats" time="0.102" classname="LandingPage"/>
+  <testcase name="LandingPage should create LandingPage" time="0.012" classname="LandingPage"/>
+  <testcase name="QuizService should be created" time="0.003" classname="QuizService"/>
+  <testcase name="QuizService should return modules mock on error" time="0.004" classname="QuizService"/>
+  <testcase name="QuizService should return questions mock on error" time="0.003" classname="QuizService"/>
+  <testcase name="QuizService should grade a quiz attempt accurately" time="0.004" classname="QuizService"/>
+  <testcase name="ProgressRingComponent should calculate SVG ring parameters correctly" time="0.007" classname="ProgressRingComponent"/>
+  <testcase name="LectureCardComponent should render lecture details" time="0.014" classname="LectureCardComponent"/>
+  <testcase name="LectureCardComponent should call pdfNotes.downloadNotes when download button is clicked" time="0.012" classname="LectureCardComponent"/>
+  <testcase name="PdfNotesService should be created" time="0.003" classname="PdfNotesService"/>
+  <testcase name="PdfNotesService should handle downloadNotes without error (using fallback window/blob)" time="0.007" classname="PdfNotesService"/>
+  <testcase name="MediaComponent should render fallback placeholder when src is absent" time="0.006" classname="MediaComponent"/>
+  <testcase name="MediaComponent should render image when src is provided" time="0.004" classname="MediaComponent"/>
+  <testcase name="GoogleIconComponent should render SVG element" time="0.005" classname="GoogleIconComponent"/>
+  <testcase name="ProgressService should be created" time="0.004" classname="ProgressService"/>
+  <testcase name="ProgressService should return local profile for guest user" time="0.004" classname="ProgressService"/>
+  <testcase name="ProgressService should return empty achievements for guest user" time="0.004" classname="ProgressService"/>
+  <testcase name="ProgressService should return default summary for new user" time="0.007" classname="ProgressService"/>
+  <testcase name="ProgressService should return leaderboard with Egyptian cohort and current user" time="0.004" classname="ProgressService"/>
+  <testcase name="ContentService should return featured instructor fallback on DB error" time="0.004" classname="ContentService"/>
+  <testcase name="ContentService should be created" time="0.004" classname="ContentService"/>
+  <testcase name="ContentService should return testimonials mock fallback on DB error" time="0.004" classname="ContentService"/>
+  <testcase name="ContentService should return introductory video fallback on DB error" time="0.003" classname="ContentService"/>
+  <testcase name="ContentService should return platform stats fallback on DB error" time="0.003" classname="ContentService"/>
+  <testcase name="CommerceService (access &amp; pricing) lets anyone watch free items" time="0.005" classname="CommerceService (access &amp; pricing)"/>
+  <testcase name="CommerceService (access &amp; pricing) requires an account for included items" time="0.005" classname="CommerceService (access &amp; pricing)"/>
+  <testcase name="CommerceService (access &amp; pricing) validates Egyptian mobile numbers" time="0.008" classname="CommerceService (access &amp; pricing)"/>
+  <testcase name="CommerceService (access &amp; pricing) requires a purchase for paid items" time="0.004" classname="CommerceService (access &amp; pricing)"/>
+  <testcase name="CommerceService (access &amp; pricing) builds an order summary only for paid items" time="0.01" classname="CommerceService (access &amp; pricing)"/>
+  <testcase name="ShellComponent should render header, main router outlet container, and footer" time="0.048" classname="ShellComponent"/>
+  <testcase name="ProgressPage should create ProgressPage" time="0.093" classname="ProgressPage"/>
+  <testcase name="ProgressPage should compute syllabus percentage and average minutes correctly" time="0.017" classname="ProgressPage"/>
+  <testcase name="ProgressPage should identify rival for XP nudge" time="0.013" classname="ProgressPage"/>
+  <testcase name="FooterComponent should render footer content and WhatsApp contact" time="0.008" classname="FooterComponent"/>
+  <testcase name="VideoSyncService should be created" time="0.002" classname="VideoSyncService"/>
+  <testcase name="VideoSyncService should pause other playing videos when a video play event fires" time="0.004" classname="VideoSyncService"/>
+  <testcase name="WeeklyChartComponent should calculate bar heights and highlight peak day" time="0.006" classname="WeeklyChartComponent"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 4: Gamification, XP &amp; National Leaderboard (Sprint 1 Regression) TC-REG-09: should retrieve Egyptian national ranking leaderboard sorted by XP" time="0.005" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 4: Gamification, XP &amp; National Leaderboard (Sprint 1 Regression)"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 4: Gamification, XP &amp; National Leaderboard (Sprint 1 Regression) TC-REG-08: should retrieve student progress summary with streak and completion metrics" time="0.005" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 4: Gamification, XP &amp; National Leaderboard (Sprint 1 Regression)"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 5: Brand Identity &amp; Title Strategy (AG-70 &amp; PBI-11 Verification) TC-REG-10: should verify bilingual language service toggles between Arabic (RTL) and English (LTR)" time="0.004" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 5: Brand Identity &amp; Title Strategy (AG-70 &amp; PBI-11 Verification)"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 5: Brand Identity &amp; Title Strategy (AG-70 &amp; PBI-11 Verification) TC-REG-11: should update document title with active brand name" time="0.005" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 5: Brand Identity &amp; Title Strategy (AG-70 &amp; PBI-11 Verification)"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 3: Quizzes &amp; Interactive Diagnostic Engine (Sprint 1 Regression) TC-REG-06: should load quiz modules with questions count and difficulty level" time="0.626" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 3: Quizzes &amp; Interactive Diagnostic Engine (Sprint 1 Regression)"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 3: Quizzes &amp; Interactive Diagnostic Engine (Sprint 1 Regression) TC-REG-07: should grade quiz answers accurately and award XP bonus" time="0.36" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 3: Quizzes &amp; Interactive Diagnostic Engine (Sprint 1 Regression)"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression) TC-REG-02: should validate student login flow signature" time="0.349" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression)"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression) TC-REG-03: should validate student signup structure with Thanawya Amma stage" time="0.281" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression)"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression) TC-REG-01: should initialize with a null user when unauthenticated guest visits" time="0.004" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 1: Authentication &amp; Student Identity (Sprint 1 Regression)"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 2: Recorded Lectures Library (Sprint 1 Regression) TC-REG-04: should retrieve active lectures catalog and verify instructor name" time="0.212" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 2: Recorded Lectures Library (Sprint 1 Regression)"/>
+  <testcase name="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 2: Recorded Lectures Library (Sprint 1 Regression) TC-REG-05: should retrieve featured revision lecture metadata for Thanawya Amma" time="0.208" classname="Sprint 1 Regression &amp; Rebrand Verification Suite (AG-70) Feature 2: Recorded Lectures Library (Sprint 1 Regression)"/>
+  <testcase name="SectionHeaderComponent should render title, eyebrow, and subtitle" time="0.005" classname="SectionHeaderComponent"/>
   <system-out>
-    <![CDATA[Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:1 (2.117.3) 2026-10-20T03:18:41.539Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:2 (2.117.3) 2026-10-20T03:18:41.848Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) LOG: '🏆 Earned 200 XP from quiz "sva" — your rank is updating!'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:3 (2.117.3) 2026-10-20T03:18:42.299Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:4 (2.117.3) 2026-10-20T03:18:42.435Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:5 (2.117.3) 2026-10-20T03:18:42.437Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:6 (2.117.3) 2026-10-20T03:18:42.702Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:7 (2.117.3) 2026-10-20T03:18:42.951Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:8 (2.117.3) 2026-10-20T03:18:42.954Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:9 (2.117.3) 2026-10-20T03:18:42.956Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:10 (2.117.3) 2026-10-20T03:18:42.958Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:11 (2.117.3) 2026-10-20T03:18:42.987Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) LOG: '🏆 Earned 60 XP from quiz "sva" — your rank is updating!'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:12 (2.117.3) 2026-10-20T03:18:43.202Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
-,Chrome Headless 155.0.0.0 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:13 (2.117.3) 2026-10-20T03:18:43.203Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+    <![CDATA[Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:1 (2.117.3) 2026-10-22T23:49:18.569Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:2 (2.117.3) 2026-10-22T23:49:18.985Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:3 (2.117.3) 2026-10-22T23:49:19.069Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:4 (2.117.3) 2026-10-22T23:49:19.274Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) LOG: '🏆 Earned 60 XP from quiz "sva" — your rank is updating!'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:5 (2.117.3) 2026-10-22T23:49:20.502Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:6 (2.117.3) 2026-10-22T23:49:20.523Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:7 (2.117.3) 2026-10-22T23:49:20.632Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:8 (2.117.3) 2026-10-22T23:49:20.639Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:9 (2.117.3) 2026-10-22T23:49:20.648Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:10 (2.117.3) 2026-10-22T23:49:20.655Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:11 (2.117.3) 2026-10-22T23:49:20.662Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:12 (2.117.3) 2026-10-22T23:49:20.705Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:13 (2.117.3) 2026-10-22T23:49:20.899Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:14 (2.117.3) 2026-10-22T23:49:20.905Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:15 (2.117.3) 2026-10-22T23:49:20.911Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:16 (2.117.3) 2026-10-22T23:49:20.922Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:17 (2.117.3) 2026-10-22T23:49:20.938Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:18 (2.117.3) 2026-10-22T23:49:21.567Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) LOG: '🏆 Earned 200 XP from quiz "sva" — your rank is updating!'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:19 (2.117.3) 2026-10-22T23:49:21.931Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:20 (2.117.3) 2026-10-22T23:49:22.284Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:21 (2.117.3) 2026-10-22T23:49:22.569Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:22 (2.117.3) 2026-10-22T23:49:22.575Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
+,Chrome Headless 126.0.6478.182 (Windows 10) WARN: 'GoTrueClient@sb-lbzphsipfsvhfrareqky-auth-token:23 (2.117.3) 2026-10-22T23:49:22.791Z Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'
 
 ]]>
   </system-out>

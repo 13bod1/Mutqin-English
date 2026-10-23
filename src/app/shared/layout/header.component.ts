@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { filter } from 'rxjs';
+import { AdminService } from '../../core/data/admin.service';
 import { AuthService } from '../../core/data/auth.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
@@ -22,6 +23,33 @@ interface NavItem {
     '(document:keydown.escape)': 'menuOpen.set(false)',
   },
   template: `
+    @if (popup(); as p) {
+      @if (p.enabled && !popupDismissed()) {
+        <div class="relative isolate flex items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold sm:text-sm"
+          [class]="popupToneClass(p.type)">
+          <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+            @if (p.title) {
+              <span class="inline-flex items-center gap-1 font-bold underline decoration-white/40 underline-offset-2">
+                <lucide-icon name="sparkles" [size]="14" />
+                {{ p.title }}:
+              </span>
+            }
+            <span class="opacity-95">{{ p.message }}</span>
+            @if (p.linkText && p.linkUrl) {
+              <a [routerLink]="p.linkUrl" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
+                {{ p.linkText }} &rarr;
+              </a>
+            }
+          </div>
+          @if (p.dismissible) {
+            <button type="button" (click)="dismissPopup()" class="absolute end-2 sm:end-4 top-1/2 -translate-y-1/2 rounded p-1 hover:bg-black/15 transition opacity-80 hover:opacity-100" aria-label="Dismiss banner">
+              <lucide-icon name="x" [size]="14" />
+            </button>
+          }
+        </div>
+      }
+    }
+
     <div class="container-page flex h-16 items-center justify-between gap-4 md:h-[72px]">
       <app-logo />
 
@@ -32,6 +60,19 @@ interface NavItem {
             class="relative rounded-lg px-3 py-2 font-display text-sm font-medium text-ink-body transition hover:text-ink
               after:absolute after:inset-x-3 after:-bottom-[1px] after:h-0.5 after:origin-center after:scale-x-0 after:rounded-full after:bg-primary after:transition">
             {{ item.key | t }}
+            @if (item.path === '/live' && hasLiveSession()) {
+              <span class="absolute -end-1 -top-0.5 flex h-2.5 w-2.5" aria-label="Live session in progress">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
+                <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+              </span>
+            }
+          </a>
+        }
+        @if (isStaff()) {
+          <a routerLink="/admin" routerLinkActive="!bg-amber-100 !border-amber-400"
+            class="ms-2 inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 font-display text-xs font-bold text-amber-900 shadow-xs transition hover:bg-amber-100 hover:text-amber-950">
+            <lucide-icon name="shield-check" [size]="15" class="text-amber-600" />
+            {{ 'nav.admin' | t }}
           </a>
         }
       </nav>
@@ -46,14 +87,16 @@ interface NavItem {
         @if (auth.user(); as u) {
           <!-- Logged-in profile in the right corner -->
           <div class="flex items-center gap-2">
-            <a routerLink="/progress"
+            <a [routerLink]="isStaff() ? '/admin' : '/progress'"
               class="flex items-center gap-2.5 rounded-full border border-line bg-surface-warm/70 py-1 pe-3 ps-1 transition hover:border-primary/50 hover:bg-surface-tint shadow-sm">
               <span class="grid h-8 w-8 place-items-center rounded-full bg-primary font-display text-xs font-bold text-white shadow-sm ring-2 ring-white">
                 {{ u.initials || 'ST' }}
               </span>
               <div class="flex flex-col text-start">
                 <span class="font-display text-xs font-bold text-ink leading-tight line-clamp-1 max-w-[130px]">{{ u.fullName }}</span>
-                <span class="text-[0.6875rem] font-semibold text-primary leading-none">{{ 'stagesShort.' + (u.stage || 'sec3') | t }}</span>
+                <span class="text-[0.6875rem] font-semibold text-primary leading-none">
+                  {{ isStaff() ? ('admin.panel' | t) : ('stagesShort.' + (u.stage || 'sec3') | t) }}
+                </span>
               </div>
             </a>
             
@@ -93,11 +136,23 @@ interface NavItem {
     @if (menuOpen()) {
       <div id="mobile-menu" class="border-t border-line/60 bg-white lg:hidden">
         <nav class="container-page flex flex-col py-3" [attr.aria-label]="'nav.main' | t">
+          @if (isStaff()) {
+            <a routerLink="/admin" class="mb-2 flex items-center gap-2.5 rounded-card border border-amber-200 bg-amber-50 px-3 py-2.5 font-display text-sm font-bold text-amber-900 shadow-xs">
+              <lucide-icon name="shield-check" [size]="18" class="text-amber-600" />
+              {{ 'nav.admin' | t }}
+            </a>
+          }
           @for (item of nav; track item.path) {
             <a [routerLink]="item.path" routerLinkActive="bg-surface-tint !text-ink" [routerLinkActiveOptions]="{ exact: !!item.exact }"
               ariaCurrentWhenActive="page"
-              class="rounded-card px-3 py-3 font-display text-[0.9375rem] font-medium text-ink-body">
+              class="relative rounded-card px-3 py-3 font-display text-[0.9375rem] font-medium text-ink-body">
               {{ item.key | t }}
+              @if (item.path === '/live' && hasLiveSession()) {
+                <span class="ms-2 inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 font-display text-[0.6875rem] font-bold text-red-600">
+                  <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500"></span>
+                  {{ 'nav.liveNow' | t }}
+                </span>
+              }
             </a>
           }
 
@@ -130,7 +185,46 @@ interface NavItem {
 export class HeaderComponent {
   protected readonly i18n = inject(LanguageService);
   protected readonly auth = inject(AuthService);
+  private readonly adminSvc = inject(AdminService);
   protected readonly menuOpen = signal(false);
+
+  protected readonly isStaff = computed(() => {
+    try {
+      if (typeof this.auth?.isStaff === 'function') {
+        return this.auth.isStaff();
+      }
+      const role = this.auth?.user?.()?.role;
+      return role === 'admin' || role === 'assistant';
+    } catch {
+      return false;
+    }
+  });
+
+  /** True when at least one live class currently has status === 'live'. Powers the navbar badge. */
+  protected readonly hasLiveSession = computed(() =>
+    this.adminSvc.liveClasses().some((s) => s.status === 'live')
+  );
+
+  protected readonly popup = this.adminSvc.activePopup;
+  protected readonly popupDismissed = signal(false);
+
+  protected dismissPopup(): void {
+    this.popupDismissed.set(true);
+  }
+
+  protected popupToneClass(type?: string): string {
+    switch (type) {
+      case 'warning':
+        return 'bg-amber-600 text-white';
+      case 'success':
+        return 'bg-emerald-700 text-white';
+      case 'info':
+        return 'bg-sky-600 text-white';
+      case 'announcement':
+      default:
+        return 'bg-primary text-white';
+    }
+  }
 
   protected readonly nav: NavItem[] = [
     { path: '/', key: 'nav.home', exact: true },

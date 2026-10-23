@@ -12,7 +12,7 @@ type Tab = 'review' | 'all';
 const TONE: Record<PaymentRowStatus, string> = {
   pending: 'tone-warning', approved: 'tone-success', paid: 'tone-success', rejected: 'tone-danger', failed: 'tone-danger', refunded: 'tone-neutral',
 };
-const METHOD_ICON = { card: 'credit-card', instapay: 'landmark', vodafone: 'smartphone' } as const;
+const METHOD_ICON: Record<string, string> = { card: 'credit-card', instapay: 'landmark', vodafone: 'smartphone', etisalat: 'smartphone' };
 
 @Component({
   selector: 'app-admin-payments',
@@ -20,7 +20,7 @@ const METHOD_ICON = { card: 'credit-card', instapay: 'landmark', vodafone: 'smar
   template: `
     <div class="space-y-6">
       <app-admin-header [title]="'admin.pay.title' | t" [subtitle]="'admin.pay.subtitle' | t">
-        <button type="button" class="btn btn-soft"><lucide-icon name="download" [size]="16" />{{ 'admin.export' | t }}</button>
+        <button type="button" class="btn btn-soft" (click)="exportCsv()"><lucide-icon name="download" [size]="16" />{{ 'admin.export' | t }}</button>
       </app-admin-header>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -92,11 +92,39 @@ const METHOD_ICON = { card: 'credit-card', instapay: 'landmark', vodafone: 'smar
           <span class="tag" [class]="tone[p.status]">{{ 'admin.pay.status.' + p.status | t }}</span>
         </div>
 
-        @if (p.receiptFile) {
-          <div class="flex h-64 flex-col items-center justify-center gap-2.5 rounded-card border border-line bg-surface-tint2">
-            <lucide-icon [name]="p.receiptFile.endsWith('.pdf') ? 'file-text' : 'image'" [size]="38" class="text-primary-light" />
-            <p class="text-[0.8125rem] text-ink-muted" dir="ltr">{{ p.receiptFile }}</p>
-            <button type="button" class="btn btn-soft btn-sm"><lucide-icon name="maximize" [size]="14" />{{ 'admin.pay.fullSize' | t }}</button>
+        @if (activeReceipt(p); as curFile) {
+          <div class="space-y-3">
+            <div class="group relative overflow-hidden rounded-card-lg border border-line bg-surface-page shadow-sm">
+              @if (isImage(curFile)) {
+                <a [href]="curFile" target="_blank" class="block max-h-96 overflow-hidden bg-black/5 text-center cursor-zoom-in">
+                  <img [src]="curFile" [alt]="p.student + ' receipt'" class="mx-auto max-h-96 w-auto object-contain transition duration-200 group-hover:scale-[1.02]" />
+                </a>
+              } @else {
+                <div class="flex h-52 flex-col items-center justify-center gap-2.5 bg-surface-tint2">
+                  <lucide-icon [name]="curFile.endsWith('.pdf') ? 'file-text' : 'image'" [size]="42" class="text-primary-light" />
+                  <p class="text-[0.8125rem] font-medium text-ink-muted" dir="ltr">{{ curFile }}</p>
+                </div>
+              }
+              <div class="flex items-center justify-between border-t border-line/60 bg-surface-tint px-3.5 py-2.5">
+                <span class="truncate text-xs font-mono text-ink-muted" dir="ltr">{{ curFile }}</span>
+                <a [href]="curFile" target="_blank" class="btn btn-soft btn-sm inline-flex items-center gap-1.5 shrink-0">
+                  <lucide-icon name="maximize" [size]="14" />{{ 'admin.pay.fullSize' | t }}
+                </a>
+              </div>
+            </div>
+
+            @if (p.receiptFiles && p.receiptFiles.length > 1) {
+              <div class="flex items-center gap-2 pt-1">
+                <span class="text-xs font-semibold text-ink-muted">Screenshots ({{ p.receiptFiles.length }}):</span>
+                @for (file of p.receiptFiles; track file) {
+                  <button type="button" (click)="selectedReceiptFile.set(file)"
+                    class="h-12 w-12 overflow-hidden rounded-card border transition"
+                    [class]="activeReceipt(p) === file ? 'border-primary ring-2 ring-primary/40' : 'border-line opacity-70 hover:opacity-100'">
+                    <img [src]="file" alt="Thumb" class="h-full w-full object-cover" />
+                  </button>
+                }
+              </div>
+            }
           </div>
         }
 
@@ -161,9 +189,22 @@ export class AdminPaymentsPage {
       .filter((p) => (this.tab() === 'all' || p.status === 'pending') && (!q || p.student.toLowerCase().includes(q) || p.reference.toLowerCase().includes(q)));
   });
 
+  protected readonly selectedReceiptFile = signal<string | null>(null);
+
+  protected activeReceipt(p: AdminPayment): string | null {
+    const override = this.selectedReceiptFile();
+    if (override && p.receiptFiles?.includes(override)) return override;
+    return p.receiptFile || p.receiptFiles?.[0] || null;
+  }
+
+  protected isImage(file: string): boolean {
+    return /\.(png|jpe?g|webp|gif|svg)$/i.test(file);
+  }
+
   protected open(p: AdminPayment): void {
     this.note.set('');
     this.noteErr.set(false);
+    this.selectedReceiptFile.set(p.receiptFile || p.receiptFiles?.[0] || null);
     this.selectedId.set(p.id);
   }
 
@@ -179,5 +220,26 @@ export class AdminPaymentsPage {
     }
     this.admin.reject(p.id, this.note().trim());
     this.selectedId.set(null);
+  }
+
+  protected exportCsv(): void {
+    const rows = [
+      ['Student', 'Email', 'Method', 'Amount (EGP)', 'Status', 'Reference', 'Date'],
+      ...this.admin.payments().map((p) => [
+        p.student,
+        p.email || '',
+        p.method,
+        p.amountEgp,
+        p.status,
+        p.reference,
+        p.submittedAt,
+      ]),
+    ];
+    const blob = new Blob([rows.map((r) => r.join(',')).join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'payments.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
 }

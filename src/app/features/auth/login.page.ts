@@ -32,6 +32,13 @@ export class LoginPage {
     return c.invalid && (c.touched || this.submitted());
   }
 
+  protected fillAdmin(): void {
+    this.form.patchValue({
+      email: 'adel@adelmostafa.com',
+      password: '3:hhL-Ds7zVYCg:',
+    });
+  }
+
   protected submit(): void {
     this.submitted.set(true);
     this.authError.set(false);
@@ -42,9 +49,13 @@ export class LoginPage {
     }
     this.loading.set(true);
     this.auth.login(this.form.getRawValue()).subscribe({
-      next: () => {
+      next: (u) => {
         this.loading.set(false);
-        this.router.navigateByUrl('/progress');
+        if (u.role === 'admin' || u.role === 'assistant') {
+          this.router.navigateByUrl('/admin');
+        } else {
+          this.router.navigateByUrl('/progress');
+        }
       },
       error: (err: any) => {
         this.loading.set(false);
