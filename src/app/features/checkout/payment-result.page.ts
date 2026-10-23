@@ -137,11 +137,14 @@ export class PaymentResultPage {
 
     // Demo only: simulate the server confirming the order a moment after the provider returns.
     effect((onCleanup) => {
-      if (this.state() !== 'processing') return;
-      const t = setTimeout(() => {
-        this.router.navigate([], { queryParams: { status: 'success' }, queryParamsHandling: 'merge', replaceUrl: true });
-      }, 2500);
-      onCleanup(() => clearTimeout(t));
+      if (this.state() === 'processing') {
+        const t = setTimeout(() => {
+          this.router.navigate([], { queryParams: { status: 'success' }, queryParamsHandling: 'merge', replaceUrl: true });
+        }, 2500);
+        onCleanup(() => clearTimeout(t));
+      } else if (this.state() === 'success' && this.id()) {
+        this.commerce.recordPurchase(this.kind(), this.id(), this.reference());
+      }
     });
   }
 

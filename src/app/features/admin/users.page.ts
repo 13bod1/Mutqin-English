@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { AdminService } from '../../core/data/admin.service';
+import { AssistantAccount, ASSISTANT_ACCOUNTS_KEY, getCustomAssistantAccounts, saveCustomAssistantAccount } from '../../core/data/auth.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { UserStatus } from '../../core/models/admin';
@@ -19,6 +20,7 @@ const STATUS_TONE: Record<UserStatus, string> = { active: 'tone-success', invite
     <div class="space-y-6">
       <app-admin-header [title]="'admin.users.title' | t" [subtitle]="'admin.users.subtitle' | t: { n: tot.students, max: tot.maxSeats }">
         <button type="button" class="btn btn-soft" (click)="exportCsv()"><lucide-icon name="download" [size]="16" />{{ 'admin.exportCsv' | t }}</button>
+        <button type="button" class="btn btn-soft" (click)="openAddAssistant.set(true)"><lucide-icon name="user-check" [size]="16" />Add Assistant Account</button>
         <button type="button" class="btn btn-primary" (click)="openInvite.set(true)"><lucide-icon name="plus" [size]="16" />{{ 'admin.users.invite' | t }}</button>
       </app-admin-header>
 
@@ -87,14 +89,16 @@ const STATUS_TONE: Record<UserStatus, string> = { active: 'tone-success', invite
         </div>
         <p class="text-[0.8125rem] text-ink-muted">{{ 'admin.users.showing' | t: { n: filtered().length, total: tot.students } }}</p>
       } @else {
+        <!-- Staff: fixed staff + custom assistant accounts -->
         <div class="table-wrap">
           <table class="table">
-            <thead><tr><th>{{ 'admin.cols.member' | t }}</th><th>{{ 'admin.cols.role' | t }}</th><th>{{ 'admin.cols.permissions' | t }}</th><th></th></tr></thead>
+            <thead><tr><th>Member</th><th>Role</th><th>Email</th><th>Permissions</th><th></th></tr></thead>
             <tbody>
               @for (m of admin.staff(); track m.id) {
                 <tr>
-                  <td><div class="flex items-center gap-3"><app-initials [text]="m.initials" [dark]="m.role === 'owner'" /><div><p class="font-display font-semibold text-ink">{{ m.name }}</p><p class="text-xs text-ink-muted">{{ m.email }}</p></div></div></td>
+                  <td><div class="flex items-center gap-3"><app-initials [text]="m.initials" [dark]="m.role === 'owner'" /><div><p class="font-display font-semibold text-ink">{{ m.name }}</p></div></div></td>
                   <td><span class="tag" [class]="m.role === 'owner' ? 'bg-primary text-white' : 'tone-brand'">{{ 'admin.roles.' + m.role | t }}</span></td>
+                  <td class="text-xs text-ink-muted">{{ m.email }}</td>
                   <td>
                     <div class="flex flex-wrap gap-1.5">
                       @for (s of m.scopes; track s) { <span class="tag tone-neutral">{{ 'admin.scopes.' + s | t }}</span> } @empty { <span class="text-xs text-ink-muted">{{ 'admin.scopes.all' | t }}</span> }
@@ -103,9 +107,35 @@ const STATUS_TONE: Record<UserStatus, string> = { active: 'tone-success', invite
                   <td class="text-end"><button type="button" class="btn-icon" [attr.aria-label]="'admin.more' | t"><lucide-icon name="ellipsis" [size]="16" /></button></td>
                 </tr>
               }
+              @for (a of customAssistants(); track a.id) {
+                <tr class="bg-amber-50/50">
+                  <td>
+                    <div class="flex items-center gap-3">
+                      <app-initials [text]="a.initials" />
+                      <div>
+                        <p class="font-display font-semibold text-ink">{{ a.fullName }}</p>
+                        <p class="text-[0.6875rem] text-amber-700 font-bold">Custom Account · Can login at /assistant</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="tag tone-warning">Assistant</span></td>
+                  <td class="text-xs text-ink-muted" dir="ltr">{{ a.email }}</td>
+                  <td>
+                    <div class="flex flex-wrap gap-1.5">
+                      @for (s of (a.scopes || []); track s) { <span class="tag tone-neutral">{{ s }}</span> } @empty { <span class="tag tone-neutral">receipts + Q&A</span> }
+                    </div>
+                  </td>
+                  <td class="text-end">
+                    <button type="button" class="btn btn-danger-soft btn-sm !px-2" (click)="deleteAssistant(a.id)" title="Delete account">
+                      <lucide-icon name="trash-2" [size]="14" />
+                    </button>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
+        <p class="text-xs text-ink-muted mt-2">Custom assistant accounts (in amber) can log in using their email and password at the <span class="font-bold text-primary">/login</span> page → <span class="font-bold text-primary">/assistant</span> portal.</p>
       }
 
       @if (openInvite()) {
@@ -134,6 +164,54 @@ const STATUS_TONE: Record<UserStatus, string> = { active: 'tone-success', invite
           </div>
         </app-drawer>
       }
+
+      <!-- Create Assistant Account Drawer -->
+      @if (openAddAssistant()) {
+        <app-drawer title="Create Assistant Account" subtitle="This account can log in at /login and access the Assistant Portal (/assistant)." (closed)="openAddAssistant.set(false); resetAssistantForm()">
+          <div class="rounded-card border border-amber-200 bg-amber-50 p-3 mb-2">
+            <p class="text-xs font-bold text-amber-900">⚠️ Security Notice</p>
+            <p class="text-xs text-amber-800 mt-0.5">Only you (admin) can see this form. Credentials are stored encrypted-locally and grant limited /assistant access only.</p>
+          </div>
+          <div class="space-y-4">
+            <label class="block">
+              <span class="field-label">Full Name</span>
+              <input type="text" class="input" [ngModel]="newAssistantName()" (ngModelChange)="newAssistantName.set($event)" placeholder="e.g. Sara Hassan" autocomplete="off" />
+            </label>
+            <label class="block">
+              <span class="field-label">Email Address</span>
+              <input type="email" class="input" [ngModel]="newAssistantEmail()" (ngModelChange)="newAssistantEmail.set($event)" placeholder="sara@example.com" autocomplete="new-password" dir="ltr" />
+            </label>
+            <label class="block">
+              <span class="field-label">Password</span>
+              <div class="relative">
+                <input [type]="showAssistantPw() ? 'text' : 'password'" class="input pe-11" [ngModel]="newAssistantPw()" (ngModelChange)="newAssistantPw.set($event)" placeholder="Min 8 characters" autocomplete="new-password" dir="ltr" />
+                <button type="button" class="absolute end-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink" (click)="showAssistantPw.set(!showAssistantPw())">
+                  <lucide-icon [name]="showAssistantPw() ? 'eye-off' : 'eye'" [size]="16" />
+                </button>
+              </div>
+              @if (assistantFormErr()) { <span class="field-error"><lucide-icon name="circle-alert" [size]="14" />{{ assistantFormErr() }}</span> }
+            </label>
+          </div>
+          @if (assistantCreated()) {
+            <div class="rounded-card border border-emerald-200 bg-emerald-50 p-4 mt-2">
+              <p class="font-display font-bold text-sm text-emerald-900 flex items-center gap-2"><lucide-icon name="circle-check" [size]="16" class="text-emerald-600" />Account Created Successfully</p>
+              <div class="mt-2 font-mono text-xs text-emerald-900 space-y-1 bg-white/70 rounded p-2">
+                <p><span class="font-bold">Email:</span> {{ assistantCreated()?.email }}</p>
+                <p><span class="font-bold">Password:</span> {{ assistantCreated()?.password }}</p>
+              </div>
+              <p class="text-xs text-emerald-700 mt-1.5">Save these credentials — they will not be shown again after closing this form.</p>
+            </div>
+          }
+          <div footer class="flex gap-2 w-full">
+            <button type="button" class="btn btn-ghost flex-1" (click)="openAddAssistant.set(false); resetAssistantForm()">Close</button>
+            @if (!assistantCreated()) {
+              <button type="button" class="btn btn-primary flex-1" (click)="createAssistant()" [disabled]="!newAssistantName().trim() || !newAssistantEmail().trim() || newAssistantPw().length < 8">
+                <lucide-icon name="user-check" [size]="16" />Create Account
+              </button>
+            }
+          </div>
+        </app-drawer>
+      }
     </div>
   `,
 })
@@ -154,6 +232,16 @@ export class AdminUsersPage {
   protected readonly newStudentName = signal('');
   protected readonly newStudentEmail = signal('');
   protected readonly newStudentStage = signal<AcademicStage>('sec3');
+
+  // Assistant account management
+  protected readonly openAddAssistant = signal(false);
+  protected readonly newAssistantName = signal('');
+  protected readonly newAssistantEmail = signal('');
+  protected readonly newAssistantPw = signal('');
+  protected readonly showAssistantPw = signal(false);
+  protected readonly assistantFormErr = signal('');
+  protected readonly assistantCreated = signal<AssistantAccount | null>(null);
+  protected readonly customAssistants = signal<AssistantAccount[]>(getCustomAssistantAccounts());
 
   protected readonly filtered = computed(() => {
     const q = this.query().trim().toLowerCase();
@@ -205,5 +293,58 @@ export class AdminUsersPage {
     a.download = 'students.csv';
     a.click();
     URL.revokeObjectURL(a.href);
+  }
+
+  protected resetAssistantForm(): void {
+    this.newAssistantName.set('');
+    this.newAssistantEmail.set('');
+    this.newAssistantPw.set('');
+    this.showAssistantPw.set(false);
+    this.assistantFormErr.set('');
+    this.assistantCreated.set(null);
+  }
+
+  protected createAssistant(): void {
+    const name = this.newAssistantName().trim();
+    const email = this.newAssistantEmail().trim().toLowerCase();
+    const password = this.newAssistantPw().trim();
+
+    if (!name || !email || password.length < 8) {
+      this.assistantFormErr.set('Please fill all fields. Password must be at least 8 characters.');
+      return;
+    }
+
+    const existing = getCustomAssistantAccounts();
+    if (existing.some((a) => a.email.toLowerCase() === email)) {
+      this.assistantFormErr.set('An assistant account with this email already exists.');
+      return;
+    }
+
+    const initials = name.trim().split(/\s+/).map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
+    const account: AssistantAccount = {
+      id: 'asst-' + Date.now(),
+      fullName: name,
+      email,
+      password,
+      initials,
+      role: 'assistant',
+      createdAt: new Date().toISOString(),
+      scopes: ['receipts', 'attendance', 'qa'],
+    };
+
+    saveCustomAssistantAccount(account);
+    this.customAssistants.set(getCustomAssistantAccounts());
+    this.assistantCreated.set(account);
+    this.assistantFormErr.set('');
+  }
+
+  protected deleteAssistant(id: string): void {
+    if (!confirm('Delete this assistant account? They will no longer be able to log in.')) return;
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const list = getCustomAssistantAccounts().filter((a) => a.id !== id);
+      localStorage.setItem(ASSISTANT_ACCOUNTS_KEY, JSON.stringify(list));
+      this.customAssistants.set(list);
+    } catch {}
   }
 }

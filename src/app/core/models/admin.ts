@@ -64,6 +64,8 @@ export interface AdminLecture {
   access: Access;
   uploadPercent?: number;
   publishAt?: string;
+  thumbnailUrl?: string;
+  videoUrl?: string;
 }
 
 export type AnnouncementState = 'scheduled' | 'sent' | 'draft';
@@ -95,6 +97,7 @@ export interface AssistantMetric {
 }
 
 export type SiteTheme = 'light' | 'dark' | 'system';
+export type UserPortalTheme = 'classic' | 'navy' | 'emerald' | 'purple' | 'gold';
 
 export interface PopupMessageSettings {
   enabled: boolean;
@@ -129,5 +132,6 @@ export interface AcademySettings {
   defaultLang: 'en' | 'ar';
   showLangSwitch: boolean;
   theme: SiteTheme;
+  userPortalTheme?: UserPortalTheme;
   popupMessage: PopupMessageSettings;
 }

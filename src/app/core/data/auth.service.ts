@@ -65,6 +65,44 @@ export const ASSISTANT_CREDENTIALS = {
   },
 };
 
+export const ASSISTANT_ACCOUNTS_KEY = 'mutqin_assistant_accounts';
+
+export interface AssistantAccount {
+  id: string;
+  fullName: string;
+  email: string;
+  password: string;
+  initials: string;
+  role: 'assistant';
+  createdAt: string;
+  scopes?: string[];
+}
+
+export function getCustomAssistantAccounts(): AssistantAccount[] {
+  if (typeof localStorage === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(ASSISTANT_ACCOUNTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomAssistantAccount(account: AssistantAccount): void {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    const list = getCustomAssistantAccounts();
+    const idx = list.findIndex((a) => a.email.toLowerCase() === account.email.toLowerCase());
+    if (idx !== -1) {
+      list[idx] = account;
+    } else {
+      list.push(account);
+    }
+    localStorage.setItem(ASSISTANT_ACCOUNTS_KEY, JSON.stringify(list));
+    window.dispatchEvent(new Event('storage'));
+  } catch {}
+}
+
 export const STUDENT_LOGINS_KEY = 'mutqin_student_logins';
 export const REGISTERED_STUDENTS_KEY = 'mutqin_admin_students';
 
@@ -105,11 +143,7 @@ export class AuthService {
   private async initUser() {
     // Preserve local admin / assistant session across reloads
     const stored = this.getStoredUser();
-    if (stored?.email?.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && stored?.role === 'admin') {
-      this.user.set(stored);
-      return;
-    }
-    if (stored?.email?.toLowerCase() === ASSISTANT_CREDENTIALS.email.toLowerCase() && stored?.role === 'assistant') {
+    if (stored?.role === 'admin' || stored?.role === 'assistant') {
       this.user.set(stored);
       return;
     }
@@ -162,10 +196,7 @@ export class AuthService {
 
     this.supabase.auth.onAuthStateChange(async (_event, session) => {
       const cur = this.user();
-      if (
-        (cur?.email?.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && cur?.role === 'admin') ||
-        (cur?.email?.toLowerCase() === ASSISTANT_CREDENTIALS.email.toLowerCase() && cur?.role === 'assistant')
-      ) {
+      if (cur?.role === 'admin' || cur?.role === 'assistant') {
         return;
       }
       if (session?.user) {
@@ -270,6 +301,24 @@ export class AuthService {
       this.user.set(assistantUser);
       this.saveStoredUser(assistantUser);
       return of(assistantUser);
+    }
+
+    // Check custom assistant accounts created from Admin Panel
+    const customAssistants = getCustomAssistantAccounts();
+    const matched = customAssistants.find(
+      (a) => a.email.toLowerCase() === cleanEmail.toLowerCase() && a.password === req.password
+    );
+    if (matched) {
+      const customAssistantUser: AuthUser = {
+        id: matched.id,
+        fullName: matched.fullName,
+        email: matched.email,
+        initials: matched.initials,
+        role: 'assistant',
+      };
+      this.user.set(customAssistantUser);
+      this.saveStoredUser(customAssistantUser);
+      return of(customAssistantUser);
     }
 
     return from(

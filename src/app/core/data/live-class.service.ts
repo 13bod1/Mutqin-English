@@ -1,24 +1,24 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { CHAT_MOCK, LIVE_CLASSES_MOCK, PURCHASES_MOCK } from '../mock/live.mock';
+import { Observable, of, throwError } from 'rxjs';
+import { CHAT_MOCK } from '../mock/live.mock';
 import { ChatMessage, LiveClass } from '../models/live';
+import { AdminService } from './admin.service';
 import { AuthService } from './auth.service';
 import { mockResponse } from './mock-response';
 
 /**
  * Live classes shown on the site (student + teacher views).
- * Access control: playbackUrl is only returned to students who have purchased the session.
- * Unauthorized access returns a 403-like error.
- *
- * Backend plan: Supabase table `live_sessions` + Mux live streams; chat via Supabase Realtime.
+ * Dynamically synchronized with Admin Dashboard.
  */
 @Injectable({ providedIn: 'root' })
 export class LiveClassService {
   private readonly auth = inject(AuthService);
+  private readonly admin = inject(AdminService);
 
-  /** GET /api/live-sessions — public list, never exposes playbackUrl */
+  /** GET /api/live-sessions — public list, dynamically sourced from Admin Dashboard */
   getAll(): Observable<LiveClass[]> {
-    const safe = LIVE_CLASSES_MOCK.map((s) => ({ ...s, playbackUrl: undefined }));
+    const list = this.admin.liveClasses();
+    const safe = list.map((s) => ({ ...s, playbackUrl: undefined }));
     return mockResponse(safe);
   }
 
@@ -26,10 +26,9 @@ export class LiveClassService {
    * GET /api/live-sessions/:id
    * - Staff (admin/assistant) always receive the playbackUrl.
    * - Students receive playbackUrl only if they have purchased the session.
-   * - Unauthorized students get a 403 error — the URL is never exposed.
    */
   getById(id: string): Observable<LiveClass | null> {
-    const session = LIVE_CLASSES_MOCK.find((s) => s.id === id) ?? null;
+    const session = this.admin.liveClasses().find((s) => s.id === id) ?? null;
     if (!session) return mockResponse(null);
 
     const user = this.auth.user();
@@ -44,13 +43,17 @@ export class LiveClassService {
       return mockResponse({ ...session, playbackUrl: undefined });
     }
 
-    // Check if the student has purchased this session
-    const hasPurchased = PURCHASES_MOCK.some(
-      (p) => p.kind === 'live' && p.itemId === id
-    );
+    // Check if the student has purchased this session in localStorage or mock
+    let hasPurchased = false;
+    try {
+      const raw = localStorage.getItem('mutqin_user_purchases');
+      if (raw) {
+        const list = JSON.parse(raw);
+        hasPurchased = list.some((p: any) => p.kind === 'live' && p.itemId === id);
+      }
+    } catch {}
 
-    if (!hasPurchased && user) {
-      // Return session metadata but 403 the stream link
+    if (!hasPurchased && session.access?.type === 'paid' && user) {
       return throwError(() => ({
         status: 403,
         message: 'Access denied: purchase this session to watch the live stream.',

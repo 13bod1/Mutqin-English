@@ -63,7 +63,16 @@ const STATE_TONE: Record<LectureState, string> = { published: 'tone-success', dr
               <tr>
                 <td>
                   <div class="flex items-center gap-3.5">
-                    <span class="grid h-12 w-20 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-primary to-[#2B1D19] text-white"><lucide-icon name="play" [size]="16" class="fill-white" /></span>
+                    @if (l.thumbnailUrl) {
+                      <div class="relative h-12 w-20 shrink-0 overflow-hidden rounded-lg bg-ink/10">
+                        <img [src]="l.thumbnailUrl" [alt]="l.title.en" class="h-full w-full object-cover" />
+                        <span class="absolute inset-0 flex items-center justify-center bg-black/30">
+                          <lucide-icon name="play" [size]="14" class="fill-white text-white" />
+                        </span>
+                      </div>
+                    } @else {
+                      <span class="grid h-12 w-20 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-primary to-[#2B1D19] text-white"><lucide-icon name="play" [size]="16" class="fill-white" /></span>
+                    }
                     <div class="min-w-0">
                       <p class="font-display font-semibold text-ink">{{ l.title | loc }}</p>
                       @if (l.state === 'processing') {

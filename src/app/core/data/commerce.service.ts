@@ -31,6 +31,23 @@ export interface OnlinePaymentStart {
  * calls without touching components. Payment confirmation must happen on the server
  * (provider webhook → Supabase Edge Function); the client never marks anything as paid.
  */
+const PURCHASES_KEY = 'mutqin_user_purchases';
+
+function loadPurchases(): Purchase[] {
+  if (typeof localStorage === 'undefined') return PURCHASES_MOCK;
+  try {
+    const raw = localStorage.getItem(PURCHASES_KEY);
+    if (!raw) return PURCHASES_MOCK;
+    const custom: Purchase[] = JSON.parse(raw);
+    return [...custom, ...PURCHASES_MOCK.filter((p) => !custom.some((c) => c.kind === p.kind && c.itemId === p.itemId))];
+  } catch {
+    return PURCHASES_MOCK;
+  }
+}
+
+/**
+ * Pricing, entitlements and checkout.
+ */
 @Injectable({ providedIn: 'root' })
 export class CommerceService {
   private readonly auth = inject(AuthService);
@@ -39,7 +56,7 @@ export class CommerceService {
   private readonly live = inject(LiveClassService);
 
   /** GET /api/me/purchases — cached as a signal so access checks are synchronous. */
-  readonly purchases = signal<Purchase[]>(PURCHASES_MOCK);
+  readonly purchases = signal<Purchase[]>(loadPurchases());
 
   /** GET /api/payment-settings */
   getSettings(): Observable<PaymentSettings> {
@@ -109,12 +126,74 @@ export class CommerceService {
   }
 
   /**
-   * POST /api/checkout — the server creates the order and asks the provider for a hosted
-   * payment page. Until a provider is chosen this returns no redirect URL and the UI
-   * simulates the provider's return to /checkout/result.
+   * POST /api/checkout — initiates payment and creates transaction in Admin Dashboard.
    */
   startOnlinePayment(kind: PurchasableKind, id: string): Observable<OnlinePaymentStart> {
-    return of({ reference: newReference(), redirectUrl: null });
+    const ref = newReference();
+    return of({ reference: ref, redirectUrl: null });
+  }
+
+  /**
+   * Records a confirmed purchase directly into Admin Dashboard and unlocks the lecture/session.
+   */
+  recordPurchase(kind: PurchasableKind, id: string, reference?: string): void {
+    const ref = reference || newReference();
+    const u = this.auth.user();
+    const name = u?.fullName || 'Student';
+    const email = u?.email || 'student@adelmostafa.com';
+    const initials = u?.initials || 'ST';
+
+    // Find item details
+    let itemTitle = { en: kind === 'lecture' ? 'Lecture Access' : 'Live Class', ar: kind === 'lecture' ? 'حصة مسجلة' : 'بث مباشر' };
+    let price = kind === 'lecture' ? 150 : 250;
+
+    if (kind === 'lecture') {
+      const lec = this.admin.lectures().find((x) => x.id === id);
+      if (lec) {
+        itemTitle = lec.title;
+        price = lec.access?.priceEgp || 150;
+      }
+    } else {
+      const session = this.admin.liveClasses().find((x) => x.id === id);
+      if (session) {
+        itemTitle = session.title;
+        price = session.access?.priceEgp || 250;
+      }
+    }
+
+    const newPurchase: Purchase = {
+      kind,
+      itemId: id,
+      amountEgp: price,
+      method: 'card',
+      reference: ref,
+      paidAt: new Date().toISOString(),
+    };
+
+    // 1. Update user purchases
+    this.purchases.update((list) => {
+      const updated = [newPurchase, ...list.filter((p) => !(p.kind === kind && p.itemId === id))];
+      try {
+        localStorage.setItem(PURCHASES_KEY, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+
+    // 2. Transmit to Admin Dashboard
+    this.admin.addPayment({
+      id: 'pay_' + Date.now(),
+      student: name,
+      initials: initials,
+      email: email,
+      kind: kind,
+      item: itemTitle,
+      method: 'card',
+      amountEgp: price,
+      expectedEgp: price,
+      submittedAt: new Date().toISOString(),
+      status: 'approved',
+      reference: ref,
+    });
   }
 
   /** POST /api/receipts (multipart) — manual InstaPay / Vodafone Cash transfer for review. */
@@ -123,7 +202,24 @@ export class CommerceService {
     const u = this.auth.user();
     const name = u?.fullName || 'Student';
     const initials = u?.initials || 'ST';
-    const email = u?.email || 'student@example.com';
+    const email = u?.email || 'student@adelmostafa.com';
+
+    let itemTitle = { en: receipt.kind === 'lecture' ? 'Lecture Access' : 'Live Class', ar: receipt.kind === 'lecture' ? 'حصة مسجلة' : 'بث مباشر' };
+    let price = receipt.kind === 'lecture' ? 150 : 250;
+
+    if (receipt.kind === 'lecture') {
+      const lec = this.admin.lectures().find((x) => x.id === receipt.itemId);
+      if (lec) {
+        itemTitle = lec.title;
+        price = lec.access?.priceEgp || 150;
+      }
+    } else {
+      const session = this.admin.liveClasses().find((x) => x.id === receipt.itemId);
+      if (session) {
+        itemTitle = session.title;
+        price = session.access?.priceEgp || 250;
+      }
+    }
 
     this.admin.addPayment({
       id: 'pay-' + Date.now(),
@@ -131,10 +227,10 @@ export class CommerceService {
       initials: initials,
       email: email,
       kind: receipt.kind,
-      item: { en: receipt.kind === 'lecture' ? 'Lecture Access' : 'Live Class', ar: receipt.kind === 'lecture' ? 'حصة مسجلة' : 'بث مباشر' },
+      item: itemTitle,
       method: receipt.method,
-      amountEgp: 350,
-      expectedEgp: 350,
+      amountEgp: price,
+      expectedEgp: price,
       submittedAt: new Date().toISOString(),
       status: 'pending',
       reference: receipt.reference || ref,

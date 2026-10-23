@@ -41,6 +41,55 @@
       </dl>
     </section>
 
+    <!-- Live Session Active Banner (synchronized with Admin Dashboard) -->
+    @if (activeLive(); as live) {
+      <div class="relative overflow-hidden rounded-banner bg-gradient-to-r from-red-600 via-rose-600 to-primary p-5 sm:p-6 text-white shadow-lift flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="relative flex h-4 w-4">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"></span>
+            <span class="relative inline-flex h-4 w-4 rounded-full bg-white"></span>
+          </span>
+          <div>
+            <span class="inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider">LIVE NOW</span>
+            <h2 class="font-display text-lg font-bold mt-0.5">{{ live.title | loc }}</h2>
+            <p class="text-xs text-white/80">With Mr. Adel Mostafa · Interactive Lesson & Discussion</p>
+          </div>
+        </div>
+        <a [routerLink]="['/live', live.id]" class="btn btn-light btn-sm sm:btn shrink-0">
+          <lucide-icon name="radio" [size]="16" class="text-red-600" />
+          Join Live Studio
+        </a>
+      </div>
+    }
+
+    <!-- Academy Announcements from Admin Dashboard -->
+    @if (activeAnnouncements().length > 0) {
+      <div class="card p-5 sm:p-6 border-s-4 border-s-primary">
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="grid h-8 w-8 place-items-center rounded-lg bg-surface-tint text-primary">
+              <lucide-icon name="megaphone" [size]="18" />
+            </span>
+            <h2 class="font-display text-base font-bold text-ink">
+              {{ i18n.lang() === 'ar' ? 'إعلانات الأكاديمية ومستر عادل مصطفى' : 'Academy Announcements from Mr. Adel Mostafa' }}
+            </h2>
+          </div>
+          <span class="tag tone-brand text-xs font-bold">{{ activeAnnouncements().length }} Active</span>
+        </div>
+        <div class="space-y-3">
+          @for (ann of activeAnnouncements(); track ann.id) {
+            <div class="rounded-card border border-line/60 bg-surface-warm/50 p-4 transition hover:bg-surface-warm">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h3 class="font-display text-sm font-bold text-ink">{{ ann.title }}</h3>
+                <span class="text-[0.6875rem] text-ink-muted">{{ ann.at | date:'mediumDate' }}</span>
+              </div>
+              <p class="mt-1 text-sm text-ink-body leading-relaxed">{{ ann.body }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
     <!-- Stat cards -->
     <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <article class="card flex flex-col p-5">

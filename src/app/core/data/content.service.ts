@@ -107,6 +107,7 @@ export class ContentService {
     const fallback: SiteVideo = {
       slug: 'intro',
       videoUrl: environment.introVideo.url,
+      posterUrl: 'images/intro-thumbnail.jpg',
       title: environment.introVideo.title,
       isActive: true,
     };

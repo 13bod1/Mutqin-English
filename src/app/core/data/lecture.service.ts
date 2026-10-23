@@ -5,7 +5,36 @@ import { ContinueWatchingItem, DurationBucket, FeaturedLecture, Lecture, Lecture
 import { Lang } from '../models/localized';
 import { SupabaseService } from '../supabase/supabase.service';
 
-/** Recorded lectures powered by Supabase with mock fallback. */
+function loadLocalAdminLectures(): Lecture[] {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const raw = localStorage.getItem('mutqin_admin_lectures');
+      if (raw) {
+        const list = JSON.parse(raw);
+        if (Array.isArray(list) && list.length > 0) {
+          return list.map((l: any, idx: number) => ({
+            id: l.id,
+            title: l.title,
+            description: l.description || { en: 'Comprehensive lesson', ar: 'درس تفصيلي' },
+            unit: l.unit || { en: 'Unit 1', ar: 'الوحدة 1' },
+            stage: l.stage || 'sec3',
+            topic: l.topic || 'grammar',
+            durationMin: l.durationMin || 45,
+            instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
+            resources: l.resources || { en: 'Summary PDF & Notes', ar: 'ملخص وقواعد PDF' },
+            order: l.order || idx + 1,
+            thumbnailUrl: l.thumbnailUrl,
+            videoUrl: l.videoUrl || RECORDED_LECTURE_VIDEOS[idx % RECORDED_LECTURE_VIDEOS.length],
+            access: l.access,
+          }));
+        }
+      }
+    }
+  } catch {}
+  return LECTURES_MOCK;
+}
+
+/** Recorded lectures powered by Supabase with admin and mock fallback. */
 @Injectable({ providedIn: 'root' })
 export class LectureService {
   private readonly supabase = inject(SupabaseService);
@@ -21,7 +50,7 @@ export class LectureService {
     ).pipe(
       map(({ data, error }) => {
         if (error || !data || data.length === 0) {
-          return LECTURES_MOCK;
+          return loadLocalAdminLectures();
         }
         return data.map((l: any, idx: number) => ({
           id: l.id,
@@ -41,7 +70,7 @@ export class LectureService {
             : undefined,
         }));
       }),
-      catchError(() => of(LECTURES_MOCK))
+      catchError(() => of(loadLocalAdminLectures()))
     );
   }
 

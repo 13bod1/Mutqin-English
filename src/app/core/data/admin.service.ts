@@ -12,7 +12,7 @@ import {
   WEEKLY_ACTIVITY_MOCK,
 } from '../mock/admin.mock';
 import { LIVE_CLASSES_MOCK } from '../mock/live.mock';
-import { AcademySettings, AdminLecture, AdminPayment, AdminStudent, Announcement, PopupMessageSettings, SiteTheme, UserStatus } from '../models/admin';
+import { AcademySettings, AdminLecture, AdminPayment, AdminStudent, Announcement, PopupMessageSettings, SiteTheme, StaffMember, UserStatus } from '../models/admin';
 import { LiveClass } from '../models/live';
 import { SupabaseService } from '../supabase/supabase.service';
 import { mockResponse } from './mock-response';
@@ -24,6 +24,7 @@ const ANNOUNCEMENTS_KEY = 'mutqin_admin_announcements';
 const STUDENTS_KEY = 'mutqin_admin_students';
 const LIVE_KEY = 'mutqin_admin_live';
 const LOGINS_KEY = 'mutqin_student_logins';
+const STAFF_KEY = 'mutqin_admin_staff';
 
 function loadStorage<T>(key: string, fallback: T): T {
   if (typeof localStorage === 'undefined') return fallback;
@@ -87,7 +88,7 @@ export class AdminService {
   private readonly supabase = inject(SupabaseService);
 
   readonly students = signal<AdminStudent[]>(loadStudents());
-  readonly staff = signal(STAFF_MOCK);
+  readonly staff = signal<StaffMember[]>(loadStorage(STAFF_KEY, STAFF_MOCK));
   readonly payments = signal<AdminPayment[]>(loadPayments());
   readonly lectures = signal<AdminLecture[]>(loadStorage(LECTURES_KEY, ADMIN_LECTURES_MOCK));
   readonly liveClasses = signal<LiveClass[]>(loadStorage(LIVE_KEY, LIVE_CLASSES_MOCK));
@@ -101,11 +102,28 @@ export class AdminService {
 
   constructor() {
     this.syncRealStudents();
+    this.applyInitialThemes();
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', () => {
         this.students.set(loadStudents());
         this.recentLogins.set(loadStorage(LOGINS_KEY, []));
+        this.staff.set(loadStorage(STAFF_KEY, STAFF_MOCK));
+        this.payments.set(loadPayments());
+        this.announcements.set(loadStorage(ANNOUNCEMENTS_KEY, ANNOUNCEMENTS_MOCK));
+        this.liveClasses.set(loadStorage(LIVE_KEY, LIVE_CLASSES_MOCK));
+        this.applyInitialThemes();
       });
+    }
+  }
+
+  private applyInitialThemes(): void {
+    if (typeof document === 'undefined') return;
+    const s = loadSettings();
+    if (s.theme) {
+      document.documentElement.setAttribute('data-theme', s.theme);
+    }
+    if (s.userPortalTheme) {
+      document.documentElement.setAttribute('data-user-theme', s.userPortalTheme);
     }
   }
 
@@ -207,9 +225,15 @@ export class AdminService {
         document.documentElement.setAttribute('data-theme', s.theme);
       }
     }
+    if (s.userPortalTheme) {
+      if (typeof document !== 'undefined') {
+        document.documentElement.setAttribute('data-user-theme', s.userPortalTheme);
+      }
+    }
     if (s.popupMessage !== undefined) {
       this.activePopup.set(s.popupMessage);
     }
+    window.dispatchEvent(new Event('storage'));
     return mockResponse(s);
   }
 
@@ -324,6 +348,24 @@ export class AdminService {
     this.payments.update((list) => {
       const updated = [p, ...list];
       saveStorage(PAYMENTS_KEY, updated);
+      return updated;
+    });
+  }
+
+  /** Add staff member */
+  addStaffMember(member: StaffMember): void {
+    this.staff.update((list) => {
+      const updated = [member, ...list.filter((x) => x.id !== member.id)];
+      saveStorage(STAFF_KEY, updated);
+      return updated;
+    });
+  }
+
+  /** Remove staff member */
+  removeStaffMember(id: string): void {
+    this.staff.update((list) => {
+      const updated = list.filter((x) => x.id !== id);
+      saveStorage(STAFF_KEY, updated);
       return updated;
     });
   }

@@ -1,8 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { AdminService } from '../../core/data/admin.service';
 import { ProgressService } from '../../core/data/progress.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { LocalizePipe, TranslatePipe } from '../../core/i18n/translate.pipe';
@@ -15,19 +16,27 @@ import { WeeklyChartComponent } from './weekly-chart.component';
 @Component({
   selector: 'app-progress',
   imports: [
-    RouterLink, DecimalPipe, LucideAngularModule, TranslatePipe, LocalizePipe,
+    RouterLink, DatePipe, DecimalPipe, LucideAngularModule, TranslatePipe, LocalizePipe,
     AvatarComponent, CtaBannerComponent, ProgressRingComponent, WeeklyChartComponent,
   ],
   templateUrl: './progress.page.html',
 })
 export class ProgressPage {
   private readonly progress = inject(ProgressService);
-  private readonly i18n = inject(LanguageService);
+  protected readonly i18n = inject(LanguageService);
+  protected readonly admin = inject(AdminService);
 
   protected readonly profile = toSignal(this.progress.getProfile());
   protected readonly summary = toSignal(this.progress.getSummary());
   protected readonly leaderboard = toSignal(this.progress.getLeaderboard(), { initialValue: [] });
   protected readonly achievements = toSignal(this.progress.getAchievements(), { initialValue: [] });
+
+  protected readonly activeAnnouncements = computed(() =>
+    this.admin.announcements().filter((a) => a.state === 'sent')
+  );
+  protected readonly activeLive = computed(() =>
+    this.admin.liveClasses().find((s) => s.status === 'live')
+  );
 
   protected readonly skillIcon: Record<SkillKey, string> = {
     grammar: 'spell-check',
