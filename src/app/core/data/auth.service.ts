@@ -52,6 +52,22 @@ export const ADMIN_CREDENTIALS = {
   },
 };
 
+export const ASSISTANT_CREDENTIALS = {
+  email: 'assistant@adelmostafa.com',
+  password: 'Assist@Adel#2026',
+  user: {
+    id: 's1-assistant-sara',
+    fullName: 'Sara Hassan (Assistant)',
+    email: 'assistant@adelmostafa.com',
+    stage: 'sec3' as AcademicStage,
+    initials: 'SH',
+    role: 'assistant' as UserRole,
+  },
+};
+
+export const STUDENT_LOGINS_KEY = 'mutqin_student_logins';
+export const REGISTERED_STUDENTS_KEY = 'mutqin_admin_students';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly supabase = inject(SupabaseService);
@@ -87,9 +103,13 @@ export class AuthService {
   }
 
   private async initUser() {
-    // Preserve local admin session across reloads
+    // Preserve local admin / assistant session across reloads
     const stored = this.getStoredUser();
     if (stored?.email?.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && stored?.role === 'admin') {
+      this.user.set(stored);
+      return;
+    }
+    if (stored?.email?.toLowerCase() === ASSISTANT_CREDENTIALS.email.toLowerCase() && stored?.role === 'assistant') {
       this.user.set(stored);
       return;
     }
@@ -127,6 +147,9 @@ export class AuthService {
         };
         this.user.set(updated);
         this.saveStoredUser(updated);
+        if (updated.role !== 'admin' && updated.role !== 'assistant') {
+          this.recordStudentActivity(updated, 'login');
+        }
       } else {
         // No active Supabase session — clear any stale local user
         this.user.set(null);
@@ -139,7 +162,10 @@ export class AuthService {
 
     this.supabase.auth.onAuthStateChange(async (_event, session) => {
       const cur = this.user();
-      if (cur?.email?.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && cur?.role === 'admin') {
+      if (
+        (cur?.email?.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && cur?.role === 'admin') ||
+        (cur?.email?.toLowerCase() === ASSISTANT_CREDENTIALS.email.toLowerCase() && cur?.role === 'assistant')
+      ) {
         return;
       }
       if (session?.user) {
@@ -155,11 +181,79 @@ export class AuthService {
         };
         this.user.set(updated);
         this.saveStoredUser(updated);
+        if (updated.role !== 'admin' && updated.role !== 'assistant') {
+          this.recordStudentActivity(updated, 'login');
+        }
       } else {
         this.user.set(null);
         this.saveStoredUser(null);
       }
     });
+  }
+
+  /** Record student login/signup in local database so it immediately reflects in the admin dashboard */
+  recordStudentActivity(user: AuthUser, type: 'login' | 'signup'): void {
+    if (typeof localStorage === 'undefined' || !user || user.role === 'admin' || user.role === 'assistant') return;
+    try {
+      const nowIso = new Date().toISOString();
+      const todayDate = nowIso.split('T')[0];
+
+      // 1. Update/Add to Registered Students Database
+      const rawStudents = localStorage.getItem(REGISTERED_STUDENTS_KEY);
+      let list: any[] = rawStudents ? JSON.parse(rawStudents) : [];
+      if (!Array.isArray(list)) list = [];
+
+      const existingIdx = list.findIndex(
+        (s) => (user.id && s.id === user.id) || (user.email && s.email?.toLowerCase() === user.email.toLowerCase())
+      );
+
+      if (existingIdx !== -1) {
+        list[existingIdx] = {
+          ...list[existingIdx],
+          name: user.fullName || list[existingIdx].name,
+          stage: user.stage || list[existingIdx].stage || 'sec3',
+          status: 'active',
+          lastLoginAt: nowIso,
+        };
+      } else {
+        const newStudent = {
+          id: user.id || 'u_' + Date.now(),
+          name: user.fullName || user.email.split('@')[0],
+          email: user.email,
+          stage: user.stage || 'sec3',
+          joinedAt: todayDate,
+          lastLoginAt: nowIso,
+          lecturesDone: 0,
+          lecturesTotal: 40,
+          avgScore: null,
+          status: 'active',
+        };
+        list.unshift(newStudent);
+      }
+      localStorage.setItem(REGISTERED_STUDENTS_KEY, JSON.stringify(list));
+
+      // 2. Add to Recent Student Logins Log
+      const rawLogins = localStorage.getItem(STUDENT_LOGINS_KEY);
+      let logins: any[] = rawLogins ? JSON.parse(rawLogins) : [];
+      if (!Array.isArray(logins)) logins = [];
+
+      logins.unshift({
+        id: user.id || 'log_' + Date.now(),
+        who: user.initials || 'ST',
+        name: user.fullName || user.email,
+        email: user.email,
+        stage: user.stage || 'sec3',
+        type,
+        time: nowIso,
+      });
+      if (logins.length > 30) logins = logins.slice(0, 30);
+      localStorage.setItem(STUDENT_LOGINS_KEY, JSON.stringify(logins));
+
+      // Broadcast storage event for reactive admin views
+      window.dispatchEvent(new Event('storage'));
+    } catch (e) {
+      console.warn('Failed to record student activity', e);
+    }
   }
 
   login(req: LoginRequest): Observable<AuthUser> {
@@ -169,6 +263,13 @@ export class AuthService {
       this.user.set(adminUser);
       this.saveStoredUser(adminUser);
       return of(adminUser);
+    }
+
+    if (cleanEmail.toLowerCase() === ASSISTANT_CREDENTIALS.email.toLowerCase() && req.password === ASSISTANT_CREDENTIALS.password) {
+      const assistantUser: AuthUser = { ...ASSISTANT_CREDENTIALS.user };
+      this.user.set(assistantUser);
+      this.saveStoredUser(assistantUser);
+      return of(assistantUser);
     }
 
     return from(
@@ -189,9 +290,11 @@ export class AuthService {
           email: data.user.email || cleanEmail,
           stage: data.user.user_metadata?.['stage'] as AcademicStage,
           initials: extractInitials(name),
+          role: 'student',
         };
         this.user.set(authUser);
         this.saveStoredUser(authUser);
+        this.recordStudentActivity(authUser, 'login');
         return authUser;
       })
     );
@@ -225,6 +328,7 @@ export class AuthService {
           email: cleanEmail,
           stage: req.stage,
           initials,
+          role: 'student',
         };
 
         // Try inserting into profiles table in background
@@ -238,6 +342,7 @@ export class AuthService {
               email: cleanEmail,
               stage_en: req.stage,
               stage_ar: req.stage,
+              role: 'student',
               city_en: 'Cairo',
               city_ar: 'القاهرة',
               goal_en: 'General Fluency & Exam Excellence',
@@ -248,6 +353,7 @@ export class AuthService {
 
         this.user.set(authUser);
         this.saveStoredUser(authUser);
+        this.recordStudentActivity(authUser, 'signup');
         return authUser;
       })
     );

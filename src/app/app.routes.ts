@@ -20,6 +20,12 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'assistant',
+    title: 'titles.assistant',
+    canMatch: [staffGuard],
+    loadComponent: () => import('./features/assistant/assistant.page').then((m) => m.AssistantPage),
+  },
+  {
     path: '',
     component: ShellComponent,
     children: [

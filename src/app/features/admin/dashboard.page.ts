@@ -62,11 +62,15 @@ import { AdminHeaderComponent, InitialsComponent, StatComponent } from './admin-
           <section class="card p-5 sm:p-6">
             <h2 class="font-display text-base font-bold">{{ 'admin.dash.activity' | t }}</h2>
             <ul class="mt-4 space-y-4">
-              @for (a of activity; track a.text) {
+              @for (a of activity(); track $index) {
                 <li class="flex items-center gap-3">
                   <app-initials [text]="a.who" size="sm" />
-                  <span class="flex-1 text-[0.8125rem] text-ink-body">{{ a.text | t }}</span>
-                  <span class="shrink-0 text-xs text-ink-muted">{{ a.when | t }}</span>
+                  <span class="flex-1 text-[0.8125rem] text-ink-body">
+                    {{ a.isReal ? a.text : (a.text | t) }}
+                  </span>
+                  <span class="shrink-0 text-xs" [class]="a.isReal ? 'font-bold text-primary' : 'text-ink-muted'">
+                    {{ a.isReal ? a.when : (a.when | t) }}
+                  </span>
                 </li>
               }
             </ul>
@@ -114,10 +118,39 @@ export class AdminDashboardPage {
     ];
   });
 
-  protected readonly activity = [
-    { who: 'NS', text: 'admin.dash.act.a1', when: 'admin.dash.act.t1' },
-    { who: 'MA', text: 'admin.dash.act.a2', when: 'admin.dash.act.t2' },
-    { who: 'SH', text: 'admin.dash.act.a3', when: 'admin.dash.act.t3' },
-    { who: 'YH', text: 'admin.dash.act.a4', when: 'admin.dash.act.t4' },
-  ];
+  protected readonly activity = computed(() => {
+    const realLogins = this.admin.recentLogins();
+    const items: { who: string; text: string; when: string; isReal?: boolean }[] = [];
+
+    for (const l of realLogins.slice(0, 4)) {
+      const isArabic = this.i18n.lang() === 'ar';
+      const actionText = l.type === 'signup'
+        ? (isArabic ? `طالب جديد سجّل في الأكاديمية (${l.name})` : `New student registered (${l.name})`)
+        : (isArabic ? `قام ${l.name} بتسجيل الدخول إلى حسابه` : `${l.name} logged into student dashboard`);
+
+      const minutesAgo = Math.max(1, Math.round((Date.now() - new Date(l.time).getTime()) / 60000));
+      const whenText = minutesAgo < 2
+        ? (isArabic ? 'الآن' : 'Just now')
+        : (isArabic ? `منذ ${minutesAgo} دقيقة` : `${minutesAgo}m ago`);
+
+      items.push({
+        who: l.who || 'ST',
+        text: actionText,
+        when: whenText,
+        isReal: true,
+      });
+    }
+
+    const baseDefaults = [
+      { who: 'NS', text: 'admin.dash.act.a1', when: 'admin.dash.act.t1' },
+      { who: 'MA', text: 'admin.dash.act.a2', when: 'admin.dash.act.t2' },
+      { who: 'SH', text: 'admin.dash.act.a3', when: 'admin.dash.act.t3' },
+      { who: 'YH', text: 'admin.dash.act.a4', when: 'admin.dash.act.t4' },
+    ];
+
+    for (const b of baseDefaults) {
+      if (items.length < 6) items.push(b);
+    }
+    return items;
+  });
 }

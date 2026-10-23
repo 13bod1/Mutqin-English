@@ -433,6 +433,7 @@ export const EN = {
     live: 'Live Sessions',
     studio: 'Live Studio',
     checkout: 'Checkout',
+    assistant: 'Assistant · Workspace',
     admin: {
       dashboard: 'Admin · Dashboard',
       users: 'Admin · Users',

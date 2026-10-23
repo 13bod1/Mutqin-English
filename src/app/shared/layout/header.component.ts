@@ -68,11 +68,18 @@ interface NavItem {
             }
           </a>
         }
-        @if (isStaff()) {
+        @if (auth.user()?.role === 'admin') {
           <a routerLink="/admin" routerLinkActive="!bg-amber-100 !border-amber-400"
             class="ms-2 inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 font-display text-xs font-bold text-amber-900 shadow-xs transition hover:bg-amber-100 hover:text-amber-950">
             <lucide-icon name="shield-check" [size]="15" class="text-amber-600" />
             {{ 'nav.admin' | t }}
+          </a>
+        }
+        @if (auth.user()?.role === 'assistant') {
+          <a routerLink="/assistant" routerLinkActive="!bg-blue-100 !border-blue-400"
+            class="ms-2 inline-flex items-center gap-1.5 rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5 font-display text-xs font-bold text-blue-900 shadow-xs transition hover:bg-blue-100 hover:text-blue-950">
+            <lucide-icon name="user-check" [size]="15" class="text-blue-600" />
+            {{ i18n.lang() === 'ar' ? 'بوابة المساعد' : 'Assistant Portal' }}
           </a>
         }
       </nav>
@@ -87,7 +94,7 @@ interface NavItem {
         @if (auth.user(); as u) {
           <!-- Logged-in profile in the right corner -->
           <div class="flex items-center gap-2">
-            <a [routerLink]="isStaff() ? '/admin' : '/progress'"
+            <a [routerLink]="u.role === 'admin' ? '/admin' : u.role === 'assistant' ? '/assistant' : '/progress'"
               class="flex items-center gap-2.5 rounded-full border border-line bg-surface-warm/70 py-1 pe-3 ps-1 transition hover:border-primary/50 hover:bg-surface-tint shadow-sm">
               <span class="grid h-8 w-8 place-items-center rounded-full bg-primary font-display text-xs font-bold text-white shadow-sm ring-2 ring-white">
                 {{ u.initials || 'ST' }}
@@ -95,7 +102,7 @@ interface NavItem {
               <div class="flex flex-col text-start">
                 <span class="font-display text-xs font-bold text-ink leading-tight line-clamp-1 max-w-[130px]">{{ u.fullName }}</span>
                 <span class="text-[0.6875rem] font-semibold text-primary leading-none">
-                  {{ isStaff() ? ('admin.panel' | t) : ('stagesShort.' + (u.stage || 'sec3') | t) }}
+                  {{ u.role === 'admin' ? ('admin.panel' | t) : u.role === 'assistant' ? (i18n.lang() === 'ar' ? 'مساعد المعلم' : 'Assistant') : ('stagesShort.' + (u.stage || 'sec3') | t) }}
                 </span>
               </div>
             </a>

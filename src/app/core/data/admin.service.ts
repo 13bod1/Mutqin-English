@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   ADMIN_LECTURES_MOCK,
@@ -14,6 +14,7 @@ import {
 import { LIVE_CLASSES_MOCK } from '../mock/live.mock';
 import { AcademySettings, AdminLecture, AdminPayment, AdminStudent, Announcement, PopupMessageSettings, SiteTheme, UserStatus } from '../models/admin';
 import { LiveClass } from '../models/live';
+import { SupabaseService } from '../supabase/supabase.service';
 import { mockResponse } from './mock-response';
 
 const SETTINGS_KEY = 'mutqin_admin_settings';
@@ -22,6 +23,7 @@ const LECTURES_KEY = 'mutqin_admin_lectures';
 const ANNOUNCEMENTS_KEY = 'mutqin_admin_announcements';
 const STUDENTS_KEY = 'mutqin_admin_students';
 const LIVE_KEY = 'mutqin_admin_live';
+const LOGINS_KEY = 'mutqin_student_logins';
 
 function loadStorage<T>(key: string, fallback: T): T {
   if (typeof localStorage === 'undefined') return fallback;
@@ -38,6 +40,24 @@ function saveStorage(key: string, val: any): void {
   try {
     localStorage.setItem(key, JSON.stringify(val));
   } catch {}
+}
+
+function loadStudents(): AdminStudent[] {
+  const base = loadStorage<AdminStudent[]>(STUDENTS_KEY, STUDENTS_MOCK);
+  const registered = loadStorage<AdminStudent[]>('mutqin_admin_students', []);
+  const map = new Map<string, AdminStudent>();
+
+  for (const s of base) {
+    if (s.email) map.set(s.email.toLowerCase(), s);
+    else if (s.id) map.set(s.id, s);
+  }
+  for (const r of registered) {
+    if (r.email) {
+      const existing = map.get(r.email.toLowerCase());
+      map.set(r.email.toLowerCase(), existing ? { ...existing, ...r, status: 'active' } : r);
+    }
+  }
+  return Array.from(map.values());
 }
 
 function loadPayments(): AdminPayment[] {
@@ -64,7 +84,9 @@ function loadSettings(): AcademySettings {
  */
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  readonly students = signal<AdminStudent[]>(loadStorage(STUDENTS_KEY, STUDENTS_MOCK));
+  private readonly supabase = inject(SupabaseService);
+
+  readonly students = signal<AdminStudent[]>(loadStudents());
   readonly staff = signal(STAFF_MOCK);
   readonly payments = signal<AdminPayment[]>(loadPayments());
   readonly lectures = signal<AdminLecture[]>(loadStorage(LECTURES_KEY, ADMIN_LECTURES_MOCK));
@@ -75,6 +97,63 @@ export class AdminService {
   readonly enrollments = ENROLLMENTS_MOCK;
   readonly activeTheme = signal<SiteTheme>(loadSettings().theme ?? 'light');
   readonly activePopup = signal<PopupMessageSettings | null>(loadSettings().popupMessage ?? null);
+  readonly recentLogins = signal<any[]>(loadStorage(LOGINS_KEY, []));
+
+  constructor() {
+    this.syncRealStudents();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', () => {
+        this.students.set(loadStudents());
+        this.recentLogins.set(loadStorage(LOGINS_KEY, []));
+      });
+    }
+  }
+
+  private async syncRealStudents(): Promise<void> {
+    try {
+      const { data, error } = await this.supabase
+        .from('profiles')
+        .select('*')
+        .limit(100);
+
+      if (!error && Array.isArray(data) && data.length > 0) {
+        this.students.update((curr) => {
+          const list = [...curr];
+          for (const p of data) {
+            if (p.role === 'admin' || p.role === 'assistant') continue;
+            const name = p.full_name_en || p.full_name_ar || p.email?.split('@')[0] || 'Student';
+            const email = p.email || '';
+            if (!email) continue;
+            const existingIdx = list.findIndex(
+              (s) => s.email?.toLowerCase() === email.toLowerCase() || s.id === p.id
+            );
+            if (existingIdx !== -1) {
+              list[existingIdx] = {
+                ...list[existingIdx],
+                name: name || list[existingIdx].name,
+                stage: p.stage_en || list[existingIdx].stage,
+                status: 'active',
+              };
+            } else {
+              list.unshift({
+                id: p.id,
+                name,
+                email,
+                stage: (p.stage_en || 'sec3') as any,
+                joinedAt: p.created_at ? p.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+                lecturesDone: 0,
+                lecturesTotal: 40,
+                avgScore: null,
+                status: 'active',
+              });
+            }
+          }
+          saveStorage(STUDENTS_KEY, list);
+          return list;
+        });
+      }
+    } catch {}
+  }
 
   /** Totals calculated dynamically from live state, backed by Proxy for backwards compatibility. */
   readonly totals = new Proxy({} as any, {

@@ -434,6 +434,7 @@ export const AR: Dictionary<typeof EN> = {
     live: 'الحصص المباشرة',
     studio: 'استوديو البث',
     checkout: 'الدفع',
+    assistant: 'مساعد المعلم · مساحة العمل',
     admin: {
       dashboard: 'الإدارة · الرئيسية',
       users: 'الإدارة · المستخدمون',

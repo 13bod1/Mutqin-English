@@ -33,18 +33,7 @@
           </div>
         }
 
-        <!-- Admin Credentials Quick Bar -->
-        <div class="mt-5 flex items-center justify-between rounded-card border border-amber-200 bg-amber-50/90 p-3 text-xs text-amber-900 shadow-xs">
-          <div class="flex items-center gap-2">
-            <lucide-icon name="shield-check" [size]="16" class="shrink-0 text-amber-600" />
-            <span><strong>{{ 'admin.panel' | t }}:</strong> adel&#64;adelmostafa.com</span>
-          </div>
-          <button type="button" (click)="fillAdmin()" class="font-bold underline text-amber-800 hover:text-amber-950">
-            Autofill
-          </button>
-        </div>
-
-        <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="mt-5 space-y-5">
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="mt-8 space-y-5">
           <div>
             <label for="login-email" class="field-label">{{ 'auth.email' | t }}</label>
             <div class="relative">
