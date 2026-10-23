@@ -1,6 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AdminService } from '../../core/data/admin.service';
 import { AssistantAccount, saveCustomAssistantAccount } from '../../core/data/auth.service';
