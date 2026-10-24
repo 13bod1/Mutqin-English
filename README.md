@@ -80,9 +80,9 @@
 - **🎨 نظام توكنات وتصميم معتمد على Figma:**
   - ألوان، ظلال، ومسافات متوافقة 100% مع مواصفات الـ Figma في `tailwind.config.js`.
   - مكونات CSS قابلة لإعادة الاستخدام (`btn`, `card`, `pill`, `chip`, `input`).
-- **🔌 جاهزية تامة للربط الخلفي (Decoupled & Ready for Backend):**
+- **🔌 حدود الربط الخلفي (Backend Integration Boundary):**
   - جميع خدمات البيانات (`LectureService`, `QuizService`, `ProgressService`, `AuthService`) تعتمد على الـ `Observable` والواجهات المكتوبة بصرامة في `src/app/core/models/`.
-  - الانتقال للـ Backend يتطلب فقط استبدال `mockResponse()` بـ `HttpClient`.
+  - الربط الإنتاجي يتطلب جلسات Supabase موثقة، وتطبيق migrations وRLS، وربط RPC ومعالجة فشل الشبكة. وجود بيانات محاكاة لا يثبت اكتمال الربط أو اجتياز اختبارات الخادم.
 
 ---
 
@@ -154,11 +154,12 @@ npm test -- --watch=false --browsers=ChromeHeadless
 npx playwright test
 ```
 
-### 3. اختبارات حزمة قاعدة البيانات (Database Python Pytest)
+### 3. فحص حزمة قاعدة البيانات المشحونة (Database Smoke Check)
+نفّذ من جذر المستودع؛ قاعدة البيانات مؤقتة في الذاكرة:
 ```bash
-# تشغيل اختبارات الحدود والصلابة الأمنية
-python -m pytest db_subtasks/10_seeders_and_tests/ -v
+python -c "from database import get_adapter; db = get_adapter('sqlite', ':memory:'); print('Tables:', len(db.get_table_names())); db.close()"
 ```
+مجموعة `db_subtasks/10_seeders_and_tests/` كانت مجموعة اختبارات خارجية ولم تُشحن ضمن المستودع. فحص التهيئة أعلاه لا يعادل تشغيل اختبارات SQLite الخارجية أو اختبارات PostgreSQL أو الخادم.
 
 ### 4. خطط وسيناريوهات فحص الجودة (Sherry QA Test Plans)
 - `qa/sherry/AG-72-admin-rbac-security-test-plan.md`: خطة فحص صلاحيات الأدمن والـ RBAC.
