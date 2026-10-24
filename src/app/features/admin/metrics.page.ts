@@ -24,8 +24,8 @@ const PRESENCE: Record<string, string> = { online: 'tone-success', away: 'tone-w
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <app-stat [label]="'admin.metrics.answered' | t" [value]="sum(admin.weeklyActivity.questions) + ''" icon="message-square" [note]="'admin.stats.vsLast' | t: { n: '+12%' }" noteIcon="trending-up" noteClass="text-success" />
-        <app-stat [label]="'admin.metrics.reviewed' | t" [value]="sum(admin.weeklyActivity.receipts) + ''" icon="receipt" tone="tone-gold" [note]="'admin.metrics.waiting' | t: { n: admin.pendingCount() }" />
-        <app-stat [label]="'admin.metrics.firstResponse' | t" [value]="'admin.metrics.minutes' | t: { n: 46 }" icon="timer" [note]="'admin.metrics.target' | t" noteIcon="circle-check" noteClass="text-success" />
+        <app-stat [label]="'admin.metrics.reviewed' | t" [value]="admin.assistantKpis().totalReviewed + ''" icon="receipt" tone="tone-gold" [note]="'admin.metrics.waiting' | t: { n: admin.pendingCount() }" />
+        <app-stat [label]="'admin.metrics.firstResponse' | t" [value]="'admin.metrics.minutes' | t: { n: Math.round(admin.assistantKpis().avgTurnaroundMinutes) }" icon="timer" [note]="'admin.metrics.target' | t" noteIcon="circle-check" noteClass="text-success" />
         <app-stat [label]="'admin.metrics.rating' | t" value="4.8 / 5" icon="star" tone="tone-gold" [note]="'admin.metrics.ratings' | t: { n: 212 }" />
       </div>
 
@@ -91,6 +91,7 @@ const PRESENCE: Record<string, string> = { online: 'tone-success', away: 'tone-w
 })
 export class AdminMetricsPage {
   protected readonly admin = inject(AdminService);
+  protected readonly Math = Math;
   protected readonly presence = PRESENCE;
   protected readonly ranges: Range[] = ['7d', '30d', 'term'];
   protected readonly range = signal<Range>('7d');

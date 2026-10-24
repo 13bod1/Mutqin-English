@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, from, map, Observable, of } from 'rxjs';
+import { catchError, from, map, Observable, of, timeout } from 'rxjs';
 import { CONTINUE_WATCHING_MOCK, FEATURED_LECTURE_MOCK, LECTURES_MOCK, RECORDED_LECTURE_VIDEOS } from '../mock/lectures.mock';
 import { ContinueWatchingItem, DurationBucket, FeaturedLecture, Lecture, LectureFilters } from '../models/lecture';
 import { Lang } from '../models/localized';
@@ -19,7 +19,8 @@ export class LectureService {
         .eq('is_published', true)
         .order('sort_order', { ascending: true })
     ).pipe(
-      map(({ data, error }) => {
+      timeout({ each: 1200, with: () => of({ data: null, error: 'timeout' }) }),
+      map(({ data, error }: any) => {
         if (error || !data || data.length === 0) {
           return LECTURES_MOCK;
         }
@@ -60,7 +61,8 @@ export class LectureService {
         .limit(1)
         .maybeSingle()
     ).pipe(
-      map(({ data, error }) => {
+      timeout({ each: 1200, with: () => of({ data: null, error: 'timeout' }) }),
+      map(({ data, error }: any) => {
         if (error || !data) {
           return FEATURED_LECTURE_MOCK;
         }

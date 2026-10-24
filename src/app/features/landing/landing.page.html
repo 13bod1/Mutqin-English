@@ -1,3 +1,34 @@
+<!-- Student Latest Announcement -->
+<div class="border-b border-line/60 bg-surface-warm/75 px-4 py-2.5" aria-label="Announcements">
+  <div class="container-page">
+    @if (latestAnnouncement(); as ann) {
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-sm">
+        <div class="flex items-start sm:items-center gap-2.5 min-w-0">
+          <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+            <lucide-icon name="megaphone" [size]="14" />
+          </span>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-bold text-ink truncate">{{ ann.title }}</span>
+              <span class="text-xs text-ink-muted shrink-0">{{ ann.at | date:'mediumDate' }}</span>
+            </div>
+            <p class="text-xs text-ink-body mt-0.5 line-clamp-2 sm:line-clamp-1 break-words">{{ ann.body }}</p>
+          </div>
+        </div>
+        <span class="inline-flex items-center gap-1 text-xs font-semibold text-primary shrink-0 self-end sm:self-auto">
+          <lucide-icon name="bell" [size]="13" />
+          <span>{{ i18n.lang() === 'ar' ? 'أحدث إعلان' : 'Latest Announcement' }}</span>
+        </span>
+      </div>
+    } @else {
+      <div class="flex items-center justify-center gap-2 py-0.5 text-xs text-ink-muted">
+        <lucide-icon name="bell-off" [size]="13" />
+        <span>{{ i18n.lang() === 'ar' ? 'لا توجد إعلانات حالياً' : 'No announcements at this time' }}</span>
+      </div>
+    }
+  </div>
+</div>
+
 <!-- Hero -->
 <section class="relative isolate overflow-hidden bg-gradient-to-b from-surface-warm to-surface-page">
   <div class="pointer-events-none absolute -end-24 -top-32 -z-10 h-96 w-96 rounded-full bg-surface-highlight/50 blur-3xl"></div>

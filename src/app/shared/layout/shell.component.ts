@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FooterComponent } from './footer.component';
 import { HeaderComponent } from './header.component';
+import { AdminService } from '../../core/data/admin.service';
 
 /** Page frame shared by every route: header, content, footer. */
 @Component({
@@ -14,4 +15,7 @@ import { HeaderComponent } from './header.component';
     <app-footer />
   `,
 })
-export class ShellComponent {}
+export class ShellComponent {
+  // Ensures theme is hydrated from mutqin_admin_settings
+  protected readonly admin = inject(AdminService);
+}

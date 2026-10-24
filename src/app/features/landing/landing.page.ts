@@ -1,9 +1,11 @@
-import { DecimalPipe } from '@angular/common';
-import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ContentService } from '../../core/data/content.service';
+import { AdminService } from '../../core/data/admin.service';
+import { LanguageService } from '../../core/i18n/language.service';
 import { LocalizePipe, TranslatePipe } from '../../core/i18n/translate.pipe';
 import { AvatarComponent } from '../../shared/ui/avatar.component';
 import { CtaBannerComponent } from '../../shared/ui/cta-banner.component';
@@ -13,13 +15,21 @@ import { SectionHeaderComponent } from '../../shared/ui/section-header.component
 @Component({
   selector: 'app-landing',
   imports: [
-    RouterLink, DecimalPipe, LucideAngularModule, TranslatePipe, LocalizePipe,
+    RouterLink, DecimalPipe, DatePipe, LucideAngularModule, TranslatePipe, LocalizePipe,
     AvatarComponent, CtaBannerComponent, MediaComponent, SectionHeaderComponent,
   ],
   templateUrl: './landing.page.html',
 })
 export class LandingPage {
   private readonly content = inject(ContentService);
+  protected readonly admin = inject(AdminService);
+  protected readonly i18n = inject(LanguageService);
+
+  protected readonly announcements = this.admin.announcements;
+  protected readonly latestAnnouncement = computed(() => {
+    const list = this.announcements();
+    return list && list.length > 0 ? list[0] : null;
+  });
 
   protected readonly stats = toSignal(this.content.getPlatformStats());
   protected readonly instructor = toSignal(this.content.getFeaturedInstructor());
