@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /assistant
 
-Sitemap: https://adel-mostafa-english.vercel.app/sitemap.xml
+Sitemap: https://mutqin-english-amber.vercel.app/sitemap.xml
+
