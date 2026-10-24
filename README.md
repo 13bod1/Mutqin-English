@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎓 متقن إنجليش — Mutqin English
+# 🎓 أكاديمية مستر عادل مصطفى — Mr. Adel Mostafa Academy
 ### منصة تعليمية ذكية لإتقان اللغة الإنجليزية لطلاب الثانوية والشهادات العامة في مصر والعالم العربي
 **Bilingual (EN / AR) • Angular 20 • Tailwind CSS • Standalone Components • Full RTL Engine**
 
@@ -80,9 +80,9 @@
 - **🎨 نظام توكنات وتصميم معتمد على Figma:**
   - ألوان، ظلال، ومسافات متوافقة 100% مع مواصفات الـ Figma في `tailwind.config.js`.
   - مكونات CSS قابلة لإعادة الاستخدام (`btn`, `card`, `pill`, `chip`, `input`).
-- **🔌 جاهزية تامة للربط الخلفي (Decoupled & Ready for Backend):**
+- **🔌 حدود الربط الخلفي (Backend Integration Boundary):**
   - جميع خدمات البيانات (`LectureService`, `QuizService`, `ProgressService`, `AuthService`) تعتمد على الـ `Observable` والواجهات المكتوبة بصرامة في `src/app/core/models/`.
-  - الانتقال للـ Backend يتطلب فقط استبدال `mockResponse()` بـ `HttpClient`.
+  - الربط الإنتاجي يتطلب جلسات Supabase موثقة، وتطبيق migrations وRLS، وربط RPC ومعالجة فشل الشبكة. وجود بيانات محاكاة لا يثبت اكتمال الربط أو اجتياز اختبارات الخادم.
 
 ---
 
@@ -113,6 +113,62 @@ npm start
 # 3. بناء نسخة الإنتاج
 npm run build
 ```
+
+---
+
+
+---
+
+## 🗄️ حزمة قاعدة البيانات المنفصلة (Standalone Database Package)
+
+تتضمن المنصة حزمة معمارية متكاملة لقواعد البيانات العلائقية تحت المسار `database/standalone/` مع محول Python ثنائي المحرك يدعم التطوير المحلي المعزول ونشر الإنتاج:
+
+```bash
+# الانتقال إلى حزمة قاعدة البيانات
+cd database/standalone
+
+# تشغيل محول SQLite المعزول في الذاكرة وفحص الجداول الـ 21
+python -c "from adapter.db_adapter import SQLiteDatabaseAdapter; db = SQLiteDatabaseAdapter(':memory:'); db.initialize_schema_sqlite(); print('Tables:', len(db.get_table_names())); db.close()"
+```
+
+- **هيكل الحزمة:**
+  - `database/standalone/adapter/`: محول `db_adapter.py` لدعم SQLite محلياً و PostgreSQL 16+ إنتاجياً مع دوال UDF مسجلة.
+  - `database/standalone/schema/`: مخطط الإنتاج الأساسي `01_mr_adel_production_schema_pg16.sql`.
+  - `database/standalone/migrations/`: سكربتات الترحيل المتسلسلة `001` إلى `007`.
+  - `database/standalone/rollback/`: سكربتات التراجع `001` إلى `007`.
+  - `database/standalone/inventory/`: جرد الجداول والحقول ومصفوفة الحدود المعمارية.
+
+---
+
+## 🧪 اختبارات الجودة وفحص النظام (Testing & QA Instructions)
+
+### 1. اختبارات الوحدة للواجهة الأمامية (Angular Unit Tests)
+```bash
+# تشغيل اختبارات Karma / Jasmine
+npm test -- --watch=false --browsers=ChromeHeadless
+```
+
+### 2. اختبارات التكامل ونهاية إلى نهاية (Playwright E2E Tests)
+```bash
+# تشغيل سيناريوهات E2E الشاملة
+npx playwright test
+```
+
+### 3. فحص حزمة قاعدة البيانات المشحونة (Database Smoke Check)
+نفّذ من جذر المستودع؛ قاعدة البيانات مؤقتة في الذاكرة:
+```bash
+python -c "from database import get_adapter; db = get_adapter('sqlite', ':memory:'); print('Tables:', len(db.get_table_names())); db.close()"
+```
+مجموعة `db_subtasks/10_seeders_and_tests/` كانت مجموعة اختبارات خارجية ولم تُشحن ضمن المستودع. فحص التهيئة أعلاه لا يعادل تشغيل اختبارات SQLite الخارجية أو اختبارات PostgreSQL أو الخادم.
+
+### 4. خطط وسيناريوهات فحص الجودة (Sherry QA Test Plans)
+- `qa/sherry/AG-72-admin-rbac-security-test-plan.md`: خطة فحص صلاحيات الأدمن والـ RBAC.
+- `qa/sherry/AG-73-theme-popup-test-plan.md`: خطة فحص النافذة الترحيبية وتوافق الألوان.
+- `qa/sherry/AG-74-announcements-test-plan.md`: خطة فحص شريط ونظام الإعلانات.
+- `qa/sherry/AG-76-sprint-2-uat-script-mr-adel.md`: دليل الفحص التجريبي ومحضر اعتماد المالك (Sprint 2 UAT Runbook).
+
+> **ملاحظة حالة الاعتماد والتسليم:**
+> هذه النسخة تمثل مخرجات سباق التطوير الثاني (Sprint 2 Candidate). حالة المهام مسجلة كـ `UNVERIFIED_PENDING_FINAL_RUNS` في انتظار إتمام جولة الفحص النهائية الشاملة وجلسة مراجعة المالك الحية (Sprint 2 Review)، دون أي ادعاء غير مبرر للاعتماد النهائي أو الإغلاق التام لكافة المهام دون اعتماد بشري.
 
 ---
 

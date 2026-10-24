@@ -1,10 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, from, map, Observable, of } from 'rxjs';
+import { catchError, from, map, Observable, of, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { CONTINUE_WATCHING_MOCK, FEATURED_LECTURE_MOCK, LECTURES_MOCK, RECORDED_LECTURE_VIDEOS } from '../mock/lectures.mock';
 import { ContinueWatchingItem, DurationBucket, FeaturedLecture, Lecture, LectureFilters } from '../models/lecture';
 import { Lang } from '../models/localized';
 import { SupabaseService } from '../supabase/supabase.service';
 
+/** Detect PostgREST / Supabase auth and permission errors */
 function loadLocalAdminLectures(): Lecture[] {
   try {
     if (typeof localStorage !== 'undefined') {
@@ -34,7 +36,25 @@ function loadLocalAdminLectures(): Lecture[] {
   return LECTURES_MOCK;
 }
 
-/** Recorded lectures powered by Supabase with admin and mock fallback. */
+export function isAuthOrPermissionError(error: any): boolean {
+  if (!error) return false;
+  const code = String(error.code || error.status || '');
+  const msg = String(error.message || error.error_description || error || '').toLowerCase();
+  return (
+    code === '42501' ||
+    code === '401' ||
+    code === '403' ||
+    code === 'PGRST301' ||
+    msg.includes('permission denied') ||
+    msg.includes('row-level security') ||
+    msg.includes('jwt') ||
+    msg.includes('unauthorized') ||
+    msg.includes('forbidden') ||
+    msg.includes('not authorized')
+  );
+}
+
+/** Recorded lectures powered by Supabase with fail-closed access control. */
 @Injectable({ providedIn: 'root' })
 export class LectureService {
   private readonly supabase = inject(SupabaseService);
@@ -48,10 +68,21 @@ export class LectureService {
         .eq('is_published', true)
         .order('sort_order', { ascending: true })
     ).pipe(
-      map(({ data, error }) => {
-        if (error || !data || data.length === 0) {
+      map(({ data, error }: any) => {
+        if (error) {
+          if (isAuthOrPermissionError(error)) {
+            throw new Error(`Access denied: insufficient permissions (${error.message || error.code || 'RLS'})`);
+          }
+          if (environment.production) {
+            throw new Error(`Failed to load lectures: ${error.message || 'Database error'}`);
+          }
           return loadLocalAdminLectures();
         }
+
+        if (!data || data.length === 0) {
+          return environment.production ? [] : LECTURES_MOCK;
+        }
+
         return data.map((l: any, idx: number) => ({
           id: l.id,
           title: { en: l.title_en, ar: l.title_ar },
@@ -70,7 +101,12 @@ export class LectureService {
             : undefined,
         }));
       }),
-      catchError(() => of(loadLocalAdminLectures()))
+      catchError((err) => {
+        if (isAuthOrPermissionError(err) || environment.production) {
+          return throwError(() => err);
+        }
+        return of(loadLocalAdminLectures());
+      })
     );
   }
 
@@ -89,10 +125,24 @@ export class LectureService {
         .limit(1)
         .maybeSingle()
     ).pipe(
-      map(({ data, error }) => {
-        if (error || !data) {
+      map(({ data, error }: any) => {
+        if (error) {
+          if (isAuthOrPermissionError(error)) {
+            throw new Error(`Access denied: insufficient permissions (${error.message || error.code || 'RLS'})`);
+          }
+          if (environment.production) {
+            throw new Error(`Failed to load featured lecture: ${error.message || 'Database error'}`);
+          }
           return FEATURED_LECTURE_MOCK;
         }
+
+        if (!data) {
+          if (environment.production) {
+            throw new Error('Featured lecture not found');
+          }
+          return FEATURED_LECTURE_MOCK;
+        }
+
         return {
           id: data.id,
           title: { en: data.title_en, ar: data.title_ar },
@@ -110,7 +160,12 @@ export class LectureService {
           videoUrl: data.video_url || RECORDED_LECTURE_VIDEOS[0],
         };
       }),
-      catchError(() => of(FEATURED_LECTURE_MOCK))
+      catchError((err) => {
+        if (isAuthOrPermissionError(err) || environment.production) {
+          return throwError(() => err);
+        }
+        return of(FEATURED_LECTURE_MOCK);
+      })
     );
   }
 }
