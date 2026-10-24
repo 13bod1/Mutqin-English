@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, from, map, Observable, of } from 'rxjs';
+import { catchError, from, map, Observable, of, timeout } from 'rxjs';
 import { QUIZ_MODULES_MOCK, QUIZ_QUESTIONS_MOCK } from '../mock/quizzes.mock';
 import { QuizModule, QuizQuestion, QuizResult } from '../models/quiz';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -20,7 +20,8 @@ export class QuizService {
         .eq('is_published', true)
         .order('sort_order', { ascending: true })
     ).pipe(
-      map(({ data, error }) => {
+      timeout({ each: 1200, with: () => of({ data: null, error: 'timeout' }) }),
+      map(({ data, error }: any) => {
         if (error || !data || data.length === 0) {
           return QUIZ_MODULES_MOCK;
         }
@@ -48,7 +49,8 @@ export class QuizService {
         .eq('module_id', moduleId)
         .order('sort_order', { ascending: true })
     ).pipe(
-      map(({ data, error }) => {
+      timeout({ each: 1200, with: () => of({ data: null, error: 'timeout' }) }),
+      map(({ data, error }: any) => {
         if (error || !data || data.length === 0) {
           return QUIZ_QUESTIONS_MOCK[moduleId] ?? [];
         }

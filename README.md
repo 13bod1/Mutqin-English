@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎓 متقن إنجليش — Mutqin English
+# 🎓 أكاديمية مستر عادل مصطفى — Mr. Adel Mostafa Academy
 ### منصة تعليمية ذكية لإتقان اللغة الإنجليزية لطلاب الثانوية والشهادات العامة في مصر والعالم العربي
 **Bilingual (EN / AR) • Angular 20 • Tailwind CSS • Standalone Components • Full RTL Engine**
 

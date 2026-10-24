@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { from, map, Observable, of } from 'rxjs';
+import { from, map, Observable, of, throwError, timeout } from 'rxjs';
 import { AcademicStage } from '../models/lecture';
 import { SupabaseService } from '../supabase/supabase.service';
 
@@ -327,6 +327,7 @@ export class AuthService {
         password: req.password,
       })
     ).pipe(
+      timeout({ each: 1200, with: () => throwError(() => new Error('Login request timed out')) }),
       map(({ data, error }) => {
         if (error || !data?.user) {
           throw error || new Error('Invalid login credentials');
@@ -366,6 +367,7 @@ export class AuthService {
         },
       })
     ).pipe(
+      timeout({ each: 1200, with: () => throwError(() => new Error('Signup request timed out')) }),
       map(({ data, error }) => {
         if (error || !data?.user) {
           throw error || new Error('Signup failed');

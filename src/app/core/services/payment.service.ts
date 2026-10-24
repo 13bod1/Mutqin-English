@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 
@@ -30,6 +30,7 @@ export interface WebhookPayload {
 }
 
 export interface ReceiptFallbackSubmission {
+  id?: string;
   studentId: string;
   lectureId: string;
   method: 'instapay' | 'cash';
@@ -38,6 +39,9 @@ export interface ReceiptFallbackSubmission {
   fileName: string;
   status: 'pending_review' | 'approved' | 'rejected';
   submittedAt: Date;
+  reviewedAt?: Date | null;
+  reviewerName?: string;
+  turnaroundMinutes?: number;
 }
 
 @Injectable({
@@ -50,7 +54,7 @@ export class PaymentService {
   private activatedSessions = new Set<string>();
   private processedEvents = new Set<string>();
   private sessions = new Map<string, PaymentSession>();
-  private receipts: ReceiptFallbackSubmission[] = [];
+  readonly receipts = signal<ReceiptFallbackSubmission[]>([]);
 
   private currentSessionSubject = new BehaviorSubject<PaymentSession | null>(null);
   public currentSession$ = this.currentSessionSubject.asObservable();
@@ -64,7 +68,7 @@ export class PaymentService {
     this.activatedSessions.clear();
     this.processedEvents.clear();
     this.sessions.clear();
-    this.receipts = [];
+    this.receipts.set([]);
     this.currentSessionSubject.next(null);
   }
 
@@ -236,7 +240,9 @@ export class PaymentService {
       return throwError(() => new Error('Invalid receipt file format. Only JPEG, PNG, or PDF files are accepted.'));
     }
 
+    const receiptId = `rcpt_${Date.now()}`;
     const receipt: ReceiptFallbackSubmission = {
+      id: receiptId,
       studentId,
       lectureId,
       method,
@@ -247,12 +253,12 @@ export class PaymentService {
       submittedAt: new Date()
     };
 
-    this.receipts.push(receipt);
+    this.receipts.update((list) => [...list, receipt]);
 
     return of({
       success: true,
       message: 'Receipt submitted successfully for review. Activation occurs within 2 hours.',
-      receiptId: `rcpt_${Date.now()}`
+      receiptId
     });
   }
 
@@ -261,7 +267,31 @@ export class PaymentService {
   }
 
   public getReceipts(): ReceiptFallbackSubmission[] {
-    return [...this.receipts];
+    return [...this.receipts()];
+  }
+
+  public setReceipts(receipts: ReceiptFallbackSubmission[]): void {
+    this.receipts.set(receipts);
+  }
+
+  public reviewReceipt(receiptId: string, status: 'approved' | 'rejected', reviewerName?: string, turnaroundMinutes?: number): void {
+    this.receipts.update((list) =>
+      list.map((r) => {
+        if (r.id === receiptId || r.referenceNumber === receiptId) {
+          const now = new Date();
+          const computedTurnaround =
+            turnaroundMinutes ?? Math.max(0, Math.round((now.getTime() - new Date(r.submittedAt).getTime()) / 60000));
+          return {
+            ...r,
+            status,
+            reviewedAt: now,
+            reviewerName: reviewerName ?? 'Sara Hassan',
+            turnaroundMinutes: computedTurnaround,
+          };
+        }
+        return r;
+      })
+    );
   }
 
   /**
