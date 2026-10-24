@@ -172,7 +172,7 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
   4. Log out, then log in as assistant (`demo_assistant_sarah`).
   5. In the browser address bar, type `/admin/settings` or navigate to `/admin/metrics`.
   6. Verify that administrative system settings are denied and total aggregate platform revenue figures remain blinded/hidden from assistant view.
-  7. Attempt to modify user identifier parameters in URL paths (IDOR check) to access another user's private data.
+  7. Ask the facilitator to show the recorded denied-access result for another synthetic student's record (Appendix A, item 5). Do not edit identifiers or inspect APIs yourself.
 - **Expected Result (Edge / Boundary):**
   - Strict role-based isolation is maintained across all roles.
   - Student and assistant accounts cannot access teacher administrative settings or view unauthorized financial aggregates.
@@ -289,7 +289,7 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
   - Metrics and audit logs are strictly **read-only** for assistant roles; unauthorized modifications are blocked.
 - **Observed Result (Edge):** `[PENDING EXECUTION]`
 - **Evidence Capture Procedure:** Screenshot metrics dashboard displaying exact 66.7% / 33.3% / 30 min values; screenshot zero-state display for assistant with 0 reviews.
-- **Cleanup / Reset Procedure:** Reset operational mock metrics to baseline test fixtures.
+- **Cleanup / Reset Procedure:** Ask the facilitator to reset the synthetic operational metrics in the isolated sandbox to the prepared baseline fixtures (Appendix A, item 6); the stakeholder performs no data reset.
 - **Outcome Status:**
   ```text
   Status: PENDING REVIEW
