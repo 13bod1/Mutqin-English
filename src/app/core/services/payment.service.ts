@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 export type PaymentStatus = 'pending' | 'processing' | 'success' | 'failed' | 'cancelled' | 'duplicate' | 'expired';
 export type PaymentMethod = 'card' | 'wallet' | 'instapay' | 'cash';
@@ -48,8 +49,12 @@ export interface ReceiptFallbackSubmission {
   providedIn: 'root'
 })
 export class PaymentService {
-  // Mock HMAC secret held exclusively on server; never leaked to client bundles
-  private readonly serverWebhookSecret = 'whsec_mutqin_super_secret_signing_key_2026';
+  /**
+   * Demo simulation flag explicitly tied to non-production environment.
+   * Client-side webhook processing and payment trust are strictly disabled in production.
+   */
+  public readonly isDemoSimulationAllowed = !environment.production;
+  private readonly demoEphemeralSigningKey = 'demo_ephemeral_dev_test_signing_key';
 
   private activatedSessions = new Set<string>();
   private processedEvents = new Set<string>();
@@ -141,6 +146,14 @@ export class PaymentService {
       return of(session);
     }
 
+    // Fail-closed enforcement in production: client payment confirmation cannot self-grant access
+    if (environment.production) {
+      session.status = 'pending';
+      session.failureReason = 'Payment requires server-side verification; client confirmation disabled in production.';
+      this.currentSessionSubject.next(session);
+      return of(session);
+    }
+
     session.status = 'success';
     session.activatedAt = new Date();
     this.activatedSessions.add(`${session.studentId}_${session.lectureId}`);
@@ -148,8 +161,11 @@ export class PaymentService {
     return of(session);
   }
 
-  /** Verifies an HMAC-SHA256 signature for incoming webhooks */
+  /** Verifies an HMAC-SHA256 signature for incoming webhooks in demo/test mode only */
   public verifyWebhookSignature(payload: WebhookPayload, signatureHeader: string): boolean {
+    if (environment.production || !this.isDemoSimulationAllowed) {
+      return false; // Fail-closed in production: webhooks require serverless verification
+    }
     if (!signatureHeader || !payload) {
       return false;
     }
@@ -159,13 +175,22 @@ export class PaymentService {
     return signatureHeader === `v1=${computedExpected}`;
   }
 
-  /** Processes an incoming webhook event idempotently */
+  /** Processes an incoming webhook event idempotently (isolated demo simulation only) */
   public handleWebhook(payload: WebhookPayload, signatureHeader: string): {
     success: boolean;
     statusCode: number;
     activated: boolean;
     message: string;
   } {
+    if (environment.production || !this.isDemoSimulationAllowed) {
+      return {
+        success: false,
+        statusCode: 501,
+        activated: false,
+        message: 'Client-side webhook ingestion is disabled in production. Webhooks must be handled by backend serverless endpoints.',
+      };
+    }
+
     // 1. Signature check
     if (!this.verifyWebhookSignature(payload, signatureHeader)) {
       return {
@@ -274,7 +299,13 @@ export class PaymentService {
     this.receipts.set(receipts);
   }
 
-  public reviewReceipt(receiptId: string, status: 'approved' | 'rejected', reviewerName?: string, turnaroundMinutes?: number): void {
+  public reviewReceipt(receiptId: string, status: 'approved' | 'rejected', reviewerName?: string, turnaroundMinutes?: number): { success: boolean; error?: string } {
+    if (environment.production || !this.isDemoSimulationAllowed) {
+      return {
+        success: false,
+        error: 'Receipt review in production requires server-side verification. Direct client mutation disabled.'
+      };
+    }
     this.receipts.update((list) =>
       list.map((r) => {
         if (r.id === receiptId || r.referenceNumber === receiptId) {
@@ -285,13 +316,14 @@ export class PaymentService {
             ...r,
             status,
             reviewedAt: now,
-            reviewerName: reviewerName ?? 'Sara Hassan',
+            reviewerName: reviewerName ?? undefined,
             turnaroundMinutes: computedTurnaround,
           };
         }
         return r;
       })
     );
+    return { success: true };
   }
 
   /**
@@ -333,8 +365,11 @@ export class PaymentService {
   }
 
   private computeMockHmac(data: string): string {
+    if (environment.production || !this.isDemoSimulationAllowed) {
+      return '';
+    }
     let hash = 0;
-    const combined = data + this.serverWebhookSecret;
+    const combined = data + this.demoEphemeralSigningKey;
     for (let i = 0; i < combined.length; i++) {
       hash = ((hash << 5) - hash) + combined.charCodeAt(i);
       hash |= 0;

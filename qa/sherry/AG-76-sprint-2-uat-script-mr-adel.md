@@ -80,7 +80,7 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
   - Environment: Local Sandbox / Mock Payment Gateway only. Real payment operations are strictly **FORBIDDEN**.
 - **Action Steps (Nominal Flow - Upload & Multi-Stage Lifecycle):**
   1. As `demo_student_omar`, navigate to the course catalog (`/lectures`) and select a Thanawya Amma revision lecture.
-  2. Click "Enroll / Pay Now" to launch the on-platform checkout modal, then choose "Vodafone Cash / InstaPay Manual Transfer" (`/checkout/lecture/:id/manual`).
+  2. Click "Enroll / Pay Now" to navigate to the on-platform checkout page (`/checkout/:kind/:id`), then select manual payment to proceed to the receipt upload page (`/checkout/:kind/:id/manual`).
   3. Enter a valid synthetic Egyptian mobile wallet number (`01012345678`).
   4. Click the file upload control and select the synthetic receipt proof file (`synthetic_test_receipt.png`).
   5. Click "Submit Receipt Proof" to transmit the payment verification request.
@@ -231,7 +231,7 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
 - **Action Steps (Nominal Flow):**
   1. In the Admin Portal (`/admin/announcements`), create a new announcement item with Title: *"Exam Schedule Announcement"*, Category: *"Important"*, and Body text in Arabic and English.
   2. Click "Publish Announcement".
-  3. Log in as student (`demo_student_omar`) and navigate to `/announcements` (or `/admin/announcements` view).
+  3. Log in as student (`demo_student_omar`) and observe the announcements notice banner on the landing page (`/`), or log in as administrator to manage announcements via `/admin/announcements`.
   4. Inspect the card presentation, timestamps, and category badge.
 - **Expected Result (Nominal Flow):**
   - Announcements appear ordered newest first on a clean notice board.
@@ -239,7 +239,7 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
 - **Observed Result (Nominal):** `[PENDING EXECUTION]`
 - **Action Steps (Edge / Boundary Flow - Zero State & Responsiveness):**
   1. In the admin console, unpublish or archive all announcements so the list count is zero.
-  2. Refresh the student `/announcements` page.
+  2. Refresh the student homepage (`/`).
   3. View the page on both desktop and mobile viewports.
 - **Expected Result (Edge / Boundary):**
   - When no announcements exist, the page renders a polite empty-state banner (*"No announcements at this time"*) rather than a blank container or error state.
@@ -298,6 +298,10 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
 - **Review Notes / Feedback:** ____________________________________________________
 
 ---
+
+
+### 3.1 Human Review & Governance Law
+> **Immutable Signature Policy:** In accordance with agile review rules, artificial intelligence subagents or automated scripts **CANNOT fake, simulate, or auto-sign** stakeholder approval signatures. Formal approval requires the in-person or live teleconference Sprint 2 Review demonstration conducted directly with Mr. Adel Mostafa, the QA Lead, and the Scrum Master. All signatures remain strictly `[PENDING REVIEW]`.
 
 ## 3. Executive Review & Formal Approval Signatures
 

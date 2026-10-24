@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { filter } from 'rxjs';
-import { AdminService } from '../../core/data/admin.service';
+import { PublicSettingsService, isSafeBannerUrl } from '../../core/services/public-settings.service';
 import { AuthService } from '../../core/data/auth.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
@@ -35,10 +35,16 @@ interface NavItem {
               </span>
             }
             <span class="opacity-95">{{ p.message }}</span>
-            @if (p.linkText && p.linkUrl) {
-              <a [routerLink]="p.linkUrl" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
-                {{ p.linkText }} &rarr;
-              </a>
+            @if (p.linkText && p.linkUrl && isSafeBannerLink(p.linkUrl)) {
+              @if (isExternalUrl(p.linkUrl)) {
+                <a [href]="p.linkUrl" target="_blank" rel="noopener noreferrer" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
+                  {{ p.linkText }} &rarr;
+                </a>
+              } @else {
+                <a [routerLink]="p.linkUrl" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
+                  {{ p.linkText }} &rarr;
+                </a>
+              }
             }
           </div>
           @if (p.dismissible) {
@@ -192,7 +198,7 @@ interface NavItem {
 export class HeaderComponent {
   protected readonly i18n = inject(LanguageService);
   protected readonly auth = inject(AuthService);
-  private readonly adminSvc = inject(AdminService);
+  private readonly publicSettings = inject(PublicSettingsService);
   protected readonly menuOpen = signal(false);
 
   protected readonly isStaff = computed(() => {
@@ -209,14 +215,19 @@ export class HeaderComponent {
 
   /** True when at least one live class currently has status === 'live'. Powers the navbar badge. */
   protected readonly hasLiveSession = computed(() =>
-    this.adminSvc.liveClasses().some((s) => s.status === 'live')
+    this.publicSettings.liveClasses().some((s) => s.status === 'live')
   );
 
-  protected readonly popup = this.adminSvc.activePopup;
-  protected readonly bannerDismissed = signal<boolean>(
-    typeof sessionStorage !== 'undefined' &&
-      sessionStorage.getItem('mutqin_banner_dismissed') === 'true'
-  );
+  protected readonly popup = this.publicSettings.activePopup;
+  private readonly locallyDismissedKey = signal<string | null>(null);
+
+  protected readonly bannerDismissed = computed(() => {
+    const p = this.popup();
+    if (!p || !p.enabled) return true;
+    const key = this.publicSettings.getBannerDismissKey(p);
+    if (this.locallyDismissedKey() === key) return true;
+    return this.publicSettings.isBannerDismissed(p);
+  });
   protected readonly popupDismissed = this.bannerDismissed;
 
   protected dismissPopup(event?: Event): void {
@@ -224,16 +235,25 @@ export class HeaderComponent {
       event.preventDefault();
       event.stopPropagation();
     }
-    this.bannerDismissed.set(true);
-    if (typeof sessionStorage !== 'undefined') {
-      try {
-        sessionStorage.setItem('mutqin_banner_dismissed', 'true');
-      } catch {}
+    const p = this.popup();
+    if (p) {
+      const key = this.publicSettings.getBannerDismissKey(p);
+      this.locallyDismissedKey.set(key);
+      this.publicSettings.dismissBanner(p);
     }
   }
 
   protected dismissBanner(event?: Event): void {
     this.dismissPopup(event);
+  }
+
+  protected isExternalUrl(url?: string | null): boolean {
+    if (!url) return false;
+    return /^https?:\/\//i.test(url.trim());
+  }
+
+  protected isSafeBannerLink(url?: string | null): boolean {
+    return isSafeBannerUrl(url);
   }
 
   protected popupToneClass(type?: string): string {

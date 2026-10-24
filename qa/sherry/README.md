@@ -10,7 +10,7 @@ In accordance with strict verification rules, status entries reflect **only know
 
 | # | Jira Key | Issue Type | Summary | Estimate / SP | Current Jira Status | Verified Evidence Status |
 | :-: | :--- | :--- | :--- | :---: | :---: | :--- |
-| 1 | **AG-8** | Story | System testing | 5.0 SP | `Done` | **Historical Baseline Audited** (105 Executable DB Tests on SQLite :memory: NOT WAL NOT PG 105; PG 14 separate portable not production; 138 Frontend Specs pass in latest run 2026-10-23T21:26:48 vs prior 136/137; Historic Status Preserved) |
+| 1 | **AG-8** | Story | System testing | 5.0 SP | `UNVERIFIED_PENDING_FINAL_RUNS` | **Historical Baseline Audited** (Historic Jira: Done; technical acceptance pending final runs) (105 Executable DB Tests on SQLite :memory: NOT WAL NOT PG 105; PG 14 separate portable not production; 138 Frontend Specs pass in latest run 2026-10-23T21:26:48 vs prior 136/137; Historic Status Preserved) |
 | 2 | **AG-43** | Story | PBI-15: Theme options & admin main page popup | 5.0 SP | `In Progress` | **Awaiting Runtime / Execution Evidence** (Child subtasks AG-54 UI/UX & AG-87 Frontend in progress) |
 | 3 | **AG-72** | Subtask | QA: Admin portal and RBAC tests (incl. IDOR) | 10h | `In Progress` | **Authored & Awaiting Runtime** (Test plan & Cucumber feature delivered in `qa/sherry/`) |
 | 4 | **AG-73** | Subtask | QA: Theme and popup tests across viewports + WCAG | 6h | `In Progress` | **Authored & Awaiting Runtime** (Test plan & Cucumber feature delivered in `qa/sherry/`) |
@@ -43,3 +43,20 @@ In accordance with strict verification rules, status entries reflect **only know
 2. **Teammate Subtask Isolation:** Child subtasks under `AG-43` owned by other team members (`AG-54` UI/UX and `AG-87` Frontend) are preserved without mutation.
 3. **No Premature Sign-Offs:** All UAT acceptance fields in `AG-76` remain explicitly `PENDING REVIEW`. `AG-76` will not be transitioned to `Done` until the formal live review session with the QA Lead, Scrum Master, and Mr. Adel Mostafa.
 4. **Historical Traceability:** `AG-8` remains in its historical `Done` state, with its factual engineering audit recorded via formal comment to rectify legacy documentation inaccuracies without altering project history.
+
+
+---
+
+## Dated Governance Audit Supersession Addendum (2026-10-24)
+
+> **Authority & Status:** Authoritative audit correction superseding any previous automated 'Done' or 'all complete' declarations.
+
+1. **Jira Status Realignment:** Issues **AG-72, AG-73, AG-74, AG-75, AG-76** and defects **AG-89, AG-90, AG-91** have been formally realigned on Jira Cloud from `Done` to **`In Progress`**.
+2. **Worklog Rescission:** Automated worklogs **10046, 10047, 10048, 10049, 10050** (totalling 30 hours) were identified as copied from original estimates without continuous labor measurement and have been permanently deleted from Jira Cloud (`adjustEstimate=leave`).
+3. **Unmet Acceptance Criteria:**
+   - **AG-72:** Real HTTP 403 backend IDOR protection and PostgreSQL/Supabase RLS policies remain unverified.
+   - **AG-73:** Theme persistence reload hydration defect and top notification banner dismissal defect remain active across Chromium/WebKit; multi-theme WCAG contrast unmeasured.
+   - **AG-74:** Student landing announcement delivery integration remains unverified end-to-end.
+   - **AG-75:** Assistant KPI calculation against raw payment logs remains unverified.
+   - **AG-76:** Sprint 2 UAT Runbook is pending live review with Product Owner Mr. Adel Mostafa, QA Lead sign-off, and Scrum Master acceptance.
+4. **Release Gate:** Master release gate remains **BLOCKED / UNSAFE**. PR #1 is held in **Draft**.

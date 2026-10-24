@@ -18,7 +18,7 @@ This report establishes the verified engineering baseline for all testing, verif
 - **Clarification on Historical 128 Database Test Claim & Persistence Substrates:** A historical summary attachment on `AG-8` (`02_IEEE_829_Master_Test_Summary_Report.docx`) previously asserted a "128 Tests / 100% PASS" battery. A thorough, independent verification of the actual runnable codebase identified that:
   - Exactly **105 executable database tests** exist across 4 runnable pytest test suites (`test_edge_cases_and_boundaries.py`, `test_security_and_hardening.py`, `test_schema_integrity.py`, and `test_edge_cases_and_race_conditions.py`) executed strictly on **SQLite 3 in-memory (`:memory:`)**, **NOT WAL mode** (in-memory SQLite does not support or use Write-Ahead Logging), and **NOT against PostgreSQL 105** (the 105 unit test suite was never executed against PostgreSQL).
   - Domains LOGIC (25) and GOVERN (10) were unexecutable documentation specifications (-35 net difference, +12 extra assertions in schema = 105 runnable tests).
-  - **No 128 tests were ever certified.**
+  - **No 128 tests were ever verified or certified.**
   - PostgreSQL persistence layer verification was conducted separately via **14 standalone verification probes** against a local **portable PostgreSQL 16.6** disposable test database instance (`mr_adel_disposable_test` on port 5433, receipt `runtime/pg_runtime_receipt.json` on 2026-10-23T20:56:32Z), **NOT against any live production database**.
   - Database persistence layer tests belong to the database architecture workstream; Sherry's QA scope is strictly confined to frontend, admin, and platform QA.
 - **Frontend Automated Test Baseline & Run Qualification:**
@@ -26,7 +26,7 @@ This report establishes the verified engineering baseline for all testing, verif
   - **Prior Recorded Runs Reconciliation:**
     - Run on 2026-10-23 (earlier): 136 specs passed, 2 failed (1.45% failure rate due to pre-existing intermittent async timeouts in TC-REG-04 and TC-REG-07 during unmocked live service injection).
     - Run on 2026-10-23 (intermediate): 137 specs passed, 1 failed (async timeout in TC-REG-07).
-    - Run on 2026-10-23T21:26:48 (certified latest): 138 specs passed, 0 failed.
+    - Run on 2026-10-23T21:26:48 (measured baseline run): 138 specs passed, 0 failed.
 
 ---
 
@@ -34,7 +34,7 @@ This report establishes the verified engineering baseline for all testing, verif
 
 | Issue Key | Issue Type | Current Status | Assigned Role | Parent Story / Task | Story Points / Hours | Verification Scope & Deliverable |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **AG-8** | Story | `Done` | Sherry Hany | _None_ | 5.0 SP | System Testing (Historical deliverable; status preserved with corrective audit) |
+| **AG-8** | Story | `UNVERIFIED_PENDING_FINAL_RUNS` (Historic Jira: Done) | Sherry Hany | _None_ | 5.0 SP | System Testing (Historical deliverable; status preserved with corrective audit) |
 | **AG-43** | Story | `In Progress` | Sherry Hany | AG-36 (Epic) | 5.0 SP | PBI-15: Theme Options & Admin Main Page Popup |
 | **AG-72** | Subtask | `In Progress` | Sherry Hany | AG-42 (PBI-14) | 10h | QA: Admin Portal, RBAC & IDOR Security Testing |
 | **AG-73** | Subtask | `In Progress` | Sherry Hany | AG-43 (PBI-15) | 6h | QA: Theme & Popup Cross-Browser, Mobile & WCAG Tests |
@@ -107,3 +107,20 @@ The following formal verification artifacts are maintained under `qa/sherry/`:
 8. `qa/sherry/AG-76-sprint-2-uat-script-mr-adel.md`
 9. `qa/sherry/README.md`
 10. `qa/sherry/SHERRY_QA_SPRINT_2_VERIFIED_REPORT.md`
+
+
+---
+
+## Dated Governance Audit Supersession Addendum (2026-10-24)
+
+> **Authority & Status:** Authoritative audit correction superseding any previous automated 'Done' or 'all complete' declarations.
+
+1. **Jira Status Realignment:** Issues **AG-72, AG-73, AG-74, AG-75, AG-76** and defects **AG-89, AG-90, AG-91** have been formally realigned on Jira Cloud from `Done` to **`In Progress`**.
+2. **Worklog Rescission:** Automated worklogs **10046, 10047, 10048, 10049, 10050** (totalling 30 hours) were identified as copied from original estimates without continuous labor measurement and have been permanently deleted from Jira Cloud (`adjustEstimate=leave`).
+3. **Unmet Acceptance Criteria:**
+   - **AG-72:** Real HTTP 403 backend IDOR protection and PostgreSQL/Supabase RLS policies remain unverified.
+   - **AG-73:** Theme persistence reload hydration defect and top notification banner dismissal defect remain active across Chromium/WebKit; multi-theme WCAG contrast unmeasured.
+   - **AG-74:** Student landing announcement delivery integration remains unverified end-to-end.
+   - **AG-75:** Assistant KPI calculation against raw payment logs remains unverified.
+   - **AG-76:** Sprint 2 UAT Runbook is pending live review with Product Owner Mr. Adel Mostafa, QA Lead sign-off, and Scrum Master acceptance.
+4. **Release Gate:** Master release gate remains **BLOCKED / UNSAFE**. PR #1 is held in **Draft**.

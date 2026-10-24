@@ -135,7 +135,7 @@ const STATUS_TONE: Record<UserStatus, string> = { active: 'tone-success', invite
             </tbody>
           </table>
         </div>
-        <p class="text-xs text-ink-muted mt-2">Custom assistant accounts (in amber) can log in using their email and password at the <span class="font-bold text-primary">/login</span> page → <span class="font-bold text-primary">/assistant</span> portal.</p>
+        <p class="text-xs text-ink-muted mt-2">Custom assistant accounts (in amber) are managed as operational metadata. In production, server provisioning via Supabase is required; local credentials cannot simulate authenticated identity.</p>
       }
 
       @if (openInvite()) {

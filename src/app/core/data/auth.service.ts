@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { from, map, Observable, of, throwError, timeout } from 'rxjs';
+import { from, Observable, of, switchMap, throwError, timeout } from 'rxjs';
 import { AcademicStage } from '../models/lecture';
 import { SupabaseService } from '../supabase/supabase.service';
 
@@ -39,9 +39,13 @@ function extractInitials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
+/**
+ * Public administrative metadata references for compiler & component consumers.
+ * NOTE: Passwords have been completely removed. Staff members must authenticate
+ * via Supabase Auth (signInWithPassword) with server-side role validation.
+ */
 export const ADMIN_CREDENTIALS = {
   email: 'adel@adelmostafa.com',
-  password: '3:hhL-Ds7zVYCg:',
   user: {
     id: 's0-adel-mostafa-admin',
     fullName: 'Mr. Adel Mostafa',
@@ -50,11 +54,10 @@ export const ADMIN_CREDENTIALS = {
     initials: 'AM',
     role: 'admin' as UserRole,
   },
-};
+} as const;
 
 export const ASSISTANT_CREDENTIALS = {
   email: 'assistant@adelmostafa.com',
-  password: 'Assist@Adel#2026',
   user: {
     id: 's1-assistant-sara',
     fullName: 'Sara Hassan (Assistant)',
@@ -63,7 +66,7 @@ export const ASSISTANT_CREDENTIALS = {
     initials: 'SH',
     role: 'assistant' as UserRole,
   },
-};
+} as const;
 
 export const ASSISTANT_ACCOUNTS_KEY = 'mutqin_assistant_accounts';
 
@@ -71,18 +74,20 @@ export interface AssistantAccount {
   id: string;
   fullName: string;
   email: string;
-  password: string;
+  password?: string;
   initials: string;
   role: 'assistant';
   createdAt: string;
   scopes?: string[];
+  serverProvisioningRequired?: boolean;
 }
 
 export function getCustomAssistantAccounts(): AssistantAccount[] {
   if (typeof localStorage === 'undefined') return [];
   try {
     const raw = localStorage.getItem(ASSISTANT_ACCOUNTS_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const list: AssistantAccount[] = raw ? JSON.parse(raw) : [];
+    return list.map(({ password, ...acc }) => ({ ...acc, serverProvisioningRequired: true }));
   } catch {
     return [];
   }
@@ -92,11 +97,16 @@ export function saveCustomAssistantAccount(account: AssistantAccount): void {
   if (typeof localStorage === 'undefined') return;
   try {
     const list = getCustomAssistantAccounts();
-    const idx = list.findIndex((a) => a.email.toLowerCase() === account.email.toLowerCase());
+    const { password, ...metadataOnly } = account;
+    const sanitizedAccount: AssistantAccount = {
+      ...metadataOnly,
+      serverProvisioningRequired: true,
+    };
+    const idx = list.findIndex((a) => a.email.toLowerCase() === sanitizedAccount.email.toLowerCase());
     if (idx !== -1) {
-      list[idx] = account;
+      list[idx] = sanitizedAccount;
     } else {
-      list.push(account);
+      list.push(sanitizedAccount);
     }
     localStorage.setItem(ASSISTANT_ACCOUNTS_KEY, JSON.stringify(list));
     window.dispatchEvent(new Event('storage'));
@@ -109,27 +119,122 @@ export const REGISTERED_STUDENTS_KEY = 'mutqin_admin_students';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly supabase = inject(SupabaseService);
-  readonly user = signal<AuthUser | null>(this.getStoredUser());
+
+  /**
+   * User signal starts strictly NULL.
+   * Authorization roles are NEVER trusted from localStorage.
+   */
+  readonly user = signal<AuthUser | null>(null);
+
+  /**
+   * Explicit error state set when privilege validation or profile query fails.
+   * Fails closed to prevent unauthorized retention of administrative roles.
+   */
+  readonly privilegeValidationError = signal<string | null>(null);
+
   readonly isStaff = computed(() => {
     const role = this.user()?.role;
     return role === 'admin' || role === 'assistant';
   });
 
+  private inFlightAuthPromise: Promise<AuthUser | null> | null = null;
+  private sessionEpoch = 0;
+  private bootCompleted = false;
+
   constructor() {
-    this.initUser();
+    this.inFlightAuthPromise = this.initUser();
   }
 
-  private getStoredUser(): AuthUser | null {
-    if (typeof localStorage === 'undefined') return null;
+  /**
+   * Returns the currently authenticated and validated user profile.
+   * Strictly fails closed to null if no verified session exists.
+   */
+  getValidatedRoleProfile(): AuthUser | null {
+    return this.user();
+  }
+
+  /**
+   * Awaits authenticated session initialization with a bounded timeout (sensible 15s max).
+   * Awaits any in-flight auth/profile work, then returns the CURRENT validated user signal.
+   * Never returns a stale boot promise if the user has subsequently logged in or updated.
+   */
+  async awaitInitialized(timeoutMs = 15000): Promise<AuthUser | null> {
+    if (!this.inFlightAuthPromise && !this.bootCompleted) {
+      this.inFlightAuthPromise = this.initUser();
+    }
+
+    if (this.inFlightAuthPromise) {
+      const timer = new Promise<void>((resolve) => setTimeout(resolve, timeoutMs));
+      await Promise.race([
+        this.inFlightAuthPromise.catch(() => null),
+        timer,
+      ]);
+    }
+
+    return this.user();
+  }
+
+  /**
+   * Revalidates current backend role from database before staff/admin navigation.
+   * Recognizes active user revocation even if local session or memory state was privileged.
+   * Bounded by timeout to prevent hanging navigation (max 15s).
+   */
+  async revalidateRoleProfile(timeoutMs = 15000): Promise<AuthUser | null> {
+    await this.awaitInitialized(Math.min(timeoutMs, 2500));
+
     try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : null;
+      const { data, error } = await this.supabase.auth.getUser();
+      if (error || !data?.user) {
+        this.clearLocalSession();
+        return null;
+      }
+
+      const currentEpoch = ++this.sessionEpoch;
+      const revalidateTask = this.resolveUserProfile(data.user, currentEpoch, 'REVALIDATE');
+      let timerHandle: any;
+      const timer = new Promise<AuthUser | null>((resolve) => {
+        timerHandle = setTimeout(() => {
+          this.sessionEpoch++;
+          const cur = this.user();
+          if (cur && (cur.role === 'admin' || cur.role === 'assistant')) {
+            const safeStudent = { ...cur, role: 'student' as UserRole };
+            this.user.set(safeStudent);
+            this.saveStoredUser(safeStudent);
+            resolve(safeStudent);
+          } else {
+            resolve(cur);
+          }
+        }, timeoutMs);
+      });
+
+      const res = await Promise.race([
+        revalidateTask.catch(() => {
+          const cur = this.user();
+          if (cur && (cur.role === 'admin' || cur.role === 'assistant')) {
+            const safeStudent = { ...cur, role: 'student' as UserRole };
+            this.user.set(safeStudent);
+            return safeStudent;
+          }
+          return cur;
+        }),
+        timer,
+      ]);
+      clearTimeout(timerHandle);
+      return res;
     } catch {
+      this.clearLocalSession();
       return null;
     }
   }
 
-  private saveStoredUser(u: AuthUser | null) {
+  private clearLocalSession(): void {
+    this.user.set(null);
+    this.saveStoredUser(null);
+    this.privilegeValidationError.set(null);
+    this.inFlightAuthPromise = null;
+  }
+
+  private saveStoredUser(u: AuthUser | null): void {
     if (typeof localStorage === 'undefined') return;
     try {
       if (u) {
@@ -140,94 +245,161 @@ export class AuthService {
     } catch {}
   }
 
-  private async initUser() {
-    // Preserve local admin / assistant session across reloads
-    const stored = this.getStoredUser();
-    if (stored?.role === 'admin' || stored?.role === 'assistant') {
-      this.user.set(stored);
-      return;
-    }
-
+  private async initUser(): Promise<AuthUser | null> {
+    const currentEpoch = ++this.sessionEpoch;
     try {
       const { data, error } = await this.supabase.auth.getUser();
+      if (this.sessionEpoch !== currentEpoch) {
+        return this.user();
+      }
       if (!error && data?.user) {
-        // Try getting profile from profiles table
-        let realName = data.user.user_metadata?.['full_name'];
-        let stage = data.user.user_metadata?.['stage'];
-        let role: UserRole | undefined;
-
-        try {
-          const { data: prof } = await this.supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', data.user.id)
-            .maybeSingle();
-
-          if (prof?.full_name_en || prof?.full_name_ar) {
-            realName = prof.full_name_en || prof.full_name_ar;
-            stage = prof.stage_en || stage;
-          }
-          role = prof?.role ?? undefined;
-        } catch {}
-
-        const finalName = realName || data.user.email?.split('@')[0] || 'Student';
-        const updated: AuthUser = {
-          id: data.user.id,
-          fullName: finalName,
-          email: data.user.email || '',
-          stage: stage as AcademicStage,
-          initials: extractInitials(finalName),
-          role,
-        };
-        this.user.set(updated);
-        this.saveStoredUser(updated);
-        if (updated.role !== 'admin' && updated.role !== 'assistant') {
-          this.recordStudentActivity(updated, 'login');
-        }
+        const authUser = await this.resolveUserProfile(data.user, currentEpoch, 'INITIAL_BOOT');
+        return authUser;
       } else {
-        // No active Supabase session — clear any stale local user
-        this.user.set(null);
-        this.saveStoredUser(null);
+        this.clearLocalSession();
+        return null;
       }
     } catch {
-      this.user.set(null);
-      this.saveStoredUser(null);
+      if (this.sessionEpoch === currentEpoch) {
+        this.clearLocalSession();
+      }
+      return null;
+    } finally {
+      this.bootCompleted = true;
+      this.inFlightAuthPromise = null;
+      this.listenAuthStateChanges();
     }
+  }
 
-    this.supabase.auth.onAuthStateChange(async (_event, session) => {
-      const cur = this.user();
-      if (cur?.role === 'admin' || cur?.role === 'assistant') {
+  private authListenerSetup = false;
+  private listenAuthStateChanges(): void {
+    if (this.authListenerSetup) return;
+    this.authListenerSetup = true;
+
+    this.supabase.auth.onAuthStateChange((event, session) => {
+      const currentEpoch = ++this.sessionEpoch;
+      if (event === 'SIGNED_OUT' || !session || !session.user) {
+        this.clearLocalSession();
         return;
       }
-      if (session?.user) {
-        const metaName = session.user.user_metadata?.['full_name'];
-        const name = metaName || session.user.email?.split('@')[0] || 'Student';
-        const updated: AuthUser = {
-          id: session.user.id,
-          fullName: name,
-          email: session.user.email || '',
-          stage: (session.user.user_metadata?.['stage'] as AcademicStage) || 'sec3',
-          initials: extractInitials(name),
-          role: this.user()?.id === session.user.id ? this.user()?.role : undefined,
-        };
-        this.user.set(updated);
-        this.saveStoredUser(updated);
-        if (updated.role !== 'admin' && updated.role !== 'assistant') {
-          this.recordStudentActivity(updated, 'login');
-        }
-      } else {
+
+      // Clear privileged user immediately while deferred profile validation is pending
+      // Fails closed so that unvalidated/revoked sessions cannot exploit callback delays
+      const cur = this.user();
+      if (cur && (cur.role === 'admin' || cur.role === 'assistant')) {
         this.user.set(null);
-        this.saveStoredUser(null);
       }
+
+      // SEC-AUTH-CALLBACK-DEADLOCK-RISK fix:
+      // Defer profile resolution outside GoTrue synchronous callback frame
+      // to avoid holding GoTrue internal auth state locks during PostgREST network calls.
+      const deferredTask = new Promise<AuthUser | null>((resolve) => {
+        setTimeout(async () => {
+          try {
+            if (this.sessionEpoch !== currentEpoch) {
+              resolve(this.user());
+              return;
+            }
+            const authUser = await this.resolveUserProfile(session.user, currentEpoch, event);
+            resolve(authUser);
+          } catch {
+            resolve(this.user());
+          } finally {
+            if (this.inFlightAuthPromise === deferredTask) {
+              this.inFlightAuthPromise = null;
+            }
+          }
+        }, 0);
+      });
+
+      this.inFlightAuthPromise = deferredTask;
     });
   }
 
-  /** Record student login/signup in local database so it immediately reflects in the admin dashboard */
+  private async resolveUserProfile(supabaseUser: any, epoch: number, event?: string): Promise<AuthUser> {
+    let realName = supabaseUser.user_metadata?.['full_name'];
+    let stage = supabaseUser.user_metadata?.['stage'] as AcademicStage;
+    let role: UserRole = 'student'; // Strict fail-closed default
+
+    const currentUser = this.user();
+    const isSameUser = currentUser?.id === supabaseUser.id;
+    const existingRole = isSameUser ? currentUser?.role : undefined;
+
+    try {
+      const { data: prof, error: profErr } = await this.supabase
+        .from('profiles')
+        .select('role, full_name_en, full_name_ar, stage_en')
+        .eq('id', supabaseUser.id)
+        .maybeSingle();
+
+      if (!profErr && prof) {
+        this.privilegeValidationError.set(null);
+        if (prof.full_name_en || prof.full_name_ar) {
+          realName = prof.full_name_en || prof.full_name_ar;
+        }
+        if (prof.stage_en) {
+          stage = prof.stage_en as AcademicStage;
+        }
+        if (prof.role === 'admin' || prof.role === 'assistant') {
+          role = prof.role;
+        } else {
+          role = 'student';
+        }
+      } else if (profErr) {
+        // FAIL-CLOSED SECURITY: If privilege validation fails with an error,
+        // strictly fail closed to 'student'. Never preserve unauthorized admin/assistant roles.
+        const errMsg = profErr.message || 'Privilege validation failed';
+        console.error('[AuthService] Profile query failed; failing closed to student role:', errMsg);
+        this.privilegeValidationError.set(errMsg);
+        role = 'student';
+      } else {
+        // No profile found in database
+        this.privilegeValidationError.set('Profile not found; defaulting to student role');
+        role = 'student';
+      }
+    } catch (err: any) {
+      // FAIL-CLOSED SECURITY: If privilege validation throws an error,
+      // strictly fail closed to 'student'. Never preserve unauthorized admin/assistant roles.
+      const errMsg = err?.message || 'Privilege validation query threw exception';
+      console.error('[AuthService] Profile query threw error; failing closed to student role:', errMsg);
+      this.privilegeValidationError.set(errMsg);
+      role = 'student';
+    }
+
+    const finalName = realName || supabaseUser.email?.split('@')[0] || 'Student';
+    const updated: AuthUser = {
+      id: supabaseUser.id,
+      fullName: finalName,
+      email: supabaseUser.email || '',
+      stage: stage || 'sec3',
+      initials: extractInitials(finalName),
+      role,
+    };
+
+    if (this.sessionEpoch === epoch) {
+      this.user.set(updated);
+      this.saveStoredUser(updated);
+
+      if (updated.role !== 'admin' && updated.role !== 'assistant') {
+        this.recordStudentActivity(updated, 'login');
+      }
+    }
+
+    return updated;
+  }
+
+  /** Record student login/signup in local database with strict input sanitization */
   recordStudentActivity(user: AuthUser, type: 'login' | 'signup'): void {
     if (typeof localStorage === 'undefined' || !user || user.role === 'admin' || user.role === 'assistant') return;
     try {
       const nowIso = new Date().toISOString();
       const todayDate = nowIso.split('T')[0];
+
+      const cleanName = typeof user.fullName === 'string' ? user.fullName.replace(/[<>"'&]/g, '').trim().slice(0, 100) : 'Student';
+      const cleanEmail = typeof user.email === 'string' ? user.email.trim().slice(0, 100) : '';
+      const cleanStage = (user.stage === 'sec1' || user.stage === 'sec2' || user.stage === 'sec3') ? user.stage : 'sec3';
+      const cleanId = typeof user.id === 'string' ? user.id.slice(0, 64) : 'u_' + Date.now();
+      const cleanInitials = typeof user.initials === 'string' ? user.initials.replace(/[^A-Za-z0-9]/g, '').slice(0, 4) : 'ST';
 
       // 1. Update/Add to Registered Students Database
       const rawStudents = localStorage.getItem(REGISTERED_STUDENTS_KEY);
@@ -235,23 +407,23 @@ export class AuthService {
       if (!Array.isArray(list)) list = [];
 
       const existingIdx = list.findIndex(
-        (s) => (user.id && s.id === user.id) || (user.email && s.email?.toLowerCase() === user.email.toLowerCase())
+        (s) => (cleanId && s.id === cleanId) || (cleanEmail && s.email?.toLowerCase() === cleanEmail.toLowerCase())
       );
 
       if (existingIdx !== -1) {
         list[existingIdx] = {
           ...list[existingIdx],
-          name: user.fullName || list[existingIdx].name,
-          stage: user.stage || list[existingIdx].stage || 'sec3',
+          name: cleanName || list[existingIdx].name,
+          stage: cleanStage || list[existingIdx].stage || 'sec3',
           status: 'active',
           lastLoginAt: nowIso,
         };
       } else {
         const newStudent = {
-          id: user.id || 'u_' + Date.now(),
-          name: user.fullName || user.email.split('@')[0],
-          email: user.email,
-          stage: user.stage || 'sec3',
+          id: cleanId,
+          name: cleanName || cleanEmail.split('@')[0],
+          email: cleanEmail,
+          stage: cleanStage,
           joinedAt: todayDate,
           lastLoginAt: nowIso,
           lecturesDone: 0,
@@ -269,11 +441,11 @@ export class AuthService {
       if (!Array.isArray(logins)) logins = [];
 
       logins.unshift({
-        id: user.id || 'log_' + Date.now(),
-        who: user.initials || 'ST',
-        name: user.fullName || user.email,
-        email: user.email,
-        stage: user.stage || 'sec3',
+        id: cleanId,
+        who: cleanInitials,
+        name: cleanName || cleanEmail,
+        email: cleanEmail,
+        stage: cleanStage,
         type,
         time: nowIso,
       });
@@ -281,7 +453,9 @@ export class AuthService {
       localStorage.setItem(STUDENT_LOGINS_KEY, JSON.stringify(logins));
 
       // Broadcast storage event for reactive admin views
-      window.dispatchEvent(new Event('storage'));
+      if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+        window.dispatchEvent(new Event('storage'));
+      }
     } catch (e) {
       console.warn('Failed to record student activity', e);
     }
@@ -289,64 +463,24 @@ export class AuthService {
 
   login(req: LoginRequest): Observable<AuthUser> {
     const cleanEmail = req.email.trim();
-    if (cleanEmail.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && req.password === ADMIN_CREDENTIALS.password) {
-      const adminUser: AuthUser = { ...ADMIN_CREDENTIALS.user };
-      this.user.set(adminUser);
-      this.saveStoredUser(adminUser);
-      return of(adminUser);
-    }
+    const currentEpoch = ++this.sessionEpoch;
 
-    if (cleanEmail.toLowerCase() === ASSISTANT_CREDENTIALS.email.toLowerCase() && req.password === ASSISTANT_CREDENTIALS.password) {
-      const assistantUser: AuthUser = { ...ASSISTANT_CREDENTIALS.user };
-      this.user.set(assistantUser);
-      this.saveStoredUser(assistantUser);
-      return of(assistantUser);
-    }
-
-    // Check custom assistant accounts created from Admin Panel
-    const customAssistants = getCustomAssistantAccounts();
-    const matched = customAssistants.find(
-      (a) => a.email.toLowerCase() === cleanEmail.toLowerCase() && a.password === req.password
-    );
-    if (matched) {
-      const customAssistantUser: AuthUser = {
-        id: matched.id,
-        fullName: matched.fullName,
-        email: matched.email,
-        initials: matched.initials,
-        role: 'assistant',
-      };
-      this.user.set(customAssistantUser);
-      this.saveStoredUser(customAssistantUser);
-      return of(customAssistantUser);
-    }
-
-    return from(
-      this.supabase.auth.signInWithPassword({
+    const loginTask = (async () => {
+      const { data, error } = await this.supabase.auth.signInWithPassword({
         email: cleanEmail,
         password: req.password,
-      })
-    ).pipe(
-      timeout({ each: 1200, with: () => throwError(() => new Error('Login request timed out')) }),
-      map(({ data, error }) => {
-        if (error || !data?.user) {
-          throw error || new Error('Invalid login credentials');
-        }
+      });
 
-        const name = data.user.user_metadata?.['full_name'] || data.user.email?.split('@')[0] || 'Student';
-        const authUser: AuthUser = {
-          id: data.user.id,
-          fullName: name,
-          email: data.user.email || cleanEmail,
-          stage: data.user.user_metadata?.['stage'] as AcademicStage,
-          initials: extractInitials(name),
-          role: 'student',
-        };
-        this.user.set(authUser);
-        this.saveStoredUser(authUser);
-        this.recordStudentActivity(authUser, 'login');
-        return authUser;
-      })
+      if (error || !data?.user || !data?.session || !data.session.user || (data.session.user.id && data.session.user.id !== data.user.id)) {
+        throw error || new Error('Invalid login credentials or unconfirmed session');
+      }
+
+      return await this.resolveUserProfile(data.user, currentEpoch, 'SIGNED_IN');
+    })();
+
+    this.inFlightAuthPromise = loginTask.catch(() => null);
+    return from(loginTask).pipe(
+      timeout({ each: 15000, with: () => throwError(() => new Error('Login request timed out')) })
     );
   }
 
@@ -354,6 +488,7 @@ export class AuthService {
     const chosenName = req.fullName.trim();
     const initials = extractInitials(chosenName);
     const cleanEmail = req.email.trim();
+    const currentEpoch = ++this.sessionEpoch;
 
     return from(
       this.supabase.auth.signUp({
@@ -367,8 +502,8 @@ export class AuthService {
         },
       })
     ).pipe(
-      timeout({ each: 1200, with: () => throwError(() => new Error('Signup request timed out')) }),
-      map(({ data, error }) => {
+      timeout({ each: 15000, with: () => throwError(() => new Error('Signup request timed out')) }),
+      switchMap(async ({ data, error }) => {
         if (error || !data?.user) {
           throw error || new Error('Signup failed');
         }
@@ -382,10 +517,14 @@ export class AuthService {
           role: 'student',
         };
 
-        // Try inserting into profiles table in background
-        if (data.user.id) {
-          Promise.resolve(
-            this.supabase.from('profiles').upsert({
+        // Fail-closed session check:
+        // Requires verified session object matching auth user id. Explicitly rejects null/undefined or mismatched session.
+        const sessionActive = !!(data?.session && data.session.user && data.session.user.id === data.user.id);
+
+        // Upsert auth profile ONLY after confirmed active session
+        if (sessionActive && data.user.id) {
+          try {
+            await this.supabase.from('profiles').upsert({
               id: data.user.id,
               full_name_en: chosenName,
               full_name_ar: chosenName,
@@ -394,22 +533,35 @@ export class AuthService {
               stage_en: req.stage,
               stage_ar: req.stage,
               role: 'student',
+              phone: '',
+              grade_level_en: req.stage,
+              grade_level_ar: req.stage,
+              governorate_en: 'Cairo',
+              governorate_ar: 'القاهرة',
               city_en: 'Cairo',
               city_ar: 'القاهرة',
               goal_en: 'General Fluency & Exam Excellence',
               goal_ar: 'الطلاقة العامة والتفوق في الامتحانات',
-            })
-          ).catch(() => {});
+            });
+          } catch (upsertErr) {
+            console.warn('[AuthService] Profile upsert deferred/failed:', upsertErr);
+          }
         }
 
-        this.user.set(authUser);
-        this.saveStoredUser(authUser);
-        this.recordStudentActivity(authUser, 'signup');
+        if (sessionActive && this.sessionEpoch === currentEpoch) {
+          this.user.set(authUser);
+          this.saveStoredUser(authUser);
+          this.recordStudentActivity(authUser, 'signup');
+        } else if (!sessionActive) {
+          if (this.sessionEpoch === currentEpoch) {
+            this.clearLocalSession();
+          }
+        }
+
         return authUser;
       })
     );
   }
-
 
   async continueWithGoogle(): Promise<void> {
     try {
@@ -426,7 +578,6 @@ export class AuthService {
       });
       if (error) {
         console.error('Google OAuth error:', error.message);
-        // Fallback: redirect to Supabase hosted login (if direct OAuth fails)
         window.location.href = `https://lbzphsipfsvhfrareqky.supabase.co/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`;
         return;
       }
@@ -439,10 +590,10 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
+    this.sessionEpoch++;
+    this.clearLocalSession();
     try {
       await this.supabase.auth.signOut();
     } catch {}
-    this.user.set(null);
-    this.saveStoredUser(null);
   }
 }

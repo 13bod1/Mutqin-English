@@ -1,11 +1,31 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, from, map, Observable, of, timeout } from 'rxjs';
+import { catchError, from, map, Observable, of, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { QUIZ_MODULES_MOCK, QUIZ_QUESTIONS_MOCK } from '../mock/quizzes.mock';
 import { QuizModule, QuizQuestion, QuizResult } from '../models/quiz';
 import { SupabaseService } from '../supabase/supabase.service';
 import { ProgressService } from './progress.service';
 
-/** Quizzes powered by Supabase with mock fallback. */
+/** Detect PostgREST / Supabase auth and permission errors */
+export function isAuthOrPermissionError(error: any): boolean {
+  if (!error) return false;
+  const code = String(error.code || error.status || '');
+  const msg = String(error.message || error.error_description || error || '').toLowerCase();
+  return (
+    code === '42501' ||
+    code === '401' ||
+    code === '403' ||
+    code === 'PGRST301' ||
+    msg.includes('permission denied') ||
+    msg.includes('row-level security') ||
+    msg.includes('jwt') ||
+    msg.includes('unauthorized') ||
+    msg.includes('forbidden') ||
+    msg.includes('not authorized')
+  );
+}
+
+/** Quizzes powered by Supabase with fail-closed access control. */
 @Injectable({ providedIn: 'root' })
 export class QuizService {
   private readonly supabase = inject(SupabaseService);
@@ -18,13 +38,23 @@ export class QuizService {
         .from('quiz_modules')
         .select('*')
         .eq('is_published', true)
-        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true })
     ).pipe(
-      timeout({ each: 1200, with: () => of({ data: null, error: 'timeout' }) }),
       map(({ data, error }: any) => {
-        if (error || !data || data.length === 0) {
+        if (error) {
+          if (isAuthOrPermissionError(error)) {
+            throw new Error(`Access denied: insufficient permissions (${error.message || error.code || 'RLS'})`);
+          }
+          if (environment.production) {
+            throw new Error(`Failed to load quiz modules: ${error.message || 'Database error'}`);
+          }
           return QUIZ_MODULES_MOCK;
         }
+
+        if (!data || data.length === 0) {
+          return environment.production ? [] : QUIZ_MODULES_MOCK;
+        }
+
         return data.map((m: any): QuizModule => ({
           id: m.id,
           title: { en: m.title_en, ar: m.title_ar },
@@ -36,7 +66,12 @@ export class QuizService {
           recommended: m.recommended,
         }));
       }),
-      catchError(() => of(QUIZ_MODULES_MOCK))
+      catchError((err) => {
+        if (isAuthOrPermissionError(err) || environment.production) {
+          return throwError(() => err);
+        }
+        return of(QUIZ_MODULES_MOCK);
+      })
     );
   }
 
@@ -49,11 +84,21 @@ export class QuizService {
         .eq('module_id', moduleId)
         .order('sort_order', { ascending: true })
     ).pipe(
-      timeout({ each: 1200, with: () => of({ data: null, error: 'timeout' }) }),
       map(({ data, error }: any) => {
-        if (error || !data || data.length === 0) {
+        if (error) {
+          if (isAuthOrPermissionError(error)) {
+            throw new Error(`Access denied: insufficient permissions (${error.message || error.code || 'RLS'})`);
+          }
+          if (environment.production) {
+            throw new Error(`Failed to load quiz questions: ${error.message || 'Database error'}`);
+          }
           return QUIZ_QUESTIONS_MOCK[moduleId] ?? [];
         }
+
+        if (!data || data.length === 0) {
+          return environment.production ? [] : (QUIZ_QUESTIONS_MOCK[moduleId] ?? []);
+        }
+
         return data.map((q: any): QuizQuestion => ({
           id: q.id,
           topic: { en: q.topic_en, ar: q.topic_ar },
@@ -69,7 +114,12 @@ export class QuizService {
               : undefined,
         }));
       }),
-      catchError(() => of(QUIZ_QUESTIONS_MOCK[moduleId] ?? []))
+      catchError((err) => {
+        if (isAuthOrPermissionError(err) || environment.production) {
+          return throwError(() => err);
+        }
+        return of(QUIZ_QUESTIONS_MOCK[moduleId] ?? []);
+      })
     );
   }
 
@@ -85,8 +135,6 @@ export class QuizService {
     const percent = questions.length ? Math.round((correct / questions.length) * 100) : 0;
 
     // Record result and award XP (async, non-blocking)
-    // Calculate XP locally for immediate display:
-    // 25 XP per correct answer + accuracy bonuses + completion bonus
     let xpEarned = correct * 25;
     if (percent === 100) xpEarned += 75;       // Perfect score bonus
     else if (percent >= 85) xpEarned += 50;    // High accuracy bonus
@@ -106,8 +154,8 @@ export class QuizService {
       correct,
       total: questions.length,
       percent,
-      elapsedSec,
       xpEarned,
+      elapsedSec,
       review,
     };
   }

@@ -46,3 +46,16 @@ Prior audit status recorded PostgreSQL 16 runtime execution as blocked. This blo
 2. **Password Validation:** Data layer checks string length only (`len >= 20`). Cryptographic hash validation (Argon2id/bcrypt) is an application and crypto service tier boundary responsibility, not an automatic standalone database vulnerability.
 3. **PostgreSQL 16 Status:** Resolved on standalone portable PG 16.6 (14/14 probes passed). Docker container and production cluster remain unverified.
 4. **External Artifacts:** Standalone schema files (`01_mr_adel_production_schema_pg16.sql`, `02_mr_adel_local_dev.db`, `03_db_adapter.py`) are local non-public files, not shipped in repository.
+
+
+---
+
+## Dated Governance Audit Supersession Addendum (2026-10-24)
+
+> **Authority & Status:** Authoritative audit correction superseding any previous automated 'all complete' declarations.
+
+1. **Labor Accounting Transparency (AG-9 11h Actual):** The 11h actual worklog on parent story `AG-9` was historically recorded as the exact mathematical sum of its child subtask hour estimates (`AG-10`: 4h, `AG-11`: 3h, `AG-12`: 4h) on October 12, rather than via real-time stopwatch time tracking.
+2. **Test Infrastructure Clarification:**
+   - Standalone SQLite test verification covers exactly **105 pytest specs** running exclusively in-memory (`:memory:`). Persistent WAL file mode was not engaged during test runs.
+   - Standalone PostgreSQL test verification covers exactly **14 Python probes** running against local portable PostgreSQL 14 (port 5433). Docker containerization and production cluster deployment remain unverified.
+3. **No Unqualified 'All Complete' Status:** Standalone database artifacts are verified within their local dev-database boundary; full end-to-end multi-tier integration with live backend RLS and frontend remains In Progress.
