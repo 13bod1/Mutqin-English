@@ -1,0 +1,24 @@
+🎓 أكاديمية مستر عادل مصطفى — Mr. Adel Mostafa Academy
+إعادة تعيين كلمة المرور | Password Reset Request
+
+مرحباً سارة إبراهيم الشافعي،
+تلقينا طلباً لإعادة تعيين كلمة المرور الخاصة بحسابك على منصة مستر عادل مصطفى.
+
+رمز الأمان للتحقق (OTP):
+{{otp_code}}
+(هذا الرمز صالح لمدة 30 دقيقة فقط)
+
+رابط إعادة التعيين المباشر:
+https://academy.adelmostafa.com/auth/reset-password?token=pwd_tok987654321
+
+----------------------------------------------------------------------
+Hello سارة إبراهيم الشافعي,
+We received a password reset request for your account.
+Your security OTP: {{otp_code}} (valid for 30 minutes).
+Direct reset URL: https://academy.adelmostafa.com/auth/reset-password?token=pwd_tok987654321
+----------------------------------------------------------------------
+
+إذا لم تكن قد طلبت إعادة تعيين كلمة المرور، يُرجى تجاهل هذه الرسالة.
+الدعم الفني: {{support_email}} | واتساب: 01100764511
+
+© {{year}} Mr. Adel Mostafa Academy.

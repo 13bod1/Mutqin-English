@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { filter } from 'rxjs';
-import { AdminService } from '../../core/data/admin.service';
+import { PublicSettingsService, isSafeBannerUrl } from '../../core/services/public-settings.service';
 import { AuthService } from '../../core/data/auth.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
@@ -24,7 +24,7 @@ interface NavItem {
   },
   template: `
     @if (popup(); as p) {
-      @if (p.enabled && !popupDismissed()) {
+      @if (p.enabled && !bannerDismissed()) {
         <div class="relative isolate flex items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold sm:text-sm"
           [class]="popupToneClass(p.type)">
           <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
@@ -35,15 +35,21 @@ interface NavItem {
               </span>
             }
             <span class="opacity-95">{{ p.message }}</span>
-            @if (p.linkText && p.linkUrl) {
-              <a [routerLink]="p.linkUrl" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
-                {{ p.linkText }} &rarr;
-              </a>
+            @if (p.linkText && p.linkUrl && isSafeBannerLink(p.linkUrl)) {
+              @if (isExternalUrl(p.linkUrl)) {
+                <a [href]="p.linkUrl" target="_blank" rel="noopener noreferrer" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
+                  {{ p.linkText }} &rarr;
+                </a>
+              } @else {
+                <a [routerLink]="p.linkUrl" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
+                  {{ p.linkText }} &rarr;
+                </a>
+              }
             }
           </div>
           @if (p.dismissible) {
-            <button type="button" (click)="dismissPopup()" class="absolute end-2 sm:end-4 top-1/2 -translate-y-1/2 rounded p-1 hover:bg-black/15 transition opacity-80 hover:opacity-100" aria-label="Dismiss banner">
-              <lucide-icon name="x" [size]="14" />
+            <button type="button" (click)="dismissPopup($event)" class="absolute end-2 sm:end-4 top-1/2 -translate-y-1/2 rounded p-1 hover:bg-black/15 transition opacity-80 hover:opacity-100 z-10 cursor-pointer" aria-label="Dismiss banner">
+              <lucide-icon name="x" [size]="14" class="pointer-events-none" />
             </button>
           }
         </div>
@@ -192,7 +198,7 @@ interface NavItem {
 export class HeaderComponent {
   protected readonly i18n = inject(LanguageService);
   protected readonly auth = inject(AuthService);
-  private readonly adminSvc = inject(AdminService);
+  private readonly publicSettings = inject(PublicSettingsService);
   protected readonly menuOpen = signal(false);
 
   protected readonly isStaff = computed(() => {
@@ -209,14 +215,45 @@ export class HeaderComponent {
 
   /** True when at least one live class currently has status === 'live'. Powers the navbar badge. */
   protected readonly hasLiveSession = computed(() =>
-    this.adminSvc.liveClasses().some((s) => s.status === 'live')
+    this.publicSettings.liveClasses().some((s) => s.status === 'live')
   );
 
-  protected readonly popup = this.adminSvc.activePopup;
-  protected readonly popupDismissed = signal(false);
+  protected readonly popup = this.publicSettings.activePopup;
+  private readonly locallyDismissedKey = signal<string | null>(null);
 
-  protected dismissPopup(): void {
-    this.popupDismissed.set(true);
+  protected readonly bannerDismissed = computed(() => {
+    const p = this.popup();
+    if (!p || !p.enabled) return true;
+    const key = this.publicSettings.getBannerDismissKey(p);
+    if (this.locallyDismissedKey() === key) return true;
+    return this.publicSettings.isBannerDismissed(p);
+  });
+  protected readonly popupDismissed = this.bannerDismissed;
+
+  protected dismissPopup(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const p = this.popup();
+    if (p) {
+      const key = this.publicSettings.getBannerDismissKey(p);
+      this.locallyDismissedKey.set(key);
+      this.publicSettings.dismissBanner(p);
+    }
+  }
+
+  protected dismissBanner(event?: Event): void {
+    this.dismissPopup(event);
+  }
+
+  protected isExternalUrl(url?: string | null): boolean {
+    if (!url) return false;
+    return /^https?:\/\//i.test(url.trim());
+  }
+
+  protected isSafeBannerLink(url?: string | null): boolean {
+    return isSafeBannerUrl(url);
   }
 
   protected popupToneClass(type?: string): string {
