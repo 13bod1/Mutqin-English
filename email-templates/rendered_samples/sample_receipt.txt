@@ -1,30 +1,30 @@
 🎓 أكاديمية مستر عادل مصطفى — Mr. Adel Mostafa Academy
 إيصال تأكيد الدفع والاشتراك | Official Payment Receipt
 
-أهلاً بك يا عمر خالد الشريف،
+أهلاً بك يا طالب تجريبي / Demo Student،
 تم تأكيد عملية الدفع وتفعيل اشتراكك بنجاح.
 
 تفاصيل الإيصال:
 ----------------------------------------------------------------------
-رقم العملية المرجعي : {{order_reference}}
-المحاضرة / الكورس   : شرح قواعد الثانوية العامة المكثف 2026
-طريقة الدفع        : فودافون كاش (Vodafone Cash)
-تاريخ العملية       : {{transaction_date}}
-المبلغ الإجمالي     : {{amount_egp}} جنيه مصري (EGP)
+رقم العملية المرجعي : DEMO-ORDER-001
+المحاضرة / الكورس   : Demo English lecture
+طريقة الدفع        : Sandbox only
+تاريخ العملية       : 2026-10-25 12:00 Africa/Cairo
+المبلغ الإجمالي     : 450.00 جنيه مصري (EGP)
 ----------------------------------------------------------------------
-رابط المحاضرة المباشر: {{lecture_access_url}}
+رابط المحاضرة المباشر: https://example.invalid/lectures/demo
 
 ----------------------------------------------------------------------
 Payment Summary:
-Student: عمر خالد الشريف
-Order Ref: {{order_reference}}
-Course: شرح قواعد الثانوية العامة المكثف 2026
-Total Paid: {{amount_egp}} EGP (فودافون كاش (Vodafone Cash))
-Date: {{transaction_date}}
+Student: طالب تجريبي / Demo Student
+Order Ref: DEMO-ORDER-001
+Course: Demo English lecture
+Total Paid: 450.00 EGP (Sandbox only)
+Date: 2026-10-25 12:00 Africa/Cairo
 ----------------------------------------------------------------------
 
 لأي استفسار بخصوص اشتراكك:
-البريد الإلكتروني: {{support_email}}
-واتساب: 01100764511
+البريد الإلكتروني: support@example.invalid
+واتساب: [demo support number]
 
-© {{year}} Mr. Adel Mostafa Academy.
+© 2026 Mr. Adel Mostafa Academy.

@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import {
   ADMIN_LECTURES_MOCK,
   ANNOUNCEMENTS_MOCK,
@@ -137,7 +137,7 @@ export class AdminService {
   readonly payments = signal<AdminPayment[]>(loadPayments());
   readonly lectures = signal<AdminLecture[]>(loadStorage(LECTURES_KEY, ADMIN_LECTURES_MOCK));
   readonly liveClasses = this.publicSettings.liveClasses;
-  readonly announcements = this.publicSettings.announcements;
+  readonly announcements = this.publicSettings.managedAnnouncements;
   readonly loadSettingsError = this.publicSettings.loadError;
   readonly publishSettingsError = this.publicSettings.publishError;
 
@@ -344,6 +344,7 @@ export class AdminService {
   readonly recentLogins = signal<any[]>(loadStorage(LOGINS_KEY, []));
 
   constructor() {
+    void this.publicSettings.loadManagedAnnouncements();
     this.syncRealStudents();
     this.applyInitialThemes();
     if (typeof window !== 'undefined') {
@@ -502,15 +503,18 @@ export class AdminService {
 
   /** PUT /api/admin/settings */
   saveSettings(s: AcademySettings): Observable<AcademySettings> {
-    Object.assign(SETTINGS_MOCK, s);
-    saveStorage(SETTINGS_KEY, s);
-    if (s.theme) {
+    return from((async () => {
+      for (const [key, value] of Object.entries({ theme: s.theme, userPortalTheme: s.userPortalTheme || 'classic', popupMessage: s.popupMessage })) {
+        const result = await this.publicSettings.savePublicSettingToServer(key, value);
+        if (!result.success) throw new Error(result.error || 'Shared settings were not saved');
+      }
+      Object.assign(SETTINGS_MOCK, s);
+      saveStorage(SETTINGS_KEY, s);
       this.publicSettings.setTheme(s.theme);
-    }
-    if (s.popupMessage !== undefined) {
+      this.publicSettings.setUserPortalTheme(s.userPortalTheme || 'classic');
       this.publicSettings.setPopup(s.popupMessage);
-    }
-    return mockResponse(s);
+      return s;
+    })());
   }
 
   /** GET /api/admin/theme — returns the active site theme */
@@ -767,12 +771,12 @@ export class AdminService {
   }
 
   /** POST /api/admin/announcements */
-  publish(a: Announcement): void {
-    this.publicSettings.publishAnnouncement(a);
+  publish(a: Announcement): Promise<{ success: boolean; error?: string }> {
+    return this.publicSettings.publishAnnouncement(a);
   }
 
-  deleteAnnouncement(id: string): void {
-    this.publicSettings.deleteAnnouncement(id);
+  deleteAnnouncement(id: string): Promise<{ success: boolean; error?: string }> {
+    return this.publicSettings.deleteAnnouncement(id);
   }
 
   /** Add or invite a student */

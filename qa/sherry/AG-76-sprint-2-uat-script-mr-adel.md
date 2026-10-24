@@ -1,13 +1,13 @@
 # 🎯 Sprint 2 Review & UAT Script: Product Owner Acceptance Runbook (AG-76)
 
-**Issue Key:** AG-76  
-**Parent Task:** AG-71 (Sprint 2 Review & UAT Preparation)  
-**Assigned QA Role:** QA Engineer  
-**Target Product Owner / Reviewer:** Mr. Adel Mostafa  
-**Sprint Duration:** Sprint 2 (Release Review & Acceptance)  
-**PBI Coverage:** PBI-11 through PBI-17 (`AG-39`, `AG-40`, `AG-41`, `AG-42`, `AG-43`, `AG-44`, `AG-45`)  
-**Estimated Effort:** 4h (Original Estimate Recorded in Jira)  
-**Acceptance Sign-Off Status:** Status: PENDING REVIEW (Awaiting QA Lead & PO Review)  
+**Issue Key:** AG-76
+**Parent Task:** AG-71 (Sprint 2 Review & UAT Preparation)
+**Assigned QA Role:** QA Engineer
+**Target Product Owner / Reviewer:** Mr. Adel Mostafa
+**Sprint Duration:** Sprint 2 (Release Review & Acceptance)
+**PBI Coverage:** PBI-11 through PBI-17 (`AG-39`, `AG-40`, `AG-41`, `AG-42`, `AG-43`, `AG-44`, `AG-45`)
+**Estimated Effort:** 4h (Original Estimate Recorded in Jira)
+**Acceptance Sign-Off Status:** Authored; QA Lead and Scrum Master document reviews pending. PO session acceptance is separate.
 
 ---
 
@@ -19,7 +19,7 @@ This User Acceptance Testing (UAT) runbook provides a structured, non-technical,
 - **UAT Functional Scope:** This document defines business acceptance walkthrough flows for Sprint 2 user stories. It validates user-visible behavior and administrative workflows.
 - **Accessibility & Security Claims Boundary:** Visual layout checks, high-contrast theme toggles, and client route guards included herein do **not** constitute formal certified compliance with WCAG 2.1 AA accessibility standards or security penetration certification. Formal compliance requires dedicated automated accessibility scanners and server-side penetration testing.
 - **Production Payment Operations Prohibition:** Live payment gateway operations (e.g. real Fawry, live Vodafone Cash, or live credit card merchant charges) are strictly **FORBIDDEN** during UAT walkthroughs. All payment scenarios must execute in a local sandbox / mock checkout environment. If a sandbox environment is unavailable, the payment scenario must be recorded as **BLOCKED**.
-- **Delivery Lifecycle State:** In accordance with agile governance, this document is an authored deliverable under active review. **AG-76 is NOT marked Done** until the QA Lead, Scrum Master, and Product Owner have formally conducted and signed off on the live review.
+- **Delivery Lifecycle State:** In accordance with agile governance, this document is an authored deliverable under active review. **AG-76 requires the QA Lead and Scrum Master document reviews before Sprint Review.** The Product Owner walkthrough and product acceptance are separate milestones; authoring this guide does not fabricate either approval.
 
 ### 1.2 Account & Role Prerequisites (Zero Real Credentials)
 All scenarios must execute using dedicated, isolated synthetic demo accounts on the local/staging environment. **No real production accounts, customer phone numbers, or passwords may be used.**
@@ -35,7 +35,7 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
 ### 1.3 Timezone Reference & Test Scheduling (`Africa/Cairo`)
 - All scheduled live sessions and countdown timers reference Egypt official time: **`Africa/Cairo`**.
 - Egypt observes Daylight Saving Time (Eastern European Summer Time / EEST, **UTC+3**) from the last Friday of April until the last Thursday of October, and Eastern European Time (EET, **UTC+2**) during winter months.
-- The runtime offset must be derived dynamically for the selected test date using standard timezone definitions (e.g. Python `zoneinfo.ZoneInfo("Africa/Cairo")`), rather than hardcoding a universal UTC+3 year-round.
+- The facilitator prepares the Cairo local session time for the selected test date. Mr. Adel compares the displayed time with the clock on his phone; no code or terminal is required. Technical verification is in Appendix A.
 
 ---
 
@@ -85,9 +85,9 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
   4. Click the file upload control and select the synthetic receipt proof file (`synthetic_test_receipt.png`).
   5. Click "Submit Receipt Proof" to transmit the payment verification request.
   6. **Verify Immediate State:** Verify that immediate lecture access is **NOT** granted upon phone number or receipt submission. The student screen displays a confirmation banner: *"Receipt Uploaded Successfully — Pending Assistant Review"* along with a unique reference number.
-  7. In the assistant session (`demo_assistant_sarah`), navigate to the payments review queue (`/admin/payments` or `/assistant`).
+  7. In the assistant session (`demo_assistant_sarah`), navigate to the assistant queue (`/assistant`). The facilitator uses `/admin/payments` only with the admin account.
   8. Locate the submitted synthetic transaction row with status `pending`.
-  9. Click "Review Receipt", inspect the synthetic image, and click "Sandbox Approve".
+  9. Click "Review Receipt", inspect the synthetic image, and click the visible "Approve / قبول" action in the isolated test environment. If it is unavailable, record BLOCKED; there is no assumed button named "Sandbox Approve".
   10. Return to the student session (`demo_student_omar`) and refresh the lecture page.
   11. Verify that lecture access is now unlocked and available for streaming.
 - **Expected Result (Nominal Flow):**
@@ -100,14 +100,14 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
   2. Enter an invalid mobile prefix (e.g., `01812345678`) or an invalid string and attempt submission.
   3. Attempt to upload a non-image disallowed file (e.g., `test_payload.txt`) or a synthetic file exceeding 5MB.
   4. Correct the fields and upload a valid synthetic receipt image with note "Invalid Test".
-  5. In the assistant session, review the receipt and click "Sandbox Reject" with reason "Illegible receipt proof".
+  5. In the assistant session, review the receipt and click the visible "Reject / رفض" action with reason "Illegible receipt proof".
   6. In the student session, verify that the lecture remains locked and an alert explains the rejection with options to re-upload.
 - **Expected Result (Edge / Boundary):**
   - Form displays immediate inline validation errors for invalid mobile prefixes and rejects non-supported / oversized files.
   - Rejected payments strictly maintain lecture access gates, prevent duplicate charge entries, and provide clear student feedback.
 - **Observed Result (Edge):** `[PENDING EXECUTION]`
 - **Evidence Capture Procedure:** Capture screenshots of: (a) student receipt submission form with selected file, (b) student pending review notice, (c) assistant review drawer with synthetic image, and (d) unlocked lecture state following approval.
-- **Cleanup / Reset Procedure:** In sandbox database, delete the test payment record or mark test enrollment as expired.
+- **Cleanup / Reset Procedure:** Ask the facilitator to clean up the synthetic record after evidence capture (Appendix A); the stakeholder does not access a database.
 - **Outcome Status:**
   ```text
   Status: PENDING REVIEW
@@ -203,7 +203,7 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
   - *Disclaimer:* Walkthrough confirms visual application and contrast; this does **not** constitute formal WCAG 2.1 AA certification.
 - **Observed Result (Nominal):** `[PENDING EXECUTION]`
 - **Action Steps (Edge / Boundary Flow - Responsiveness & Dismissal):**
-  1. Open Chrome DevTools Device Mode and simulate a narrow mobile viewport (360px x 640px).
+  1. Use the mobile phone or 360px test view already prepared by the facilitator (Appendix A). Do not open developer tools during the stakeholder walkthrough.
   2. Verify that the popup container scales responsively without horizontal overflow or clipping navigation bars.
   3. Click the "Dismiss" (X) button on the popup.
   4. Refresh the homepage and navigate between pages (`/lectures`, `/live`).
@@ -283,7 +283,7 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
 - **Action Steps (Edge / Boundary Flow - Zero Denominator & Read-Only Integrity):**
   1. In the metrics dashboard, select a newly created assistant profile with zero review history (`demo_assistant_new`, 0 reviews).
   2. Verify that the dashboard renders clean zero-state indicators (`0 reviews / -- min avg / 0% approval`) without division-by-zero, `NaN`, or application runtime errors.
-  3. Log in as assistant (`demo_assistant_sarah`) and attempt to alter, delete, or overwrite historical review timestamps or operational metrics via client or API inspection.
+  3. Log in as assistant (`demo_assistant_sarah`) and try to open `/admin/metrics` in the address bar; access must be denied. Ask the facilitator to present the separate recorded API/audit-integrity test (Appendix A).
 - **Expected Result (Edge / Boundary):**
   - Zero-denominator states render gracefully with placeholder dashes or zeros without mathematical errors.
   - Metrics and audit logs are strictly **read-only** for assistant roles; unauthorized modifications are blocked.
@@ -301,17 +301,31 @@ All scenarios must execute using dedicated, isolated synthetic demo accounts on 
 
 
 ### 3.1 Human Review & Governance Law
-> **Immutable Signature Policy:** In accordance with agile review rules, artificial intelligence subagents or automated scripts **CANNOT fake, simulate, or auto-sign** stakeholder approval signatures. Formal approval requires the in-person or live teleconference Sprint 2 Review demonstration conducted directly with Mr. Adel Mostafa, the QA Lead, and the Scrum Master. All signatures remain strictly `[PENDING REVIEW]`.
+> **Immutable Signature Policy:** In accordance with agile review rules, artificial intelligence subagents or automated scripts **CANNOT fake, simulate, or auto-sign** stakeholder approval signatures. Document review requires attributable decisions from the QA Lead and Scrum Master. Product acceptance is recorded separately during the live review with Mr. Adel. This file never signs on behalf of a person; actual agent reviews must be labeled as agent reviews.
 
 ## 3. Executive Review & Formal Approval Signatures
 
-> **Mandatory Review Note:** In accordance with agile governance and AG-76 acceptance criteria, this document is an authored deliverable under active review. No deliverable is marked "Done" until the QA Lead and Scrum Master have performed formal review, followed by the live Sprint 2 Review demonstration with Mr. Adel Mostafa. All signature checkboxes remain unticked to prevent premature sign-off.
+> **Mandatory Review Note:** In accordance with agile governance and AG-76 acceptance criteria, this document is an authored deliverable under active review. The AG-76 authored-script subtask can be accepted only after its actual required QA Lead and Scrum Master reviews; the Product Owner live walkthrough is a separate acceptance event. All signature checkboxes remain unticked to prevent premature sign-off.
 
 | Role | Designee / Stakeholder | Verification Status | Formal Signature | Sign-Off Date |
 | :--- | :--- | :---: | :--- | :--- |
-| **QA Engineer** | QA Author (`sherryhany`) | Authored & Ready | `Authored - Ready for Review` | October 2026 |
+| **QA Engineer** | Assigned author (`sherryhany`) | Document prepared with agent assistance; author confirmation pending | `[PENDING AUTHOR CONFIRMATION]` | `[PENDING]` |
 | **QA Lead** | Assigned QA Lead | Pending Review | `[PENDING REVIEW]` | `[PENDING]` |
 | **Scrum Master** | Assigned Scrum Master | Pending Review | `[PENDING REVIEW]` | `[PENDING]` |
 | **Product Owner** | Mr. Adel Mostafa | Pending Acceptance | `[PENDING SPRINT 2 REVIEW]` | `[PENDING]` |
 
 **Current Lifecycle State:** `IN PROGRESS (Awaiting QA Lead & Scrum Master Review — AG-76 NOT DONE)`
+
+## Appendix A — Facilitator and QA preparation only (not stakeholder actions)
+
+The facilitator must prepare these prerequisites before inviting Mr. Adel. If unavailable, mark the affected walkthrough BLOCKED rather than asking him to execute technical commands.
+
+1. Confirm the exact review environment and commit. Provision isolated synthetic student/assistant/admin accounts through the approved authentication service; never place production credentials in this guide.
+2. Verify the displayed Cairo time for the chosen date using an IANA-aware clock. Technical QA may use `zoneinfo.ZoneInfo("Africa/Cairo")`; the stakeholder only compares the prepared time.
+3. Prepare a physical phone or a 360×640 browser viewport. QA may use developer tools before the meeting; keep those steps out of the stakeholder script. Record browser/version and viewport.
+4. Prepare the clearly synthetic receipt, isolated pending/rejected/approved examples and the raw KPI comparison dataset. Confirm that the actual controls are Approve/قبول and Reject/رفض for the logged-in role; do not claim unavailable controls exist.
+5. Run HTTP authorization/IDOR and audit mutation checks separately with sanctioned test identities. Redact tokens and personal data from evidence. A client redirect is not proof of HTTP 403. The stakeholder sees the recorded result rather than inspecting APIs.
+6. Only an authorized facilitator performs synthetic-data cleanup in the disposable sandbox, after retaining evidence. Never delete live payment/audit records or production data.
+7. Attach the actual QA Lead and Scrum Master document-review records with identity, date, reviewed commit and accepted/changes-required verdict. Agent review must be named as agent review; no human signature is inferred.
+
+End of the stakeholder guide and facilitator appendix.

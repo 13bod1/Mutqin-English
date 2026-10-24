@@ -25,9 +25,9 @@ interface NavItem {
   template: `
     @if (popup(); as p) {
       @if (p.enabled && !bannerDismissed()) {
-        <div class="relative isolate flex items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold sm:text-sm"
+        <div class="relative isolate flex items-center justify-center gap-2 px-10 py-2 text-center text-xs font-semibold sm:text-sm"
           [class]="popupToneClass(p.type)">
-          <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+          <div class="min-w-0 flex flex-wrap items-center justify-center gap-1.5 break-words sm:gap-2">
             @if (p.title) {
               <span class="inline-flex items-center gap-1 font-bold underline decoration-white/40 underline-offset-2">
                 <lucide-icon name="sparkles" [size]="14" />
@@ -259,11 +259,11 @@ export class HeaderComponent {
   protected popupToneClass(type?: string): string {
     switch (type) {
       case 'warning':
-        return 'bg-amber-600 text-white';
+        return 'bg-amber-800 text-white';
       case 'success':
         return 'bg-emerald-700 text-white';
       case 'info':
-        return 'bg-sky-600 text-white';
+        return 'bg-sky-800 text-white';
       case 'announcement':
       default:
         return 'bg-primary text-white';

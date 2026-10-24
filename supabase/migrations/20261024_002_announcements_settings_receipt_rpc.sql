@@ -34,11 +34,20 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- Allow public read of select profile details (for leaderboard / display)
+-- Personal profile data is private; leaderboard integrations must request a
+-- separately approved projection, not SELECT * over student emails/phones.
+CREATE OR REPLACE FUNCTION public.current_platform_role()
+RETURNS text LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public, pg_temp AS $$
+  SELECT role::text FROM public.profiles WHERE id = auth.uid()
+$$;
+REVOKE ALL ON FUNCTION public.current_platform_role() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.current_platform_role() TO authenticated, service_role;
 DROP POLICY IF EXISTS "Public: read profiles" ON public.profiles;
-CREATE POLICY "Public: read profiles"
-  ON public.profiles FOR SELECT
-  USING (true);
+DROP POLICY IF EXISTS "Public: read profiles for leaderboard" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles: owner or staff read" ON public.profiles;
+CREATE POLICY "Profiles: owner or staff read" ON public.profiles FOR SELECT
+  TO authenticated USING (id = auth.uid() OR public.current_platform_role() IN ('admin', 'assistant', 'super_admin'));
 
 -- Allow users to update their own profile (name, phone, stage)
 DROP POLICY IF EXISTS "Users: update own profile" ON public.profiles;
@@ -76,7 +85,7 @@ BEGIN
         -- Does NOT trust auth.uid() being NULL; unauthenticated callers cannot create elevated profiles
         IF NEW.role IS DISTINCT FROM 'student' THEN
             IF auth.uid() IS NULL THEN
-                RAISE EXCEPTION 'Security Violation: Unauthenticated callers cannot create elevated profiles.';
+                RAISE EXCEPTION 'Security Violation: Unauthenticated callers cannot create elevated profiles.' USING ERRCODE = '42501';
             END IF;
 
             SELECT role INTO v_caller_role
@@ -84,13 +93,13 @@ BEGIN
             WHERE id = auth.uid();
 
             IF v_caller_role IS NULL OR v_caller_role NOT IN ('admin', 'super_admin') THEN
-                RAISE EXCEPTION 'Security Violation: Users cannot self-assign elevated roles on profile creation.';
+                RAISE EXCEPTION 'Security Violation: Users cannot self-assign elevated roles on profile creation.' USING ERRCODE = '42501';
             END IF;
         END IF;
     ELSIF TG_OP = 'UPDATE' THEN
         IF NEW.role IS DISTINCT FROM OLD.role THEN
             IF auth.uid() IS NULL THEN
-                RAISE EXCEPTION 'Security Violation: Unauthenticated callers cannot alter profile roles.';
+                RAISE EXCEPTION 'Security Violation: Unauthenticated callers cannot alter profile roles.' USING ERRCODE = '42501';
             END IF;
 
             SELECT role INTO v_caller_role
@@ -98,7 +107,7 @@ BEGIN
             WHERE id = auth.uid();
 
             IF v_caller_role IS NULL OR v_caller_role NOT IN ('admin', 'super_admin') THEN
-                RAISE EXCEPTION 'Security Violation: Users cannot alter their own profile role or privileges.';
+                RAISE EXCEPTION 'Security Violation: Users cannot alter their own profile role or privileges.' USING ERRCODE = '42501';
             END IF;
         END IF;
     END IF;
@@ -346,7 +355,7 @@ BEGIN
     -- 1. Identity & Role Verification
     v_caller_id := auth.uid();
     IF v_caller_id IS NULL THEN
-        RAISE EXCEPTION 'Unauthorized: Session missing auth.uid().';
+        RAISE EXCEPTION 'Unauthorized: Session missing auth.uid().' USING ERRCODE = '42501';
     END IF;
 
     SELECT role INTO v_caller_role
@@ -354,7 +363,7 @@ BEGIN
     WHERE id = v_caller_id;
 
     IF v_caller_role IS NULL OR v_caller_role NOT IN ('admin', 'assistant', 'super_admin') THEN
-        RAISE EXCEPTION 'Unauthorized: Only verified staff (admin or assistant) can review receipts.';
+        RAISE EXCEPTION 'Unauthorized: Only verified staff (admin or assistant) can review receipts.' USING ERRCODE = '42501';
     END IF;
 
     IF p_action NOT IN ('approved', 'rejected') THEN
@@ -463,4 +472,19 @@ REVOKE EXECUTE ON FUNCTION public.review_receipt_rpc(UUID, TEXT, TEXT) FROM anon
 GRANT EXECUTE ON FUNCTION public.review_receipt_rpc(UUID, TEXT, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.review_receipt_rpc(UUID, TEXT, TEXT) TO service_role;
 
+-- Financial reporting is a separate admin-only endpoint. Operational receipt
+-- review remains available to assistants without granting report execution.
+CREATE OR REPLACE FUNCTION public.admin_financial_summary()
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public, pg_temp AS $$
+BEGIN
+  IF public.current_platform_role() IS NULL OR public.current_platform_role() NOT IN ('admin', 'super_admin') THEN
+    RAISE EXCEPTION 'Financial reports require an administrator.' USING ERRCODE = '42501';
+  END IF;
+  RETURN (SELECT jsonb_build_object('total_revenue', coalesce(sum(amount) FILTER (WHERE status = 'approved'), 0),
+                                   'approved_count', count(*) FILTER (WHERE status = 'approved')) FROM public.payments);
+END;
+$$;
+REVOKE ALL ON FUNCTION public.admin_financial_summary() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.admin_financial_summary() TO authenticated, service_role;
 COMMIT;
