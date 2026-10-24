@@ -67,8 +67,8 @@ const METHOD_ICON: Record<string, string> = { card: 'credit-card', instapay: 'la
                 <td>
                   <div class="flex justify-end gap-1.5">
                     @if (p.status === 'pending') {
-                      <button type="button" class="btn btn-success-soft btn-sm !px-2.5" (click)="admin.approve(p.id)" [attr.aria-label]="'admin.pay.approve' | t"><lucide-icon name="check" [size]="15" /></button>
-                      <button type="button" class="btn btn-danger-soft btn-sm !px-2.5" (click)="open(p)" [attr.aria-label]="'admin.pay.reject' | t"><lucide-icon name="x" [size]="15" /></button>
+                      <button type="button" class="btn btn-success-soft btn-sm !px-2.5" (click)="admin.approve(p.id)" [attr.aria-label]="'admin.pay.approve' | t" title="Approve & Enroll"><lucide-icon name="check" [size]="15" /></button>
+                      <button type="button" class="btn btn-danger-soft btn-sm !px-2.5" (click)="quickReject(p)" [attr.aria-label]="'admin.pay.reject' | t" title="Reject Payment"><lucide-icon name="x" [size]="15" /></button>
                     }
                     <button type="button" class="btn btn-soft btn-sm !px-2.5" (click)="open(p)" [attr.aria-label]="'admin.pay.review' | t"><lucide-icon name="eye" [size]="15" /></button>
                   </div>
@@ -213,12 +213,24 @@ export class AdminPaymentsPage {
     this.selectedId.set(null);
   }
 
-  protected reject(p: AdminPayment): void {
-    if (!this.note().trim()) {
-      this.noteErr.set(true);
-      return;
+  protected quickReject(p: AdminPayment): void {
+    const defaultReason = this.i18n.lang() === 'ar' ? 'بيانات التحويل غير مطابقة أو لقطة الشاشة غير واضحة' : 'Payment reference or receipt details could not be verified';
+    const note = prompt(
+      this.i18n.lang() === 'ar' ? 'تأكيد رفض الإيصال - سبب الرفض:' : 'Confirm Payment Rejection - Reason:',
+      defaultReason
+    );
+    if (note !== null) {
+      this.admin.reject(p.id, note.trim() || defaultReason);
+      if (this.selectedId() === p.id) {
+        this.selectedId.set(null);
+      }
     }
-    this.admin.reject(p.id, this.note().trim());
+  }
+
+  protected reject(p: AdminPayment): void {
+    const defaultReason = this.i18n.lang() === 'ar' ? 'بيانات التحويل غير مطابقة أو لقطة الشاشة غير واضحة' : 'Payment reference or receipt details could not be verified';
+    const finalNote = this.note().trim() || defaultReason;
+    this.admin.reject(p.id, finalNote);
     this.selectedId.set(null);
   }
 

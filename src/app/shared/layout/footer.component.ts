@@ -31,6 +31,12 @@ import { LogoComponent } from '../ui/logo.component';
           <ul class="mt-4 space-y-3 text-sm">
             <li><a routerLink="/lectures" class="text-ink-body hover:text-ink">{{ 'nav.lectures' | t }}</a></li>
             <li><a routerLink="/quizzes" class="text-ink-body hover:text-ink">{{ 'nav.quizzes' | t }}</a></li>
+            <li>
+              <a href="https://www.youtube.com/@madrasetnatv" target="_blank" rel="noopener" class="text-red-700 hover:text-red-800 font-semibold flex items-center gap-1.5" title="قناة مدرستنا التعليمية (وزارة التربية والتعليم)">
+                <span class="h-2 w-2 rounded-full bg-red-600 inline-block animate-pulse"></span>
+                قناة مدرستنا (Madrasetna TV)
+              </a>
+            </li>
             <li><a href="#" class="text-ink-body hover:text-ink">{{ 'footer.studyGuides' | t }}</a></li>
           </ul>
         </div>
@@ -49,6 +55,17 @@ import { LogoComponent } from '../ui/logo.component';
           <h3 class="font-display text-base font-bold">{{ 'footer.support' | t }}</h3>
           <p class="mt-4 text-sm leading-6 text-ink-body">{{ 'footer.hours' | t }}</p>
           <div class="mt-4 flex flex-wrap gap-2.5">
+            <!-- Madrasetna TV YouTube Channel -->
+            <a href="https://www.youtube.com/@madrasetnatv"
+              target="_blank" rel="noopener"
+              aria-label="قناة مدرستنا التعليمية (Madrasetna TV)"
+              title="قناة مدرستنا التعليمية (Madrasetna TV)"
+              class="grid h-10 w-10 place-items-center rounded-full border border-red-200 bg-red-50 text-red-600 shadow-sm transition hover:scale-110 hover:border-red-400 hover:bg-red-100 ring-2 ring-red-400/20">
+              <svg class="h-4.5 w-4.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </a>
+
             <!-- Facebook -->
             <a href="https://www.facebook.com/share/19VQQzp4Bx/?mibextid=wwXIfr"
               target="_blank" rel="noopener"
@@ -71,7 +88,7 @@ import { LogoComponent } from '../ui/logo.component';
               </svg>
             </a>
 
-            <!-- YouTube -->
+            <!-- YouTube Adel Mostafa -->
             <a href="https://youtube.com/@adelmostafa7859"
               target="_blank" rel="noopener"
               aria-label="YouTube (@adelmostafa7859)"

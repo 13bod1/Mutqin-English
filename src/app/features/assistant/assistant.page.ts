@@ -274,6 +274,10 @@ interface StudentQuestion {
                             <lucide-icon name="check" [size]="14" class="me-1" />
                             {{ i18n.lang() === 'ar' ? 'تأكيد' : 'Verify' }}
                           </button>
+                          <button type="button" (click)="rejectPayment(p)" class="btn btn-danger-soft btn-sm" [title]="i18n.lang() === 'ar' ? 'رفض الإيصال' : 'Reject receipt'">
+                            <lucide-icon name="x" [size]="14" class="me-1" />
+                            {{ i18n.lang() === 'ar' ? 'رفض' : 'Reject' }}
+                          </button>
                           <button type="button" (click)="flagPayment(p)" class="btn btn-soft btn-sm text-amber-700" [title]="i18n.lang() === 'ar' ? 'إبلاغ المعلم' : 'Flag note'">
                             <lucide-icon name="flag" [size]="14" />
                           </button>
@@ -430,7 +434,7 @@ interface StudentQuestion {
                   @if (q.answer) {
                     <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-card text-xs text-emerald-950 space-y-1">
                       <p class="font-bold flex items-center gap-1.5">
-                        <lucide-icon name="check-circle-2" [size]="14" class="text-emerald-600" />
+                        <lucide-icon name="circle-check" [size]="14" class="text-emerald-600" />
                         {{ i18n.lang() === 'ar' ? 'إجابة المساعد:' : 'Assistant Answer:' }} ({{ q.answeredBy }})
                       </p>
                       <p class="text-emerald-900">{{ q.answer }}</p>
@@ -620,6 +624,17 @@ export class AssistantPage {
 
   protected approvePayment(id: string): void {
     this.admin.approve(id);
+  }
+
+  protected rejectPayment(p: AdminPayment): void {
+    const defaultReason = this.i18n.lang() === 'ar' ? 'بيانات التحويل غير مطابقة أو لقطة الشاشة غير واضحة' : 'Payment reference or receipt details could not be verified';
+    const note = prompt(
+      this.i18n.lang() === 'ar' ? 'تأكيد رفض الإيصال - سبب الرفض:' : 'Confirm Payment Rejection - Reason:',
+      defaultReason
+    );
+    if (note !== null) {
+      this.admin.reject(p.id, note.trim() || defaultReason);
+    }
   }
 
   protected flagPayment(p: AdminPayment): void {

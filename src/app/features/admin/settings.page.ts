@@ -2,8 +2,11 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AdminService } from '../../core/data/admin.service';
+import { saveCustomAssistantAccount } from '../../core/data/auth.service';
+import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { AcademySettings, SiteTheme, UserPortalTheme } from '../../core/models/admin';
 import { AccessEditorComponent } from './access-editor.component';
@@ -13,7 +16,7 @@ type BoolKey = { [K in keyof AcademySettings]-?: NonNullable<AcademySettings[K]>
 
 @Component({
   selector: 'app-admin-settings',
-  imports: [NgTemplateOutlet, FormsModule, LucideAngularModule, TranslatePipe, AdminHeaderComponent, InitialsComponent, AccessEditorComponent, DrawerComponent],
+  imports: [NgTemplateOutlet, FormsModule, RouterLink, LucideAngularModule, TranslatePipe, AdminHeaderComponent, InitialsComponent, AccessEditorComponent, DrawerComponent],
   template: `
     <div class="space-y-6 pb-24">
       <app-admin-header [title]="'admin.settings.title' | t" [subtitle]="'admin.settings.subtitle' | t">
@@ -215,6 +218,13 @@ type BoolKey = { [K in keyof AcademySettings]-?: NonNullable<AcademySettings[K]>
                 <label class="block"><span class="field-label">{{ 'admin.settings.joinOpens' | t }}</span>
                   <span class="relative block"><input type="number" min="0" class="input input-plain pe-20" [ngModel]="f.joinOpensMin" (ngModelChange)="set('joinOpensMin', +$event)" /><span class="pointer-events-none absolute end-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-ink-muted">{{ 'admin.min' | t }}</span></span></label>
               </div>
+              <div class="rounded-card-lg border border-line/70 p-4 space-y-2">
+                <label class="block">
+                  <span class="field-label">Broadcast / Live Stream Link (YouTube / Vimeo / External)</span>
+                  <input class="input input-plain [unicode-bidi:plaintext]" [ngModel]="f.liveStreamUrl" (ngModelChange)="set('liveStreamUrl', $event)" placeholder="https://www.youtube.com/watch?v=... or https://youtube.com/live/..." dir="ltr" />
+                </label>
+                <p class="text-xs text-ink-muted">Students opening scheduled live sessions will be directed to this broadcast stream.</p>
+              </div>
               <ng-container *ngTemplateOutlet="toggle; context: { key: 'recordReplays', label: 'admin.settings.record', hint: 'admin.settings.recordHint' }" />
               <ng-container *ngTemplateOutlet="toggle; context: { key: 'slowMode', label: 'admin.settings.slow', hint: 'admin.settings.slowHint' }" />
             </section>
@@ -225,8 +235,8 @@ type BoolKey = { [K in keyof AcademySettings]-?: NonNullable<AcademySettings[K]>
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <span><strong class="block font-display text-sm text-ink">{{ 'admin.settings.defaultLang' | t }}</strong><span class="text-[0.8125rem] text-ink-muted">{{ 'admin.settings.defaultLangHint' | t }}</span></span>
                 <div class="seg">
-                  <button type="button" [class.seg-on]="f.defaultLang === 'en'" (click)="set('defaultLang', 'en')">English</button>
-                  <button type="button" [class.seg-on]="f.defaultLang === 'ar'" (click)="set('defaultLang', 'ar')" lang="ar">العربية</button>
+                  <button type="button" [class.seg-on]="f.defaultLang === 'en'" (click)="changeDefaultLang('en')">English</button>
+                  <button type="button" [class.seg-on]="f.defaultLang === 'ar'" (click)="changeDefaultLang('ar')" lang="ar">العربية</button>
                 </div>
               </div>
               <ng-container *ngTemplateOutlet="toggle; context: { key: 'showLangSwitch', label: 'admin.settings.langSwitch', hint: 'admin.settings.langSwitchHint' }" />
@@ -247,7 +257,12 @@ type BoolKey = { [K in keyof AcademySettings]-?: NonNullable<AcademySettings[K]>
                   }
                 </div>
               }
-              <button type="button" class="btn btn-soft" (click)="openInviteStaff.set(true)"><lucide-icon name="plus" [size]="16" />{{ 'admin.settings.invite' | t }}</button>
+              <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <button type="button" class="btn btn-soft" (click)="openInviteStaff.set(true)"><lucide-icon name="plus" [size]="16" />{{ 'admin.settings.invite' | t }}</button>
+                <a routerLink="/admin/metrics" class="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline">
+                  <lucide-icon name="chart-column" [size]="14" />Go to Assistant Metrics &rarr;
+                </a>
+              </div>
             </section>
           </div>
         </div>
@@ -270,6 +285,10 @@ type BoolKey = { [K in keyof AcademySettings]-?: NonNullable<AcademySettings[K]>
                   <option value="assistant">Teaching Assistant (Receipts & Q&A)</option>
                   <option value="reviewer">Content Reviewer</option>
                 </select>
+              </label>
+              <label class="block">
+                <span class="field-label">Login Password</span>
+                <input type="password" class="input" [ngModel]="newStaffPassword()" (ngModelChange)="newStaffPassword.set($event)" placeholder="Set login password (min 8 characters)" dir="ltr" />
               </label>
             </div>
             <div footer class="flex gap-2 w-full">
@@ -312,6 +331,7 @@ type BoolKey = { [K in keyof AcademySettings]-?: NonNullable<AcademySettings[K]>
 })
 export class AdminSettingsPage {
   protected readonly admin = inject(AdminService);
+  protected readonly i18n = inject(LanguageService);
   private readonly loaded = toSignal(this.admin.getSettings());
 
   protected readonly form = linkedSignal<AcademySettings | undefined>(() => (this.loaded() ? { ...this.loaded()! } : undefined));
@@ -328,6 +348,7 @@ export class AdminSettingsPage {
   protected readonly newStaffName = signal('');
   protected readonly newStaffEmail = signal('');
   protected readonly newStaffRole = signal<'admin' | 'assistant' | 'reviewer'>('assistant');
+  protected readonly newStaffPassword = signal('');
 
   // User Portal Theme Palettes
   protected readonly themePalettes = [
@@ -350,6 +371,11 @@ export class AdminSettingsPage {
   protected set<K extends keyof AcademySettings>(key: K, value: AcademySettings[K]): void {
     this.saved.set(false);
     this.form.update((f) => (f ? { ...f, [key]: value } : f));
+  }
+
+  protected changeDefaultLang(lang: 'en' | 'ar'): void {
+    this.set('defaultLang', lang);
+    this.i18n.setLang(lang);
   }
 
   protected setUserPortalTheme(t: UserPortalTheme): void {
@@ -390,19 +416,37 @@ export class AdminSettingsPage {
     const name = this.newStaffName().trim();
     const email = this.newStaffEmail().trim();
     const role = this.newStaffRole();
+    const pw = this.newStaffPassword().trim() || 'assistant123';
     if (!name || !email) return;
 
+    const staffId = 'staff_' + Date.now();
+    const initials = name.slice(0, 2).toUpperCase();
+
+    if (role === 'assistant') {
+      saveCustomAssistantAccount({
+        id: staffId,
+        fullName: name,
+        email,
+        password: pw,
+        initials,
+        role: 'assistant',
+        createdAt: new Date().toISOString(),
+        scopes: ['receipts', 'attendance', 'qa'],
+      });
+    }
+
     this.admin.addStaffMember({
-      id: 'staff_' + Date.now(),
+      id: staffId,
       name,
       email,
       role: role as any,
-      initials: name.slice(0, 2).toUpperCase(),
-      scopes: ['payments', 'qa'],
+      initials,
+      scopes: role === 'assistant' ? ['receipts', 'attendance', 'qa'] : ['all'],
     });
     this.openInviteStaff.set(false);
     this.newStaffName.set('');
     this.newStaffEmail.set('');
+    this.newStaffPassword.set('');
   }
 
   protected togglePopup(): void {

@@ -12,9 +12,10 @@ import {
   WEEKLY_ACTIVITY_MOCK,
 } from '../mock/admin.mock';
 import { LIVE_CLASSES_MOCK } from '../mock/live.mock';
-import { AcademySettings, AdminLecture, AdminPayment, AdminStudent, Announcement, PopupMessageSettings, SiteTheme, StaffMember, UserStatus } from '../models/admin';
+import { AcademySettings, AdminLecture, AdminPayment, AdminStudent, Announcement, AssistantMetric, PopupMessageSettings, SiteTheme, StaffMember, UserStatus } from '../models/admin';
 import { LiveClass } from '../models/live';
 import { SupabaseService } from '../supabase/supabase.service';
+import { getCustomAssistantAccounts } from './auth.service';
 import { mockResponse } from './mock-response';
 
 const SETTINGS_KEY = 'mutqin_admin_settings';
@@ -25,6 +26,7 @@ const STUDENTS_KEY = 'mutqin_admin_students';
 const LIVE_KEY = 'mutqin_admin_live';
 const LOGINS_KEY = 'mutqin_student_logins';
 const STAFF_KEY = 'mutqin_admin_staff';
+const ASSISTANTS_KEY = 'mutqin_assistant_metrics';
 
 function loadStorage<T>(key: string, fallback: T): T {
   if (typeof localStorage === 'undefined') return fallback;
@@ -79,6 +81,35 @@ function loadSettings(): AcademySettings {
   return s;
 }
 
+function loadAssistants(): AssistantMetric[] {
+  const base = loadStorage<AssistantMetric[]>(ASSISTANTS_KEY, ASSISTANT_METRICS_MOCK);
+  const custom = getCustomAssistantAccounts();
+  const map = new Map<string, AssistantMetric>();
+  for (const b of base) {
+    if (b.id) map.set(b.id, b);
+    if (b.name) map.set(b.name.toLowerCase(), b);
+  }
+  for (const c of custom) {
+    const existing = map.get(c.id) || map.get(c.fullName.toLowerCase());
+    if (existing) {
+      map.set(c.id, { ...existing, id: c.id, name: c.fullName, initials: c.initials, scopes: c.scopes || ['receipts', 'attendance', 'qa'] });
+    } else {
+      map.set(c.id, {
+        id: c.id,
+        name: c.fullName,
+        initials: c.initials,
+        scopes: c.scopes || ['receipts', 'attendance', 'qa'],
+        questions: 0,
+        receipts: 0,
+        avgResponse: { en: 'New', ar: 'جديد' },
+        rating: 5.0,
+        presence: 'online',
+      });
+    }
+  }
+  return Array.from(new Set(map.values()));
+}
+
 /**
  * Data store for the admin panel.
  * Persistent reactive store synchronized with browser storage and ready for Supabase / REST endpoints.
@@ -93,7 +124,7 @@ export class AdminService {
   readonly lectures = signal<AdminLecture[]>(loadStorage(LECTURES_KEY, ADMIN_LECTURES_MOCK));
   readonly liveClasses = signal<LiveClass[]>(loadStorage(LIVE_KEY, LIVE_CLASSES_MOCK));
   readonly announcements = signal<Announcement[]>(loadStorage(ANNOUNCEMENTS_KEY, ANNOUNCEMENTS_MOCK));
-  readonly assistants = signal(ASSISTANT_METRICS_MOCK);
+  readonly assistants = signal<AssistantMetric[]>(loadAssistants());
   readonly weeklyActivity = WEEKLY_ACTIVITY_MOCK;
   readonly enrollments = ENROLLMENTS_MOCK;
   readonly activeTheme = signal<SiteTheme>(loadSettings().theme ?? 'light');
@@ -111,20 +142,20 @@ export class AdminService {
         this.payments.set(loadPayments());
         this.announcements.set(loadStorage(ANNOUNCEMENTS_KEY, ANNOUNCEMENTS_MOCK));
         this.liveClasses.set(loadStorage(LIVE_KEY, LIVE_CLASSES_MOCK));
+        this.assistants.set(loadAssistants());
         this.applyInitialThemes();
       });
     }
   }
 
-  private applyInitialThemes(): void {
+  applyInitialThemes(): void {
     if (typeof document === 'undefined') return;
     const s = loadSettings();
     if (s.theme) {
       document.documentElement.setAttribute('data-theme', s.theme);
     }
-    if (s.userPortalTheme) {
-      document.documentElement.setAttribute('data-user-theme', s.userPortalTheme);
-    }
+    const userTheme = s.userPortalTheme || 'classic';
+    document.documentElement.setAttribute('data-user-theme', userTheme);
   }
 
   private async syncRealStudents(): Promise<void> {
@@ -352,6 +383,15 @@ export class AdminService {
     });
   }
 
+  /** Add assistant metric */
+  addAssistantMetric(metric: AssistantMetric): void {
+    this.assistants.update((list) => {
+      const updated = [metric, ...list.filter((x) => x.id !== metric.id && x.name.toLowerCase() !== metric.name.toLowerCase())];
+      saveStorage(ASSISTANTS_KEY, updated);
+      return updated;
+    });
+  }
+
   /** Add staff member */
   addStaffMember(member: StaffMember): void {
     this.staff.update((list) => {
@@ -359,6 +399,19 @@ export class AdminService {
       saveStorage(STAFF_KEY, updated);
       return updated;
     });
+    if (member.role === 'assistant') {
+      this.addAssistantMetric({
+        id: member.id,
+        name: member.name,
+        initials: member.initials,
+        scopes: member.scopes || ['receipts', 'attendance', 'qa'],
+        questions: 0,
+        receipts: 0,
+        avgResponse: { en: 'New', ar: 'جديد' },
+        rating: 5.0,
+        presence: 'online',
+      });
+    }
   }
 
   /** Remove staff member */
@@ -366,6 +419,11 @@ export class AdminService {
     this.staff.update((list) => {
       const updated = list.filter((x) => x.id !== id);
       saveStorage(STAFF_KEY, updated);
+      return updated;
+    });
+    this.assistants.update((list) => {
+      const updated = list.filter((x) => x.id !== id);
+      saveStorage(ASSISTANTS_KEY, updated);
       return updated;
     });
   }

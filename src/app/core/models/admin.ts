@@ -134,4 +134,5 @@ export interface AcademySettings {
   theme: SiteTheme;
   userPortalTheme?: UserPortalTheme;
   popupMessage: PopupMessageSettings;
+  liveStreamUrl?: string;
 }

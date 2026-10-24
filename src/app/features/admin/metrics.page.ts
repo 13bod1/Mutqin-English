@@ -126,6 +126,12 @@ const PRESENCE: Record<string, string> = { online: 'tone-success', away: 'tone-w
                 <p><span class="font-bold">Password:</span> {{ assistantCreated()?.password }}</p>
               </div>
               <p class="text-xs text-emerald-700 mt-1.5">Save these credentials — they can immediately sign in at /login.</p>
+              <div class="mt-3 pt-2 border-t border-emerald-200/60 flex items-center justify-between">
+                <span class="text-xs font-semibold text-emerald-900">Added to Assistant Metrics &darr;</span>
+                <button type="button" class="btn btn-sm btn-outline border-emerald-600 text-emerald-800" (click)="openAddAssistant.set(false); resetAssistantForm()">
+                  View in Table
+                </button>
+              </div>
             </div>
           }
           <div footer class="flex gap-2 w-full">

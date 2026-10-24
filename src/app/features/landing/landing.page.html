@@ -226,6 +226,34 @@
   </div>
 </section>
 
+<!-- Official Curriculum Partner / Madrasetna TV -->
+<section class="py-10 bg-surface-warm/40 border-y border-line/60">
+  <div class="container-page">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-5 rounded-card-lg border border-red-200 bg-white p-5 sm:p-6 shadow-sm">
+      <div class="flex items-center gap-4">
+        <div class="grid h-14 w-14 place-items-center rounded-2xl bg-red-600 text-white shadow-md shrink-0">
+          <lucide-icon name="youtube" [size]="28" class="fill-white" />
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-display text-base sm:text-lg font-bold text-ink">قناة مدرستنا التعليمية (Madrasetna TV)</h3>
+            <span class="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700">شريك المنهج الرسمي</span>
+          </div>
+          <p class="text-xs sm:text-sm text-ink-muted mt-1">
+            تابع شروحات وحصص وزارة التربية والتعليم الرسمية لصفوف الثانوية العامة بالتكامل مع محاضرات مستر عادل مصطفى.
+          </p>
+        </div>
+      </div>
+      <a href="https://www.youtube.com/@madrasetnatv" target="_blank" rel="noopener"
+        class="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 font-display text-xs font-bold shadow-md transition hover:scale-105 shrink-0">
+        <lucide-icon name="youtube" [size]="16" class="fill-white" />
+        <span>زيارة قناة مدرستنا</span>
+        <lucide-icon name="external-link" [size]="14" />
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- CTA -->
 <app-cta-banner [eyebrow]="'landing.cta.eyebrow' | t" [title]="'landing.cta.title' | t"
   [text]="'landing.cta.text' | t: { n: (stats()?.studentsCount | number) ?? '1,200' }" [note]="'landing.cta.note' | t">
