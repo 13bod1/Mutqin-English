@@ -1,0 +1,24 @@
+{
+  "name": "Mr. Adel Mostafa Academy | أكاديمية مستر عادل مصطفى",
+  "short_name": "Adel Mostafa",
+  "description": "منصة مستر عادل مصطفى التعليمية لإتقان اللغة الإنجليزية لطلاب الثانوية والإعدادية",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#4E342E",
+  "lang": "ar-EG",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "education",
+    "learning"
+  ]
+}

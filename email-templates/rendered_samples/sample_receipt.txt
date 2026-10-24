@@ -1,0 +1,30 @@
+🎓 أكاديمية مستر عادل مصطفى — Mr. Adel Mostafa Academy
+إيصال تأكيد الدفع والاشتراك | Official Payment Receipt
+
+أهلاً بك يا طالب تجريبي / Demo Student،
+تم تأكيد عملية الدفع وتفعيل اشتراكك بنجاح.
+
+تفاصيل الإيصال:
+----------------------------------------------------------------------
+رقم العملية المرجعي : DEMO-ORDER-001
+المحاضرة / الكورس   : Demo English lecture
+طريقة الدفع        : Sandbox only
+تاريخ العملية       : 2026-10-25 12:00 Africa/Cairo
+المبلغ الإجمالي     : 450.00 جنيه مصري (EGP)
+----------------------------------------------------------------------
+رابط المحاضرة المباشر: https://example.invalid/lectures/demo
+
+----------------------------------------------------------------------
+Payment Summary:
+Student: طالب تجريبي / Demo Student
+Order Ref: DEMO-ORDER-001
+Course: Demo English lecture
+Total Paid: 450.00 EGP (Sandbox only)
+Date: 2026-10-25 12:00 Africa/Cairo
+----------------------------------------------------------------------
+
+لأي استفسار بخصوص اشتراكك:
+البريد الإلكتروني: support@example.invalid
+واتساب: [demo support number]
+
+© 2026 Mr. Adel Mostafa Academy.

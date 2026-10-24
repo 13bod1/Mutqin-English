@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إيصال تأكيد الدفع والاشتراك | Payment Receipt — أكاديمية مستر عادل مصطفى</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #F8FAFC; margin: 0; padding: 24px; color: #1E293B; }
+    .container { max-width: 600px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .header { background-color: #4E342E; padding: 24px 32px; text-align: center; color: #FFFFFF; }
+    .header h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+    .header p { margin: 6px 0 0; font-size: 13px; opacity: 0.9; }
+    .content { padding: 32px; line-height: 1.7; font-size: 15px; }
+    .greeting { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+    .receipt-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .receipt-table th, .receipt-table td { padding: 12px 14px; border-bottom: 1px solid #E2E8F0; text-align: right; }
+    .receipt-table th { background-color: #F8FAFC; color: #64748B; font-size: 13px; font-weight: 600; }
+    .receipt-table td { font-size: 14px; }
+    .total-row td { font-weight: 700; color: #4E342E; font-size: 16px; border-top: 2px solid #CBD5E1; }
+    .btn { display: inline-block; background-color: #4E342E; color: #FFFFFF !important; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-weight: 600; font-size: 14px; margin: 16px 0; }
+    .footer { background-color: #F8FAFC; border-top: 1px solid #E2E8F0; padding: 20px 32px; font-size: 12px; color: #64748B; text-align: center; }
+    .en-section { border-top: 1px solid #E2E8F0; margin-top: 24px; padding-top: 24px; direction: ltr; text-align: left; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎓 أكاديمية مستر عادل مصطفى</h1>
+      <p>Mr. Adel Mostafa Academy — Official Payment Receipt</p>
+    </div>
+    <div class="content">
+      <div class="greeting">أهلاً بك يا {{student_name}}،</div>
+      <p>تم استلام وتأكيد عملية الدفع وتفعيل اشتراكك بنجاح في المحتوى التعليمي التالي:</p>
+
+      <table class="receipt-table">
+        <tr>
+          <th>البند / التفاصيل</th>
+          <th>القيمة</th>
+        </tr>
+        <tr>
+          <td>رقم المرجع (Order Ref)</td>
+          <td><strong>{{order_reference}}</strong></td>
+        </tr>
+        <tr>
+          <td>المحاضرة / الكورس</td>
+          <td>{{course_title}}</td>
+        </tr>
+        <tr>
+          <td>طريقة الدفع</td>
+          <td>{{payment_method}}</td>
+        </tr>
+        <tr>
+          <td>تاريخ العملية</td>
+          <td>{{transaction_date}}</td>
+        </tr>
+        <tr class="total-row">
+          <td>المبلغ المدفوع</td>
+          <td>{{amount_egp}} جنيه مصري (EGP)</td>
+        </tr>
+      </table>
+
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="{{lecture_access_url}}" class="btn">الانتقال إلى المحاضرة الآن | Start Learning</a>
+      </div>
+
+      <div class="en-section">
+        <p><strong>Payment Confirmation:</strong></p>
+        <p>Your enrollment in <em>{{course_title}}</em> (Ref: {{order_reference}}) has been confirmed. Total paid: {{amount_egp}} EGP via {{payment_method}} on {{transaction_date}}.</p>
+      </div>
+    </div>
+    <div class="footer">
+      <p>هذا إيصال إلكتروني صادر آلياً عن منصة مستر عادل مصطفى التعليمية.<br>للدعم الفني والاستفسارات: <a href="mailto:{{support_email}}">{{support_email}}</a> | واتساب: {{support_phone}}</p>
+      <p>© {{year}} Mr. Adel Mostafa Academy. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
