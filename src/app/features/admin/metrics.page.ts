@@ -26,77 +26,24 @@ const PRESENCE: Record<string, string> = { online: 'tone-success', away: 'tone-w
         </button>
       </app-admin-header>
 
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <app-stat [label]="'admin.metrics.answered' | t" [value]="sum(admin.weeklyActivity.questions) + ''" icon="message-square" [note]="'admin.stats.vsLast' | t: { n: '+12%' }" noteIcon="trending-up" noteClass="text-success" />
-        <app-stat [label]="'admin.metrics.reviewed' | t" [value]="sum(admin.weeklyActivity.receipts) + ''" icon="receipt" tone="tone-gold" [note]="'admin.metrics.waiting' | t: { n: admin.pendingCount() }" />
-        <app-stat [label]="'admin.metrics.firstResponse' | t" [value]="'admin.metrics.minutes' | t: { n: 46 }" icon="timer" [note]="'admin.metrics.target' | t" noteIcon="circle-check" noteClass="text-success" />
-        <app-stat [label]="'admin.metrics.rating' | t" value="4.8 / 5" icon="star" tone="tone-gold" [note]="'admin.metrics.ratings' | t: { n: 212 }" />
-      </div>
-
-      <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <section class="card p-5 sm:p-6">
-          <div class="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 class="font-display text-base font-bold">{{ 'admin.metrics.activity' | t }}</h2>
-              <p class="text-[0.8125rem] text-ink-muted">{{ 'admin.metrics.week' | t }}</p>
-            </div>
-            <div class="flex gap-4 text-xs text-ink-body">
-              <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-primary"></span>{{ 'admin.metrics.answered' | t }}</span>
-              <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-gold"></span>{{ 'admin.metrics.reviewed' | t }}</span>
-            </div>
-          </div>
-          <div class="mt-6 flex h-48 items-end justify-between gap-2" role="img" [attr.aria-label]="'admin.metrics.activity' | t">
-            @for (d of days; track d; let i = $index) {
-              <div class="flex h-full flex-1 flex-col items-center justify-end gap-2">
-                <div class="flex h-full items-end gap-1">
-                  <span class="w-3 rounded-t sm:w-4 bg-primary" [style.height.%]="(admin.weeklyActivity.questions[i] / maxQ()) * 100" [title]="admin.weeklyActivity.questions[i]"></span>
-                  <span class="w-3 rounded-t sm:w-4 bg-gold" [style.height.%]="(admin.weeklyActivity.receipts[i] / maxQ()) * 100" [title]="admin.weeklyActivity.receipts[i]"></span>
-                </div>
-                <span class="text-xs text-ink-muted">{{ 'admin.days.' + d | t }}</span>
-              </div>
-            }
-          </div>
-        </section>
-
-        <section class="card space-y-4 p-5 sm:p-6">
-          <h2 class="font-display text-base font-bold">{{ 'admin.metrics.targets' | t }}</h2>
-          @for (g of goals; track g.key) {
-            <div>
-              <div class="flex justify-between text-[0.8125rem]"><span class="text-ink-body">{{ g.key | t }}</span><span class="font-display font-bold text-ink">{{ g.v }}%</span></div>
-              <div class="progress-track mt-2"><div class="progress-fill" [class]="g.c" [style.width.%]="g.v"></div></div>
-            </div>
-          }
-          <p class="note tone-warning border-t-0"><lucide-icon name="circle-alert" [size]="16" class="mt-0.5 shrink-0" />{{ 'admin.metrics.alert' | t: { n: 3 } }}</p>
-        </section>
-      </div>
-
-      <div class="table-wrap">
-        <table class="table">
-          <thead>
-            <tr><th>{{ 'admin.cols.assistant' | t }}</th><th>{{ 'admin.cols.focus' | t }}</th><th>{{ 'admin.cols.questions' | t }}</th><th>{{ 'admin.cols.receipts' | t }}</th><th>{{ 'admin.cols.avgResponse' | t }}</th><th>{{ 'admin.cols.rating' | t }}</th><th>{{ 'admin.cols.status' | t }}</th></tr>
-          </thead>
-          <tbody>
-            @for (a of admin.assistants(); track a.id) {
-              <tr>
-                <td><div class="flex items-center gap-3"><app-initials [text]="a.initials" /><p class="font-display font-semibold text-ink">{{ a.name }}</p></div></td>
-                <td><div class="flex flex-wrap gap-1.5">@for (s of a.scopes; track s) { <span class="tag tone-brand">{{ 'admin.scopes.' + s | t }}</span> }</div></td>
-                <td class="font-display font-semibold text-ink">{{ a.questions }}</td>
-                <td>{{ a.receipts ?? '—' }}</td>
-                <td class="whitespace-nowrap">{{ a.avgResponse | loc }}</td>
-                <td><span class="flex items-center gap-1 font-display font-semibold text-ink"><lucide-icon name="star" [size]="14" class="fill-gold text-gold" />{{ a.rating }}</span></td>
-                <td><span class="tag" [class]="presence[a.presence]">{{ 'admin.presence.' + a.presence | t }}</span></td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+      @if (admin.paymentLoading()) { <p role="status">Loading verified review activity…</p> }
+      @if (admin.paymentLoadError()) { <p role="alert" class="note tone-danger">{{ admin.paymentLoadError() }}</p> }
+      <button type="button" class="btn btn-outline" (click)="admin.refreshPayments()" [disabled]="admin.paymentLoading()">Refresh verified metrics</button>
+      <section class="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label="Verified receipt metrics">
+        <app-stat label="Reviewed receipts" [value]="rangeKpi().totalReviewed + ''" icon="receipt" />
+        <app-stat label="Pending receipts" [value]="rangeKpi().totalPending + ''" icon="clock" />
+        <app-stat label="Average review time" [value]="rangeKpi().avgTurnaroundDisplay" icon="timer" />
+        <app-stat label="Approval rate" [value]="rangeKpi().approvalRate == null ? 'N/A' : rangeKpi().approvalRate + '%'" icon="circle-check" />
+        <app-stat label="Rejection rate" [value]="rangeKpi().rejectionRate == null ? 'N/A' : rangeKpi().rejectionRate + '%'" icon="circle-x" />
+      </section>
+      <p class="note">Metrics are calculated from the server-authorized payment ledger for the selected date range. Question activity, ratings and targets are not displayed without a verified data source.</p>
 
       <!-- Create Assistant Account Drawer -->
       @if (openAddAssistant()) {
-        <app-drawer title="Create Assistant Account" subtitle="This account can log in at /login and access the Assistant Portal (/assistant)." (closed)="openAddAssistant.set(false); resetAssistantForm()">
+        <app-drawer title="Create Assistant Account" subtitle="Local metadata only. An authorized backend administrator must provision the real account." (closed)="openAddAssistant.set(false); resetAssistantForm()">
           <div class="rounded-card border border-amber-200 bg-amber-50 p-3 mb-2">
             <p class="text-xs font-bold text-amber-900">⚠️ Security Notice</p>
-            <p class="text-xs text-amber-800 mt-0.5">Only you (admin) can see this form. Credentials are stored securely and grant limited /assistant portal access only.</p>
+            <p class="text-xs text-amber-800 mt-0.5">Only you (admin) can see this form. This browser cannot provision authentication accounts or grant staff privileges. No login credentials are saved.</p>
           </div>
           <div class="space-y-4">
             <label class="block">
@@ -120,12 +67,12 @@ const PRESENCE: Record<string, string> = { online: 'tone-success', away: 'tone-w
           </div>
           @if (assistantCreated()) {
             <div class="rounded-card border border-emerald-200 bg-emerald-50 p-4 mt-2">
-              <p class="font-display font-bold text-sm text-emerald-900 flex items-center gap-2"><lucide-icon name="circle-check" [size]="16" class="text-emerald-600" />Account Created Successfully</p>
+              <p class="font-display font-bold text-sm text-emerald-900 flex items-center gap-2"><lucide-icon name="circle-check" [size]="16" class="text-emerald-600" />Local metadata recorded — server provisioning required</p>
               <div class="mt-2 font-mono text-xs text-emerald-900 space-y-1 bg-white/70 rounded p-2">
                 <p><span class="font-bold">Email:</span> {{ assistantCreated()?.email }}</p>
-                <p><span class="font-bold">Password:</span> {{ assistantCreated()?.password }}</p>
+                <p>No password is stored or provisioned by this form.</p>
               </div>
-              <p class="text-xs text-emerald-700 mt-1.5">Save these credentials — they can immediately sign in at /login.</p>
+              <p class="text-xs text-emerald-700 mt-1.5">An authorized backend administrator must provision this identity before sign-in.</p>
               <div class="mt-3 pt-2 border-t border-emerald-200/60 flex items-center justify-between">
                 <span class="text-xs font-semibold text-emerald-900">Added to Assistant Metrics &darr;</span>
                 <button type="button" class="btn btn-sm btn-outline border-emerald-600 text-emerald-800" (click)="openAddAssistant.set(false); resetAssistantForm()">
@@ -149,6 +96,8 @@ const PRESENCE: Record<string, string> = { online: 'tone-success', away: 'tone-w
 })
 export class AdminMetricsPage {
   protected readonly admin = inject(AdminService);
+  protected readonly Math = Math;
+  protected readonly rangeKpi = computed(() => this.admin.getKpisForRange(this.range()));
   protected readonly presence = PRESENCE;
   protected readonly ranges: Range[] = ['7d', '30d', 'term'];
   protected readonly range = signal<Range>('7d');
@@ -199,7 +148,8 @@ export class AdminMetricsPage {
     };
 
     saveCustomAssistantAccount(account);
-    this.assistantCreated.set({ email, password: pw });
+    this.assistantCreated.set({ email, password: '' });
+    this.newAssistantPw.set('');
     this.admin.addStaffMember({
       id: account.id,
       name: account.fullName,

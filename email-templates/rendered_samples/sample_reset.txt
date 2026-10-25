@@ -1,0 +1,24 @@
+🎓 أكاديمية مستر عادل مصطفى — Mr. Adel Mostafa Academy
+إعادة تعيين كلمة المرور | Password Reset Request
+
+مرحباً طالب تجريبي / Demo Student،
+تلقينا طلباً لإعادة تعيين كلمة المرور الخاصة بحسابك على منصة مستر عادل مصطفى.
+
+رمز الأمان للتحقق (OTP):
+654321
+(هذا الرمز صالح لمدة 30 دقيقة فقط)
+
+رابط إعادة التعيين المباشر:
+https://example.invalid/reset?demo=1
+
+----------------------------------------------------------------------
+Hello طالب تجريبي / Demo Student,
+We received a password reset request for your account.
+Your security OTP: 654321 (valid for 30 minutes).
+Direct reset URL: https://example.invalid/reset?demo=1
+----------------------------------------------------------------------
+
+إذا لم تكن قد طلبت إعادة تعيين كلمة المرور، يُرجى تجاهل هذه الرسالة.
+الدعم الفني: support@example.invalid | واتساب: [demo support number]
+
+© 2026 Mr. Adel Mostafa Academy.

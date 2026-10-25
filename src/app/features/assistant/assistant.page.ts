@@ -651,6 +651,7 @@ export class AssistantPage {
   protected readonly zoomedStudent = signal<string>('');
   protected readonly attendanceMap = signal<Record<string, boolean>>({});
   protected readonly replyDrafts: Record<string, string> = {};
+  protected readonly reviewError = signal<string | null>(null);
 
   protected annTitle = '';
   protected annBody = '';
@@ -744,28 +745,31 @@ export class AssistantPage {
     this.zoomedStudent.set(student);
   }
 
-  protected approvePayment(id: string): void {
-    this.admin.approve(id);
+  protected async approvePayment(id: string): Promise<void> {
+    const res = await this.admin.reviewReceiptRpc(id, 'approved');
+    if (!res.success) { this.reviewError.set(res.error || 'Review failed'); } else { this.reviewError.set(null); }
   }
 
-  protected rejectPayment(p: AdminPayment): void {
+  protected async rejectPayment(p: AdminPayment): Promise<void> {
     const defaultReason = this.i18n.lang() === 'ar' ? 'بيانات التحويل غير مطابقة أو لقطة الشاشة غير واضحة' : 'Payment reference or receipt details could not be verified';
     const note = prompt(
       this.i18n.lang() === 'ar' ? 'تأكيد رفض الإيصال - سبب الرفض:' : 'Confirm Payment Rejection - Reason:',
       defaultReason
     );
     if (note !== null) {
-      this.admin.reject(p.id, note.trim() || defaultReason);
+      const res = await this.admin.reviewReceiptRpc(p.id, 'rejected', note.trim() || defaultReason);
+      if (!res.success) { this.reviewError.set(res.error || 'Review failed'); } else { this.reviewError.set(null); }
     }
   }
 
-  protected flagPayment(p: AdminPayment): void {
+  protected async flagPayment(p: AdminPayment): Promise<void> {
     const note = prompt(
       this.i18n.lang() === 'ar' ? 'ملاحظة للمراجعة:' : 'Discrepancy note for Mr. Adel:',
       'Please verify transfer amount / reference'
     );
     if (note) {
-      this.admin.reject(p.id, `Flagged by Assistant: ${note}`);
+      const res = await this.admin.reviewReceiptRpc(p.id, 'rejected', `Flagged by Assistant: ${note}`);
+      if (!res.success) { this.reviewError.set(res.error || 'Review failed'); } else { this.reviewError.set(null); }
     }
   }
 

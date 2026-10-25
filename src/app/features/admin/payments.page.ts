@@ -67,7 +67,7 @@ const METHOD_ICON: Record<string, string> = { card: 'credit-card', instapay: 'la
                 <td>
                   <div class="flex justify-end gap-1.5">
                     @if (p.status === 'pending') {
-                      <button type="button" class="btn btn-success-soft btn-sm !px-2.5" (click)="admin.approve(p.id)" [attr.aria-label]="'admin.pay.approve' | t" title="Approve & Enroll"><lucide-icon name="check" [size]="15" /></button>
+                      <button type="button" class="btn btn-success-soft btn-sm !px-2.5" (click)="approve(p)" [attr.aria-label]="'admin.pay.approve' | t" title="Approve & Enroll"><lucide-icon name="check" [size]="15" /></button>
                       <button type="button" class="btn btn-danger-soft btn-sm !px-2.5" (click)="quickReject(p)" [attr.aria-label]="'admin.pay.reject' | t" title="Reject Payment"><lucide-icon name="x" [size]="15" /></button>
                     }
                     <button type="button" class="btn btn-soft btn-sm !px-2.5" (click)="open(p)" [attr.aria-label]="'admin.pay.review' | t"><lucide-icon name="eye" [size]="15" /></button>
@@ -180,6 +180,7 @@ export class AdminPaymentsPage {
   protected readonly selected = computed(() => this.admin.payments().find((p) => p.id === this.selectedId()) ?? null);
   protected readonly note = signal('');
   protected readonly noteErr = signal(false);
+  protected readonly actionError = signal<string | null>(null);
 
   protected readonly failedCount = computed(() => this.admin.payments().filter((p) => p.status === 'failed' || p.status === 'rejected').length);
   protected readonly shown = computed(() => {
@@ -208,29 +209,35 @@ export class AdminPaymentsPage {
     this.selectedId.set(p.id);
   }
 
-  protected approve(p: AdminPayment): void {
-    this.admin.approve(p.id);
+  protected async approve(p: AdminPayment): Promise<void> {
+    const res = await this.admin.reviewReceiptRpc(p.id, 'approved');
+    if (!res.success) { this.actionError.set(res.error || 'Review failed'); return; }
+    this.actionError.set(null);
     this.selectedId.set(null);
   }
 
-  protected quickReject(p: AdminPayment): void {
+  protected async quickReject(p: AdminPayment): Promise<void> {
     const defaultReason = this.i18n.lang() === 'ar' ? 'بيانات التحويل غير مطابقة أو لقطة الشاشة غير واضحة' : 'Payment reference or receipt details could not be verified';
     const note = prompt(
       this.i18n.lang() === 'ar' ? 'تأكيد رفض الإيصال - سبب الرفض:' : 'Confirm Payment Rejection - Reason:',
       defaultReason
     );
     if (note !== null) {
-      this.admin.reject(p.id, note.trim() || defaultReason);
+      const res = await this.admin.reviewReceiptRpc(p.id, 'rejected', note.trim() || defaultReason);
+      if (!res.success) { this.actionError.set(res.error || 'Review failed'); return; }
+      this.actionError.set(null);
       if (this.selectedId() === p.id) {
         this.selectedId.set(null);
       }
     }
   }
 
-  protected reject(p: AdminPayment): void {
+  protected async reject(p: AdminPayment): Promise<void> {
     const defaultReason = this.i18n.lang() === 'ar' ? 'بيانات التحويل غير مطابقة أو لقطة الشاشة غير واضحة' : 'Payment reference or receipt details could not be verified';
     const finalNote = this.note().trim() || defaultReason;
-    this.admin.reject(p.id, finalNote);
+    const res = await this.admin.reviewReceiptRpc(p.id, 'rejected', finalNote);
+    if (!res.success) { this.actionError.set(res.error || 'Review failed'); return; }
+    this.actionError.set(null);
     this.selectedId.set(null);
   }
 

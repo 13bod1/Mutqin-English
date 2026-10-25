@@ -14,7 +14,7 @@ import { GoogleIconComponent } from '../../shared/ui/google-icon.component';
 })
 export class LoginPage {
   protected readonly i18n = inject(LanguageService);
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   protected readonly form = inject(NonNullableFormBuilder).group({
@@ -92,6 +92,18 @@ export class LoginPage {
     this.forgotModalOpen.set(false);
   }
 
+  protected readonly recoveryPassword = signal('');
+  protected readonly recoveryMessage = signal<string | null>(null);
+  protected readonly recoveryBusy = signal(false);
+  protected saveRecoveryPassword(): void {
+    if (this.recoveryBusy()) return;
+    this.recoveryBusy.set(true); this.recoveryMessage.set(null);
+    this.auth.updateRecoveredPassword(this.recoveryPassword()).subscribe({
+      next: () => { this.recoveryPassword.set(''); this.recoveryBusy.set(false); this.recoveryMessage.set(this.i18n.lang() === 'ar' ? 'تم تحديث كلمة المرور.' : 'Password updated.'); },
+      error: () => { this.recoveryBusy.set(false); this.recoveryMessage.set(this.i18n.lang() === 'ar' ? 'تعذر التحديث؛ تحقق من الرابط وكلمة مرور لا تقل عن 12 حرفاً.' : 'Unable to update: check the recovery link and use at least 12 characters.'); }
+    });
+  }
+
   protected submitForgot(): void {
     const email = this.forgotEmail().trim();
     if (!email || !email.includes('@')) {
@@ -120,8 +132,8 @@ export class LoginPage {
         } else {
           this.forgotSuccess.set(
             this.i18n.lang() === 'ar'
-              ? 'تم إرسال تعليمات استعادة كلمة المرور إلى بريدك الإلكتروني.'
-              : 'Password reset link sent to your email.'
+              ? 'إذا كان الحساب مؤهلاً، ستُرسل تعليمات الاستعادة.'
+              : 'If eligible, recovery instructions will be sent.'
           );
           if (res.accountFound) {
             this.canDirectReset.set(true);
