@@ -1,0 +1,25 @@
+🎓 أكاديمية مستر عادل مصطفى — Mr. Adel Mostafa Academy
+تأكيد البريد الإلكتروني وتفعيل الحساب | Email Confirmation
+
+أهلاً بك يا {{student_name}}،
+شكراً لانضمامك إلى منصة مستر عادل مصطفى لتعليم اللغة الإنجليزية.
+
+رمز التحقق الخاص بك (OTP):
+{{otp_code}}
+(هذا الرمز صالح لمدة {{expiry_minutes}} دقيقة)
+
+رابط التفعيل المباشر:
+{{confirmation_url}}
+
+----------------------------------------------------------------------
+Hello {{student_name}},
+Thank you for joining Mr. Adel Mostafa Academy.
+Your verification OTP: {{otp_code}} (valid for {{expiry_minutes}} minutes).
+Direct activation link: {{confirmation_url}}
+----------------------------------------------------------------------
+
+لأي استفسار أو مساعدة، يرجى التواصل مع فريق الدعم:
+البريد الإلكتروني: {{support_email}}
+واتساب: {{support_phone}}
+
+© {{year}} Mr. Adel Mostafa Academy.

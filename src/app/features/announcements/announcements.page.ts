@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { AdminService } from '../../core/data/admin.service';
+import { PublicSettingsService } from '../../core/services/public-settings.service';
 import { AuthService } from '../../core/data/auth.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
@@ -68,7 +68,7 @@ type AnnouncementFilter = 'all' | 'pinned' | 'general' | 'live' | 'exams';
           </div>
 
           <span class="text-xs text-ink-muted">
-            {{ i18n.lang() === 'ar' ? 'يتم التحديث تلقائياً في الوقت الفعلي' : 'Real-time updates enabled' }}
+            {{ i18n.lang() === 'ar' ? 'الإعلانات المنشورة' : 'Published notices' }}
           </span>
         </div>
 
@@ -147,7 +147,7 @@ type AnnouncementFilter = 'all' | 'pinned' | 'general' | 'live' | 'exams';
   `,
 })
 export class AnnouncementsPage {
-  protected readonly admin = inject(AdminService);
+  protected readonly publicSettings = inject(PublicSettingsService);
   protected readonly auth = inject(AuthService);
   protected readonly i18n = inject(LanguageService);
 
@@ -161,7 +161,7 @@ export class AnnouncementsPage {
   ];
 
   protected readonly publishedList = computed(() =>
-    this.admin.announcements().filter((a) => a.state !== 'draft')
+    this.publicSettings.announcements().filter((a) => a.state === 'sent' && Date.parse(a.at) <= Date.now())
   );
 
   protected readonly pinnedCount = computed(() =>
