@@ -47,7 +47,8 @@ const TONE: Record<AnnouncementState, string> = { scheduled: 'tone-gold', sent: 
                     @if (a.seen !== undefined) { · {{ 'admin.ann.seen' | t: { n: a.seen, total: a.reach ?? 0, pct: pct(a) } }} }
                   </p>
                 </div>
-                <button type="button" class="btn-icon text-danger hover:bg-red-50" (click)="admin.deleteAnnouncement(a.id)" title="Delete announcement"><lucide-icon name="trash-2" [size]="16" /></button>
+                <button type="button" class="btn-icon" (click)="edit(a)" title="Edit announcement" [disabled]="saving()"><lucide-icon name="square-pen" [size]="16" /></button>
+                <button type="button" class="btn-icon text-danger hover:bg-red-50" (click)="remove(a.id)" [disabled]="saving()" title="Delete announcement"><lucide-icon name="trash-2" [size]="16" /></button>
               </li>
             } @empty {
               <li class="px-5 py-12 text-center text-ink-muted">{{ 'admin.noResults' | t }}</li>
@@ -97,6 +98,7 @@ const TONE: Record<AnnouncementState, string> = { scheduled: 'tone-gold', sent: 
             <button type="button" class="btn btn-soft" (click)="save('draft')">{{ 'admin.ann.saveDraft' | t }}</button>
             <button type="submit" class="btn btn-primary"><lucide-icon name="send" [size]="16" class="flip-rtl" />{{ (schedule() ? 'admin.ann.scheduleBtn' : 'admin.ann.sendNow') | t }}</button>
           </div>
+          @if (actionError()) { <p class="note tone-danger" role="alert">{{ actionError() }}</p> }
           @if (done()) { <p class="note tone-success" role="status"><lucide-icon name="circle-check" [size]="16" class="shrink-0" />{{ done()! | t }}</p> }
         </form>
       </div>
@@ -112,6 +114,9 @@ export class AdminAnnouncementsPage {
     { key: 'all', n: 347 }, { key: 'sec3', n: 214 }, { key: 'sec2', n: 71 }, { key: 'sec1', n: 44 }, { key: 'prep', n: 18 },
   ];
 
+  protected readonly actionError = signal<string | null>(null);
+  protected readonly saving = signal(false);
+  protected readonly editingId = signal<string | null>(null);
   protected readonly filter = signal<Filter>('all');
   protected readonly title = signal('');
   protected readonly body = signal('');
@@ -138,12 +143,30 @@ export class AdminAnnouncementsPage {
     this.save(this.schedule() ? 'scheduled' : 'sent');
   }
 
-  protected save(state: AnnouncementState): void {
+  protected edit(a: Announcement): void {
+    this.editingId.set(a.id); this.title.set(a.title); this.body.set(a.body);
+    this.audience.set(a.audience); this.inApp.set(a.channels.includes('inApp'));
+    this.email.set(a.channels.includes('email')); this.pin.set(!!a.pinned);
+    this.schedule.set(a.state === 'scheduled');
+  }
+
+  protected async remove(id: string): Promise<void> {
+    if (this.saving()) return;
+    this.saving.set(true); this.actionError.set(null);
+    try { const result = await this.admin.deleteAnnouncement(id); if (!result.success) this.actionError.set(result.error || 'Announcement was not deleted'); }
+    catch (error: any) { this.actionError.set(error?.message || 'Network error'); }
+    finally { this.saving.set(false); }
+  }
+
+  protected async save(state: AnnouncementState): Promise<void> {
     this.tried.set(true);
     if (!this.title().trim() || (state !== 'draft' && !this.body().trim())) return;
     const channels = [...(this.inApp() ? ['inApp' as const] : []), ...(this.email() ? ['email' as const] : [])];
-    this.admin.publish({
-      id: 'a' + Date.now(),
+    if (this.saving()) return;
+    this.saving.set(true); this.actionError.set(null);
+    try {
+    const result = await this.admin.publish({
+      id: this.editingId() || crypto.randomUUID(),
       icon: state === 'draft' ? 'square-pen' : this.pin() ? 'pin' : 'megaphone',
       title: this.title().trim(),
       body: this.body().trim(),
@@ -151,13 +174,17 @@ export class AdminAnnouncementsPage {
       channels,
       state,
       pinned: this.pin(),
-      at: state === 'scheduled' ? new Date(this.when() + ':00+02:00').toISOString() : new Date().toISOString(),
+      at: state === 'scheduled' ? new Date(this.when()).toISOString() : new Date().toISOString(),
       ...(state === 'sent' ? { seen: 0, reach: this.audiences.find((a) => a.key === this.audience())?.n ?? 0 } : {}),
     });
+    if (!result.success) { this.actionError.set(result.error || 'Announcement was not saved'); return; }
+    this.editingId.set(null);
     this.title.set('');
     this.body.set('');
     this.tried.set(false);
     this.done.set(`admin.ann.done.${state}`);
     setTimeout(() => this.done.set(null), 3000);
+    } catch (error: any) { this.actionError.set(error?.message || 'Announcement network error'); }
+    finally { this.saving.set(false); }
   }
 }

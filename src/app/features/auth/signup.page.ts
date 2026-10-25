@@ -75,7 +75,11 @@ export class SignupPage {
       .subscribe({
         next: () => {
           this.loading.set(false);
-          this.router.navigateByUrl('/progress');
+          if (this.auth?.user ? this.auth.user() : true) {
+            this.router.navigateByUrl('/progress');
+          } else {
+            this.router.navigateByUrl('/login');
+          }
         },
         error: (err: any) => {
           this.loading.set(false);

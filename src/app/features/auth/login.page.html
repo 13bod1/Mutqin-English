@@ -1,3 +1,11 @@
+@if (auth.recoveryAuthorized()) {
+  <form (ngSubmit)="saveRecoveryPassword()" class="card mx-auto my-5 max-w-md p-5" aria-label="Recovery password form">
+    <label for="recovery-password" class="field-label">{{ i18n.lang() === 'ar' ? 'كلمة مرور جديدة عبر رابط الاستعادة' : 'New password from recovery link' }}</label>
+    <input id="recovery-password" type="password" class="input" name="recoveryPassword" autocomplete="new-password" minlength="12" required [ngModel]="recoveryPassword()" (ngModelChange)="recoveryPassword.set($event)" />
+    <button class="btn btn-primary mt-3" type="submit" [disabled]="recoveryBusy()">{{ i18n.lang() === 'ar' ? 'حفظ كلمة المرور' : 'Save password' }}</button>
+  </form>
+}
+@if (recoveryMessage()) { <p role="status" class="p-3 text-center">{{ recoveryMessage() }}</p> }
 <section class="relative isolate overflow-hidden bg-gradient-to-b from-surface-warm to-surface-page py-10 md:py-16">
   <div class="pointer-events-none absolute -start-32 -top-32 -z-10 h-96 w-96 rounded-full bg-surface-highlight/40 blur-3xl"></div>
   <div class="pointer-events-none absolute -bottom-40 -end-32 -z-10 h-96 w-96 rounded-full bg-surface-highlight/40 blur-3xl"></div>

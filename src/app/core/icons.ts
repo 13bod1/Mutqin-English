@@ -1,5 +1,5 @@
 import {
-  Activity, ArrowRight, Award, BadgeCheck, Ban, Banknote, Bell, BookA, BookOpen, BrainCircuit, Calendar, CalendarPlus,
+  Activity, ArrowRight, Award, BadgeCheck, Ban, Banknote, Bell, BellOff, BookA, BookOpen, BrainCircuit, Calendar, CalendarPlus,
   Captions, ChartColumn, ChartPie, Check, CheckCheck, ChevronDown, ChevronRight, CircleAlert, CircleCheck, CircleDashed, CirclePause,
   CirclePlay, CircleX, ClipboardCheck, Clock, CloudUpload, Copy, CreditCard, DollarSign, Download, Ellipsis, ExternalLink, Eye, EyeOff, FileText,
   Flag, Flame, Gauge, Globe, GraduationCap, Hand, Headphones, Headset, History, Hourglass, Image, Infinity, Info, Key, Landmark,
@@ -12,7 +12,7 @@ import {
 
 /** Every icon used in the app, registered once (tree-shaken). Use as <lucide-icon name="book-open" />. */
 export const APP_ICONS = {
-  Activity, ArrowRight, Award, BadgeCheck, Ban, Banknote, Bell, BookA, BookOpen, BrainCircuit, Calendar, CalendarPlus,
+  Activity, ArrowRight, Award, BadgeCheck, Ban, Banknote, Bell, BellOff, BookA, BookOpen, BrainCircuit, Calendar, CalendarPlus,
   Captions, ChartColumn, ChartPie, Check, CheckCheck, ChevronDown, ChevronRight, CircleAlert, CircleCheck, CircleDashed, CirclePause,
   CirclePlay, CircleX, ClipboardCheck, Clock, CloudUpload, Copy, CreditCard, DollarSign, Download, Ellipsis, ExternalLink, Eye, EyeOff, FileText,
   Flag, Flame, Gauge, Globe, GraduationCap, Hand, Headphones, Headset, History, Hourglass, Image, Infinity, Info, Key, Landmark,
