@@ -143,11 +143,24 @@ export class AdminAnnouncementsPage {
     this.save(this.schedule() ? 'scheduled' : 'sent');
   }
 
+  private toLocalDatetimeString(isoOrDate: string | Date): string {
+    const d = typeof isoOrDate === 'string' ? new Date(isoOrDate) : isoOrDate;
+    if (isNaN(d.getTime())) return '2026-10-31T10:00';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
   protected edit(a: Announcement): void {
     this.editingId.set(a.id); this.title.set(a.title); this.body.set(a.body);
     this.audience.set(a.audience); this.inApp.set(a.channels.includes('inApp'));
     this.email.set(a.channels.includes('email')); this.pin.set(!!a.pinned);
     this.schedule.set(a.state === 'scheduled');
+    if (a.at) {
+      const parsed = new Date(a.at);
+      if (!isNaN(parsed.getTime())) {
+        this.when.set(this.toLocalDatetimeString(parsed));
+      }
+    }
   }
 
   protected async remove(id: string): Promise<void> {
@@ -161,6 +174,13 @@ export class AdminAnnouncementsPage {
   protected async save(state: AnnouncementState): Promise<void> {
     this.tried.set(true);
     if (!this.title().trim() || (state !== 'draft' && !this.body().trim())) return;
+    if (state === 'scheduled') {
+      const schedTime = this.when() ? new Date(this.when()).getTime() : NaN;
+      if (isNaN(schedTime)) {
+        this.actionError.set('Scheduled date and time is invalid');
+        return;
+      }
+    }
     const channels = [...(this.inApp() ? ['inApp' as const] : []), ...(this.email() ? ['email' as const] : [])];
     if (this.saving()) return;
     this.saving.set(true); this.actionError.set(null);
