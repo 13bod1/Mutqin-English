@@ -228,6 +228,8 @@ export class AuthService {
   }
 
   private clearLocalSession(): void {
+    this.recoveryAuthorized.set(false);
+    this.recoveryUserId = null;
     this.user.set(null);
     this.saveStoredUser(null);
     this.privilegeValidationError.set(null);
@@ -271,6 +273,8 @@ export class AuthService {
     }
   }
 
+  readonly recoveryAuthorized = signal(false);
+  private recoveryUserId: string | null = null;
   private authListenerSetup = false;
   private listenAuthStateChanges(): void {
     if (this.authListenerSetup) return;
@@ -278,6 +282,7 @@ export class AuthService {
 
     this.supabase.auth.onAuthStateChange((event, session) => {
       const currentEpoch = ++this.sessionEpoch;
+      if (event === 'PASSWORD_RECOVERY' && session?.user?.id) { this.recoveryUserId = session.user.id; this.recoveryAuthorized.set(true); }
       if (event === 'SIGNED_OUT' || !session || !session.user) {
         this.clearLocalSession();
         return;
@@ -598,6 +603,18 @@ export class AuthService {
       });
       if (error) throw error;
       return { success: true, accountFound: false, updated: false, message: 'If eligible, recovery instructions will be sent.' };
+    })());
+  }
+
+  updateRecoveredPassword(password: string): Observable<void> {
+    return from((async () => {
+      if (!this.recoveryAuthorized() || !this.recoveryUserId) throw new Error('No password-recovery session');
+      if (password.length < 12) throw new Error('Use at least 12 characters');
+      const verified = await this.supabase.auth.getUser();
+      if (verified.error || verified.data?.user?.id !== this.recoveryUserId) throw new Error('Recovery session could not be verified');
+      const result = await this.supabase.auth.updateUser({ password });
+      if (result.error) throw result.error;
+      this.recoveryAuthorized.set(false); this.recoveryUserId = null;
     })());
   }
 

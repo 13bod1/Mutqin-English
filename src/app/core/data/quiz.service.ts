@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, from, map, Observable, of, throwError } from 'rxjs';
+import { catchError, from, map, Observable, of, throwError, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { QUIZ_MODULES_MOCK, QUIZ_QUESTIONS_MOCK } from '../mock/quizzes.mock';
 import { QuizModule, QuizQuestion, QuizResult } from '../models/quiz';
@@ -40,6 +40,7 @@ export class QuizService {
         .eq('is_published', true)
         .order('created_at', { ascending: true })
     ).pipe(
+      timeout(environment.production ? 15000 : 2500),
       map(({ data, error }: any) => {
         if (error) {
           if (isAuthOrPermissionError(error)) {
@@ -84,6 +85,7 @@ export class QuizService {
         .eq('module_id', moduleId)
         .order('sort_order', { ascending: true })
     ).pipe(
+      timeout(environment.production ? 15000 : 2500),
       map(({ data, error }: any) => {
         if (error) {
           if (isAuthOrPermissionError(error)) {
