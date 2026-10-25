@@ -381,7 +381,9 @@ export class AuthService {
       this.saveStoredUser(studentUser);
       this.recordStudentActivity(studentUser, 'login');
       // Sync with Supabase session in background if available
-      this.supabase.auth.signInWithPassword({ email: cleanEmail, password: req.password }).catch(() => {});
+      try {
+        this.supabase.auth.signInWithPassword({ email: cleanEmail, password: req.password }).catch(() => {});
+      } catch {}
       return of(studentUser);
     }
 

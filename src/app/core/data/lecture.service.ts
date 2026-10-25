@@ -63,10 +63,8 @@ export class LectureService {
   constructor() {
     if (typeof window !== 'undefined') {
       const refresh = () => this.lecturesSubject.next(loadCombinedLectures());
-      window.addEventListener('storage', refresh);
       window.addEventListener('mutqin_lectures_updated', refresh);
     }
-    this.syncSupabase();
   }
 
   private async syncSupabase(): Promise<void> {
