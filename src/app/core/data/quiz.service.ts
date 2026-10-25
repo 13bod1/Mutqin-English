@@ -40,7 +40,7 @@ export class QuizService {
         .eq('is_published', true)
         .order('created_at', { ascending: true })
     ).pipe(
-      timeout(environment.production ? 15000 : 2500),
+      timeout(environment.production ? 15000 : 1500),
       map(({ data, error }: any) => {
         if (error) {
           if (isAuthOrPermissionError(error)) {
@@ -85,7 +85,7 @@ export class QuizService {
         .eq('module_id', moduleId)
         .order('sort_order', { ascending: true })
     ).pipe(
-      timeout(environment.production ? 15000 : 2500),
+      timeout(environment.production ? 15000 : 1500),
       map(({ data, error }: any) => {
         if (error) {
           if (isAuthOrPermissionError(error)) {

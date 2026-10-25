@@ -178,7 +178,9 @@ export class AdminService {
   readonly students = signal<AdminStudent[]>(loadStudents());
   readonly staff = signal<StaffMember[]>(loadStorage(STAFF_KEY, STAFF_MOCK));
   private readonly _assistants = signal<AssistantMetric[]>(loadAssistants());
-  readonly payments = signal<AdminPayment[]>(loadPayments());
+  readonly payments = signal<AdminPayment[]>(environment.production ? [] : loadPayments());
+  readonly paymentLoadError = signal<string | null>(null);
+  readonly paymentLoading = signal(false);
   readonly lectures = signal<AdminLecture[]>(loadLectures());
   readonly liveClasses = this.publicSettings.liveClasses;
   readonly announcements = this.publicSettings.managedAnnouncements;
@@ -391,6 +393,7 @@ export class AdminService {
     void this.publicSettings.loadManagedAnnouncements();
     this.publicSettings.setLiveClasses(loadLiveClasses());
     this.syncRealStudents();
+    if (environment.production) void this.refreshPayments();
     this.applyInitialThemes();
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', () => {
@@ -411,6 +414,26 @@ export class AdminService {
     }
     const userTheme = s.userPortalTheme || 'classic';
     document.documentElement.setAttribute('data-user-theme', userTheme);
+  }
+
+  /** Replace—not merge—production receipts with the server-authorized ledger. */
+  async refreshPayments(): Promise<void> {
+    this.paymentLoading.set(true); this.paymentLoadError.set(null);
+    try {
+      const response = await this.supabase.from('payments').select('*').order('created_at', { ascending: false });
+      if (response.error || !Array.isArray(response.data)) throw response.error || new Error('Invalid payment ledger');
+      const mapped: AdminPayment[] = response.data.map((p: any) => ({
+        id: p.id, student: p.student_name || 'Student', email: '', initials: 'ST', kind: 'lecture',
+        item: { en: 'Lecture payment', ar: 'دفعة محاضرة' }, method: p.payment_method || 'instapay',
+        amountEgp: Number(p.amount), expectedEgp: Number(p.amount), submittedAt: p.created_at,
+        status: p.status, reviewedAt: p.verified_at, reviewerId: p.verified_by,
+        turnaroundMinutes: p.turnaround_minutes == null ? null : Number(p.turnaround_minutes),
+        reference: p.transaction_reference || p.id,
+      }));
+      this.payments.set(mapped);
+    } catch (error: any) {
+      this.payments.set([]); this.paymentLoadError.set(error?.message || 'Unable to load payment ledger');
+    } finally { this.paymentLoading.set(false); }
   }
 
   /** Add assistant metric */
