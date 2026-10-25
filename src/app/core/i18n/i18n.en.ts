@@ -19,7 +19,7 @@ export const EN = {
     signup: 'Sign Up',
     admin: 'Admin Dashboard',
     switchLang: 'العربية',
-    switchLangLabel: 'Switch language to Arabic',
+    switchLangLabel: 'Switch Language to Arabic',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
     main: 'Main navigation',

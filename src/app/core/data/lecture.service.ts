@@ -1,110 +1,114 @@
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, from, map, Observable, of } from 'rxjs';
+import { catchError, from, map, Observable, of, throwError, timeout } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { CONTINUE_WATCHING_MOCK, FEATURED_LECTURE_MOCK, LECTURES_MOCK, RECORDED_LECTURE_VIDEOS } from '../mock/lectures.mock';
 import { ContinueWatchingItem, DurationBucket, FeaturedLecture, Lecture, LectureFilters } from '../models/lecture';
 import { Lang } from '../models/localized';
 import { SupabaseService } from '../supabase/supabase.service';
 
-export function loadCombinedLectures(): Lecture[] {
-  const map = new Map<string, Lecture>();
-
-  // 1. Base mock lectures
-  for (const m of LECTURES_MOCK) {
-    map.set(m.id, m);
-  }
-
-  // 2. Add / override with admin lectures
-  if (typeof localStorage !== 'undefined') {
-    try {
+/** Detect PostgREST / Supabase auth and permission errors */
+function loadLocalAdminLectures(): Lecture[] {
+  try {
+    if (typeof localStorage !== 'undefined') {
       const raw = localStorage.getItem('mutqin_admin_lectures');
       if (raw) {
         const list = JSON.parse(raw);
-        if (Array.isArray(list)) {
-          for (let i = 0; i < list.length; i++) {
-            const l = list[i];
-            // Only published lectures are visible to students
-            if (l.state === 'draft' || l.state === 'scheduled') continue;
-
-            const existing = map.get(l.id);
-            const titleEn = typeof l.title === 'object' ? l.title?.en : l.title;
-            const titleAr = typeof l.title === 'object' ? l.title?.ar : (l.title_ar || titleEn);
-
-            const item: Lecture = {
-              id: l.id,
-              title: { en: titleEn || 'Lecture', ar: titleAr || titleEn || 'محاضرة' },
-              description: l.description || existing?.description || { en: 'Comprehensive lesson by Mr. Adel Mostafa', ar: 'درس تفصيلي وشرح متكامل للأستاذ عادل مصطفى' },
-              unit: l.unit || existing?.unit || { en: 'Unit ' + (i + 1), ar: 'الوحدة ' + (i + 1) },
-              stage: l.stage || existing?.stage || 'sec3',
-              topic: l.topic || existing?.topic || 'grammar',
-              durationMin: l.durationMin || existing?.durationMin || 45,
-              instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
-              resources: l.resources || existing?.resources || { en: 'Summary PDF & Notes', ar: 'ملخص وقواعد PDF' },
-              order: l.order || existing?.order || i + 1,
-              thumbnailUrl: l.thumbnailUrl || existing?.thumbnailUrl || ((l.topic || existing?.topic) === 'phonetics' ? '/images/thumb-phonetics.svg' : (l.topic || existing?.topic) === 'exam' ? '/images/thumb-exam.svg' : (l.topic || existing?.topic) === 'phrasal' ? '/images/thumb-phrasal.svg' : '/images/thumb-grammar.svg'),
-              videoUrl: l.videoUrl || existing?.videoUrl || RECORDED_LECTURE_VIDEOS[i % RECORDED_LECTURE_VIDEOS.length],
-              access: l.access || existing?.access || { type: 'included' },
-            };
-            map.set(l.id, item);
-          }
+        if (Array.isArray(list) && list.length > 0) {
+          return list.map((l: any, idx: number) => ({
+            id: l.id,
+            title: l.title,
+            description: l.description || { en: 'Comprehensive lesson', ar: 'درس تفصيلي' },
+            unit: l.unit || { en: 'Unit 1', ar: 'الوحدة 1' },
+            stage: l.stage || 'sec3',
+            topic: l.topic || 'grammar',
+            durationMin: l.durationMin || 45,
+            instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
+            resources: l.resources || { en: 'Summary PDF & Notes', ar: 'ملخص وقواعد PDF' },
+            order: l.order || idx + 1,
+            thumbnailUrl: l.thumbnailUrl,
+            videoUrl: l.videoUrl || RECORDED_LECTURE_VIDEOS[idx % RECORDED_LECTURE_VIDEOS.length],
+            access: l.access,
+          }));
         }
       }
-    } catch {}
-  }
-
-  return Array.from(map.values());
+    }
+  } catch {}
+  return LECTURES_MOCK;
 }
 
-/** Recorded lectures powered by Supabase with live admin synchronization. */
+export function isAuthOrPermissionError(error: any): boolean {
+  if (!error) return false;
+  const code = String(error.code || error.status || '');
+  const msg = String(error.message || error.error_description || error || '').toLowerCase();
+  return (
+    code === '42501' ||
+    code === '401' ||
+    code === '403' ||
+    code === 'PGRST301' ||
+    msg.includes('permission denied') ||
+    msg.includes('row-level security') ||
+    msg.includes('jwt') ||
+    msg.includes('unauthorized') ||
+    msg.includes('forbidden') ||
+    msg.includes('not authorized')
+  );
+}
+
+/** Recorded lectures powered by Supabase with fail-closed access control. */
 @Injectable({ providedIn: 'root' })
 export class LectureService {
   private readonly supabase = inject(SupabaseService);
-  private readonly lecturesSubject = new BehaviorSubject<Lecture[]>(loadCombinedLectures());
 
-  constructor() {
-    if (typeof window !== 'undefined') {
-      const refresh = () => this.lecturesSubject.next(loadCombinedLectures());
-      window.addEventListener('mutqin_lectures_updated', refresh);
-    }
-  }
-
-  private async syncSupabase(): Promise<void> {
-    try {
-      const { data, error } = await this.supabase
+  /** GET /api/lectures */
+  getLectures(): Observable<Lecture[]> {
+    return from(
+      this.supabase
         .from('lectures')
         .select('*')
         .eq('is_published', true)
-        .order('sort_order', { ascending: true });
+        .order('sort_order', { ascending: true })
+    ).pipe(
+      timeout(environment.production ? 15000 : 2500),
+      map(({ data, error }: any) => {
+        if (error) {
+          if (isAuthOrPermissionError(error)) {
+            throw new Error(`Access denied: insufficient permissions (${error.message || error.code || 'RLS'})`);
+          }
+          if (environment.production) {
+            throw new Error(`Failed to load lectures: ${error.message || 'Database error'}`);
+          }
+          return loadLocalAdminLectures();
+        }
 
-      if (!error && Array.isArray(data) && data.length > 0) {
-        const combined = loadCombinedLectures();
-        const map = new Map<string, Lecture>(combined.map((l) => [l.id, l]));
+        if (!data || data.length === 0) {
+          return environment.production ? [] : LECTURES_MOCK;
+        }
 
-        data.forEach((l: any, idx: number) => {
-          map.set(l.id, {
-            id: l.id,
-            title: { en: l.title_en, ar: l.title_ar },
-            description: { en: l.description_en, ar: l.description_ar },
-            unit: { en: l.unit_en, ar: l.unit_ar },
-            stage: l.stage,
-            topic: l.topic,
-            durationMin: l.duration_min,
-            instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
-            resources: { en: l.resources_en, ar: l.resources_ar },
-            order: l.sort_order,
-            thumbnailUrl: l.thumbnail_url ?? undefined,
-            videoUrl: l.video_url || RECORDED_LECTURE_VIDEOS[idx % RECORDED_LECTURE_VIDEOS.length],
-            access: l.access_type ? { type: l.access_type, priceEgp: l.price_egp ?? undefined } : undefined,
-          });
-        });
-
-        this.lecturesSubject.next(Array.from(map.values()));
-      }
-    } catch {}
-  }
-
-  /** GET /api/lectures — Live reactive stream synchronized with Admin dashboard */
-  getLectures(): Observable<Lecture[]> {
-    return this.lecturesSubject.asObservable();
+        return data.map((l: any, idx: number) => ({
+          id: l.id,
+          title: { en: l.title_en, ar: l.title_ar },
+          description: { en: l.description_en, ar: l.description_ar },
+          unit: { en: l.unit_en, ar: l.unit_ar },
+          stage: l.stage,
+          topic: l.topic,
+          durationMin: l.duration_min,
+          instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
+          resources: { en: l.resources_en, ar: l.resources_ar },
+          order: l.sort_order,
+          thumbnailUrl: l.thumbnail_url ?? undefined,
+          videoUrl: l.video_url || RECORDED_LECTURE_VIDEOS[idx % RECORDED_LECTURE_VIDEOS.length],
+          access: l.access_type
+            ? { type: l.access_type, priceEgp: l.price_egp ?? undefined }
+            : undefined,
+        }));
+      }),
+      catchError((err) => {
+        if (isAuthOrPermissionError(err) || environment.production) {
+          return throwError(() => err);
+        }
+        return of(loadLocalAdminLectures());
+      })
+    );
   }
 
   /** GET /api/me/continue-watching */
@@ -122,10 +126,25 @@ export class LectureService {
         .limit(1)
         .maybeSingle()
     ).pipe(
-      map(({ data, error }) => {
-        if (error || !data) {
+      timeout(environment.production ? 15000 : 2500),
+      map(({ data, error }: any) => {
+        if (error) {
+          if (isAuthOrPermissionError(error)) {
+            throw new Error(`Access denied: insufficient permissions (${error.message || error.code || 'RLS'})`);
+          }
+          if (environment.production) {
+            throw new Error(`Failed to load featured lecture: ${error.message || 'Database error'}`);
+          }
           return FEATURED_LECTURE_MOCK;
         }
+
+        if (!data) {
+          if (environment.production) {
+            throw new Error('Featured lecture not found');
+          }
+          return FEATURED_LECTURE_MOCK;
+        }
+
         return {
           id: data.id,
           title: { en: data.title_en, ar: data.title_ar },
@@ -143,7 +162,12 @@ export class LectureService {
           videoUrl: data.video_url || RECORDED_LECTURE_VIDEOS[0],
         };
       }),
-      catchError(() => of(FEATURED_LECTURE_MOCK))
+      catchError((err) => {
+        if (isAuthOrPermissionError(err) || environment.production) {
+          return throwError(() => err);
+        }
+        return of(FEATURED_LECTURE_MOCK);
+      })
     );
   }
 }

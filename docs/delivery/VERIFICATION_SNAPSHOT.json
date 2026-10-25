@@ -1,0 +1,110 @@
+{
+  "build_exit": 0,
+  "unit": {
+    "total": 138,
+    "failed": 3,
+    "skipped": 0,
+    "passed": 135,
+    "failures": [
+      "Sprint 1 Regression & Rebrand Verification Suite (AG-70) Feature 3: Quizzes & Interactive Diagnostic Engine (Sprint 1 Regression) TC-REG-07: should grade quiz answers accurately and award XP bonus",
+      "AuthService should signup a new user",
+      "AuthService should handle login successfully"
+    ],
+    "junit_hash": "a789b03e254bcd5e83048065eeda47b9ee56cc620797593a044aac0eba20c75b",
+    "exit_code": 1
+  },
+  "e2e": {
+    "stats": {
+      "startTime": "2026-10-25T04:50:19.951Z",
+      "duration": 34031.314,
+      "expected": 18,
+      "skipped": 0,
+      "unexpected": 3,
+      "flaky": 0
+    },
+    "errors": [],
+    "exit_code": 1,
+    "report": "C:\\Users\\Samer\\AppData\\Local\\hermes\\profiles\\jira\\workspace\\samer_sherry_delivery\\urgent_delivery\\checks\\e2e_report.json",
+    "global_timeout": false
+  },
+  "browser_behavior_checks": 25,
+  "browser_behavior_passed": true,
+  "contrast": [
+    {
+      "theme": "light",
+      "accent": "classic",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0
+    },
+    {
+      "theme": "light",
+      "accent": "navy",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0
+    },
+    {
+      "theme": "light",
+      "accent": "emerald",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0
+    },
+    {
+      "theme": "light",
+      "accent": "purple",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0
+    },
+    {
+      "theme": "light",
+      "accent": "gold",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0
+    },
+    {
+      "theme": "dark",
+      "accent": "classic",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0
+    },
+    {
+      "theme": "dark",
+      "accent": "navy",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0
+    },
+    {
+      "theme": "dark",
+      "accent": "emerald",
+      "measured": 73,
+      "unmeasured": 26,
+      "failed": 0
+    },
+    {
+      "theme": "dark",
+      "accent": "purple",
+      "measured": 73,
+      "unmeasured": 26,
+      "failed": 0
+    },
+    {
+      "theme": "dark",
+      "accent": "gold",
+      "measured": 73,
+      "unmeasured": 26,
+      "failed": 0
+    }
+  ],
+  "backend_previous": {
+    "runtime": "Official PostgREST16.5 and PostgreSQL16.6, actual signed local JWTs",
+    "passed": 27,
+    "failed": 0,
+    "not_verified": "Production GoTrue/Auth/SMTP/deployment"
+  }
+}
