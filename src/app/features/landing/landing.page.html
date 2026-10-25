@@ -1,7 +1,9 @@
 <!-- Student Latest Announcement -->
 <div class="border-b border-line/60 bg-surface-warm/75 px-4 py-2.5" aria-label="Announcements">
   <div class="container-page">
-    @if (latestAnnouncement(); as ann) {
+    @if (publicSettings.loadError()) {
+      <p class="text-sm text-ink-body" role="status">{{ i18n.lang() === 'ar' ? 'تعذر تحميل الإعلانات. أعد المحاولة لاحقاً.' : 'Announcements could not be loaded. Please try again later.' }}</p>
+    } @else if (latestAnnouncement(); as ann) {
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-sm">
         <div class="flex items-start sm:items-center gap-2.5 min-w-0">
           <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
@@ -96,11 +98,11 @@
 
           <!-- Floating Badges -->
           <div class="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-3 z-10">
-            <span class="inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 font-display text-xs font-semibold text-ink shadow-card">
+            <span class="inline-flex items-center gap-2 rounded-full bg-surface-card/95 px-3 py-1.5 font-display text-xs font-semibold text-ink shadow-card">
               <span class="h-2.5 w-2.5 rounded-full bg-success-mid animate-pulse"></span>
               {{ 'landing.hero.introVideoLabel' | t }}
             </span>
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 font-display text-xs font-semibold text-gold-dark shadow-card">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-surface-card/95 px-3 py-1.5 font-display text-xs font-semibold text-gold-dark shadow-card">
               <lucide-icon name="flame" [size]="14" class="fill-gold text-gold" />
               {{ 'landing.hero.streak' | t }}
             </span>
@@ -161,7 +163,7 @@
 </section>
 
 <!-- Features -->
-<section class="section border-t border-line/50 bg-white">
+<section class="section border-t border-line/50 bg-surface-card">
   <div class="container-page">
     <app-section-header [eyebrow]="'landing.features.eyebrow' | t" [title]="'landing.features.title' | t"
       [subtitle]="'landing.features.subtitle' | t" />
@@ -192,7 +194,7 @@
     @if (instructor(); as ins) {
       <div class="card mx-auto mt-12 grid max-w-5xl overflow-hidden md:grid-cols-[5fr_7fr]">
         <app-media class="min-h-[320px] md:min-h-[480px]" icon="graduation-cap" [iconSize]="64" [src]="ins.photoUrl" [alt]="ins.name | loc">
-          <div class="absolute inset-x-4 bottom-4 rounded-card border border-white/40 bg-white/80 px-4 py-3 backdrop-blur-md">
+          <div class="absolute inset-x-4 bottom-4 rounded-card border border-white/40 bg-surface-card/80 px-4 py-3 backdrop-blur-md">
             <p class="font-display text-base font-bold text-ink">{{ ins.name | loc }}</p>
             <p class="text-sm text-ink-body">{{ ins.title | loc }}</p>
           </div>
@@ -226,7 +228,7 @@
 </section>
 
 <!-- Testimonials -->
-<section class="section bg-white">
+<section class="section bg-surface-card">
   <div class="container-page">
     <app-section-header [eyebrow]="'landing.testimonials.eyebrow' | t" [title]="'landing.testimonials.title' | t"
       [subtitle]="'landing.testimonials.subtitle' | t" />
@@ -260,17 +262,17 @@
 <!-- Official Curriculum Partner / Madrasetna TV -->
 <section class="py-10 bg-surface-warm/40 border-y border-line/60">
   <div class="container-page">
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-5 rounded-card-lg border border-red-200 bg-white p-5 sm:p-6 shadow-sm">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-5 rounded-card-lg border border-line bg-surface-card p-5 sm:p-6 shadow-sm">
       <div class="flex items-center gap-4">
         <div class="grid h-14 w-14 place-items-center rounded-2xl bg-red-600 text-white shadow-md shrink-0">
           <lucide-icon name="youtube" [size]="28" class="fill-white" />
         </div>
         <div>
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
             <h3 class="font-display text-base sm:text-lg font-bold text-ink">قناة مدرستنا التعليمية (Madrasetna TV)</h3>
             <span class="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-700">شريك المنهج الرسمي</span>
           </div>
-          <p class="text-xs sm:text-sm text-ink-muted mt-1">
+          <p class="text-xs sm:text-sm text-ink-body mt-1">
             تابع شروحات وحصص وزارة التربية والتعليم الرسمية لصفوف الثانوية العامة بالتكامل مع محاضرات مستر عادل مصطفى.
           </p>
         </div>

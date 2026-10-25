@@ -25,7 +25,7 @@ interface NavItem {
   template: `
     @if (popup(); as p) {
       @if (p.enabled && !bannerDismissed()) {
-        <div class="relative isolate flex items-center justify-center gap-2 px-10 py-2 text-center text-xs font-semibold sm:text-sm"
+        <div class="relative isolate flex items-center justify-center gap-2 px-16 py-2 text-center text-xs font-semibold sm:text-sm"
           [class]="popupToneClass(p.type)">
           <div class="min-w-0 flex flex-wrap items-center justify-center gap-1.5 break-words sm:gap-2">
             @if (p.title) {
@@ -48,7 +48,7 @@ interface NavItem {
             }
           </div>
           @if (p.dismissible) {
-            <button type="button" (click)="dismissPopup($event)" class="absolute end-2 sm:end-4 top-1/2 -translate-y-1/2 rounded p-1 hover:bg-black/15 transition opacity-80 hover:opacity-100 z-10 cursor-pointer" aria-label="Dismiss banner">
+            <button type="button" (click)="dismissPopup($event)" class="absolute end-2 sm:end-4 top-1/2 -translate-y-1/2 grid h-11 w-11 place-items-center rounded p-1 hover:bg-black/15 transition opacity-80 hover:opacity-100 z-10 cursor-pointer" aria-label="Dismiss banner">
               <lucide-icon name="x" [size]="14" class="pointer-events-none" />
             </button>
           }
