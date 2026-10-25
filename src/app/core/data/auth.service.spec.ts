@@ -50,6 +50,8 @@ describe('AuthService', () => {
 
   afterEach(() => {
     localStorage.removeItem('mutqin_auth_user');
+    localStorage.removeItem('mutqin_student_accounts');
+    localStorage.removeItem('mutqin_student_logins');
   });
 
   it('should be created and start with null user if no storage', () => {

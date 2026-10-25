@@ -55,6 +55,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/quizzes/quizzes.page').then((m) => m.QuizzesPage),
       },
       {
+        path: 'announcements',
+        title: 'titles.announcements',
+        loadComponent: () => import('./features/announcements/announcements.page').then((m) => m.AnnouncementsPage),
+      },
+      {
         path: 'live',
         title: 'titles.live',
         loadComponent: () => import('./features/live/live-list.page').then((m) => m.LiveListPage),

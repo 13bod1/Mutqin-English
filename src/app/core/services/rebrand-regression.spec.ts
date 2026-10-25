@@ -39,6 +39,12 @@ describe('Sprint 1 Regression & Rebrand Verification Suite (AG-70)', () => {
     titleService = TestBed.inject(Title);
   });
 
+  afterEach(() => {
+    localStorage.removeItem('mutqin_auth_user');
+    localStorage.removeItem('mutqin_student_accounts');
+    localStorage.removeItem('mutqin_student_logins');
+  });
+
   describe('Feature 1: Authentication & Student Identity (Sprint 1 Regression)', () => {
     it('TC-REG-01: should initialize with a null user when unauthenticated guest visits', () => {
       expect(authService).toBeTruthy();

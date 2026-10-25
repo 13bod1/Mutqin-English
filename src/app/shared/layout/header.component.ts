@@ -35,7 +35,7 @@ interface NavItem {
               </span>
             }
             <span class="opacity-95">{{ p.message }}</span>
-            @if (p.linkText && p.linkUrl && isSafeBannerLink(p.linkUrl)) {
+            @if (p.linkText && p.linkUrl && isSafeBannerLink(p.linkUrl) && p.linkText.toLowerCase() !== 'explore sessions') {
               @if (isExternalUrl(p.linkUrl)) {
                 <a [href]="p.linkUrl" target="_blank" rel="noopener noreferrer" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
                   {{ p.linkText }} &rarr;
@@ -273,6 +273,7 @@ export class HeaderComponent {
   protected readonly nav: NavItem[] = [
     { path: '/', key: 'nav.home', exact: true },
     { path: '/lectures', key: 'nav.lectures' },
+    { path: '/announcements', key: 'nav.announcements' },
     { path: '/live', key: 'nav.live' },
     { path: '/quizzes', key: 'nav.quizzes' },
     { path: '/progress', key: 'nav.progress' },

@@ -126,6 +126,27 @@ const STATE_TONE: Record<LectureState, string> = { published: 'tone-success', dr
             </select>
           </label>
         </div>
+        <div class="space-y-2">
+          <span class="field-label">{{ i18n.lang() === 'ar' ? 'صورة الغلاف (Thumbnail)' : 'Lecture Thumbnail' }}</span>
+          <div class="flex items-center gap-3">
+            <div class="relative h-14 w-24 shrink-0 overflow-hidden rounded-lg border border-line bg-surface-tint">
+              @if (d.thumbnailUrl) {
+                <img [src]="d.thumbnailUrl" alt="Preview" class="h-full w-full object-cover" />
+              } @else {
+                <span class="flex h-full w-full items-center justify-center text-ink-muted"><lucide-icon name="image" [size]="20" /></span>
+              }
+            </div>
+            <input type="text" class="input input-plain flex-1 text-sm [unicode-bidi:plaintext]" dir="ltr"
+              placeholder="/images/thumb-grammar.svg or image URL"
+              [ngModel]="d.thumbnailUrl ?? ''" (ngModelChange)="patch({ thumbnailUrl: $event || undefined })" />
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <button type="button" class="btn btn-soft btn-xs text-xs" (click)="patch({ thumbnailUrl: '/images/thumb-grammar.svg', topic: 'grammar' })">Grammar</button>
+            <button type="button" class="btn btn-soft btn-xs text-xs" (click)="patch({ thumbnailUrl: '/images/thumb-exam.svg', topic: 'exam' })">Exam</button>
+            <button type="button" class="btn btn-soft btn-xs text-xs" (click)="patch({ thumbnailUrl: '/images/thumb-phrasal.svg', topic: 'phrasal' })">Phrasal</button>
+            <button type="button" class="btn btn-soft btn-xs text-xs" (click)="patch({ thumbnailUrl: '/images/thumb-phonetics.svg', topic: 'phonetics' })">Phonetics</button>
+          </div>
+        </div>
         <app-access-editor [value]="d.access" (valueChange)="patch({ access: $event })" [defaultPrice]="150" />
         <p class="note tone-brand"><lucide-icon name="info" [size]="16" class="mt-0.5 shrink-0" />{{ 'admin.access.note' | t }}</p>
         <button footer type="button" class="btn btn-soft" (click)="draft.set(null)">{{ 'admin.cancel' | t }}</button>
@@ -179,7 +200,17 @@ export class AdminLecturesPage {
 
   protected create(): void {
     this.isNew.set(true);
-    this.draft.set({ id: 'new-' + Date.now(), title: { en: '', ar: '' }, topic: 'grammar', stage: 'sec3', durationMin: null, views: null, state: 'draft', access: { type: 'included' } });
+    this.draft.set({
+      id: 'new-' + Date.now(),
+      title: { en: '', ar: '' },
+      topic: 'grammar',
+      stage: 'sec3',
+      durationMin: null,
+      views: null,
+      state: 'draft',
+      access: { type: 'included' },
+      thumbnailUrl: '/images/thumb-grammar.svg',
+    });
   }
 
   protected edit(l: AdminLecture): void {

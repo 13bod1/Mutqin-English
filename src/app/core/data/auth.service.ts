@@ -589,6 +589,18 @@ export class AuthService {
     }
   }
 
+  /** Provider-acknowledged recovery: email alone never authorizes a password change. */
+  requestPasswordReset(email: string, newPassword?: string): Observable<{ success: boolean; message: string; accountFound: boolean; updated?: boolean }> {
+    if (newPassword) return throwError(() => new Error('A verified recovery session is required. Use the recovery email link.'));
+    return from((async () => {
+      const { error } = await this.supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/login` : undefined,
+      });
+      if (error) throw error;
+      return { success: true, accountFound: false, updated: false, message: 'If eligible, recovery instructions will be sent.' };
+    })());
+  }
+
   async logout(): Promise<void> {
     this.sessionEpoch++;
     this.clearLocalSession();

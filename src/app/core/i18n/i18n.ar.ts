@@ -13,6 +13,7 @@ export const AR: Dictionary<typeof EN> = {
   nav: {
     home: 'الرئيسية',
     lectures: 'المحاضرات المسجلة',
+    announcements: 'الإعلانات',
     quizzes: 'الاختبارات والتمارين',
     live: 'الحصص المباشرة',
     liveNow: 'بث مباشر',
@@ -428,6 +429,7 @@ export const AR: Dictionary<typeof EN> = {
     login: 'تسجيل الدخول',
     signup: 'إنشاء حساب',
     lectures: 'المحاضرات المسجلة',
+    announcements: 'الإعلانات والتبليغات',
     quizzes: 'الاختبارات والتمارين',
     progress: 'تقدّمي',
     notFound: 'الصفحة غير موجودة',

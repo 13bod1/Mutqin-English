@@ -120,6 +120,50 @@ function loadSettings(): AcademySettings {
   return s;
 }
 
+function loadLiveClasses(): LiveClass[] {
+  const list = loadStorage<LiveClass[]>(LIVE_KEY, LIVE_CLASSES_MOCK);
+  let changed = false;
+  const updated = list.map((item) => {
+    if (!item.thumbnail) {
+      changed = true;
+      const fallback = item.id.includes('grammar')
+        ? '/images/thumb-grammar.svg'
+        : item.id.includes('phrasal')
+        ? '/images/thumb-phrasal.svg'
+        : '/images/thumb-exam.svg';
+      return { ...item, thumbnail: fallback };
+    }
+    return item;
+  });
+  if (changed) {
+    saveStorage(LIVE_KEY, updated);
+  }
+  return updated;
+}
+
+function loadLectures(): AdminLecture[] {
+  const list = loadStorage<AdminLecture[]>(LECTURES_KEY, ADMIN_LECTURES_MOCK);
+  let changed = false;
+  const updated = list.map((item) => {
+    if (!item.thumbnailUrl) {
+      changed = true;
+      const fallback = item.topic === 'grammar'
+        ? '/images/thumb-grammar.svg'
+        : item.topic === 'phrasal'
+        ? '/images/thumb-phrasal.svg'
+        : item.topic === 'phonetics'
+        ? '/images/thumb-phonetics.svg'
+        : '/images/thumb-exam.svg';
+      return { ...item, thumbnailUrl: fallback };
+    }
+    return item;
+  });
+  if (changed) {
+    saveStorage(LECTURES_KEY, updated);
+  }
+  return updated;
+}
+
 /**
  * Data store for the admin panel.
  * Persistent reactive store synchronized with browser storage and ready for Supabase / REST endpoints.
@@ -135,7 +179,7 @@ export class AdminService {
   readonly staff = signal<StaffMember[]>(loadStorage(STAFF_KEY, STAFF_MOCK));
   private readonly _assistants = signal<AssistantMetric[]>(loadAssistants());
   readonly payments = signal<AdminPayment[]>(loadPayments());
-  readonly lectures = signal<AdminLecture[]>(loadStorage(LECTURES_KEY, ADMIN_LECTURES_MOCK));
+  readonly lectures = signal<AdminLecture[]>(loadLectures());
   readonly liveClasses = this.publicSettings.liveClasses;
   readonly announcements = this.publicSettings.managedAnnouncements;
   readonly loadSettingsError = this.publicSettings.loadError;
@@ -345,6 +389,7 @@ export class AdminService {
 
   constructor() {
     void this.publicSettings.loadManagedAnnouncements();
+    this.publicSettings.setLiveClasses(loadLiveClasses());
     this.syncRealStudents();
     this.applyInitialThemes();
     if (typeof window !== 'undefined') {

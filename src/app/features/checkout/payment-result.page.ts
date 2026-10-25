@@ -77,7 +77,7 @@ import { StatePanelComponent } from '../../shared/ui/state-panel.component';
               <div class="kv"><span>{{ 'pay.amount' | t }}</span><span>{{ 'access.price' | t: { n: (it?.priceEgp | number) ?? '' } }}</span></div>
               <div class="kv"><span>{{ 'pay.reference' | t }}</span><span dir="ltr">{{ reference() }}</span></div>
             </div>
-            <a actions href="https://wa.me/" target="_blank" rel="noopener" class="btn btn-soft"><lucide-icon name="message-circle" [size]="16" />{{ 'pay.contactSupport' | t }}</a>
+            <a actions href="https://wa.me/201100764511" target="_blank" rel="noopener" class="btn btn-soft"><lucide-icon name="message-circle" [size]="16" />{{ 'pay.contactSupport' | t }}</a>
             <a actions [routerLink]="itemLink()" class="btn btn-primary">{{ 'pay.result.back' | t }}</a>
           </app-state-panel>
         }

@@ -23,13 +23,24 @@ import { SectionHeaderComponent } from '../../shared/ui/section-header.component
           <div class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             @for (s of list; track s.id) {
               <article class="card flex flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lift">
-                <div class="relative flex aspect-[16/8] items-center justify-center bg-gradient-to-br from-primary to-[#2B1D19] text-white">
-                  <lucide-icon name="radio" [size]="36" class="opacity-80" />
-                  <span class="absolute start-3 top-3 rounded-md bg-white/95 px-2.5 py-1 font-display text-[0.6875rem] font-semibold text-ink">{{ 'stagesShort.' + s.stage | t }}</span>
-                  <span class="tag absolute end-3 top-3" [class]="statusClass(s)">
+                <div class="relative flex aspect-[16/8] items-center justify-center overflow-hidden bg-gradient-to-br from-primary to-[#2B1D19] text-white group">
+                  @if (s.thumbnail) {
+                    <img [src]="s.thumbnail" [alt]="s.title | loc" class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/20"></div>
+                  } @else {
+                    <lucide-icon name="radio" [size]="36" class="opacity-80" />
+                  }
+                  <span class="absolute start-3 top-3 z-10 rounded-md bg-white/95 px-2.5 py-1 font-display text-[0.6875rem] font-semibold text-ink shadow-sm">{{ 'stagesShort.' + s.stage | t }}</span>
+                  <span class="tag absolute end-3 top-3 z-10 shadow-sm" [class]="statusClass(s)">
                     @if (s.status === 'live') { <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white"></span> }
                     {{ 'live.status.' + s.status | t }}
                   </span>
+                  @if (s.status === 'live') {
+                    <span class="absolute bottom-3 start-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-red-600/90 px-2.5 py-0.5 text-[0.6875rem] font-bold text-white backdrop-blur">
+                      <span class="h-1.5 w-1.5 rounded-full bg-white animate-ping"></span>
+                      {{ 'live.status.live' | t }}
+                    </span>
+                  }
                 </div>
                 <div class="flex flex-1 flex-col p-5">
                   <p class="flex items-center gap-1.5 font-display text-xs font-semibold text-ink-soft">

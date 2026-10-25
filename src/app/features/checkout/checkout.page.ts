@@ -50,7 +50,7 @@ type Method = 'online' | 'manual';
             <lucide-icon name="info" [size]="18" class="mt-0.5 shrink-0" />
             {{ 'pay.duplicate.note' | t }}
           </p>
-          <a actions href="https://wa.me/" target="_blank" rel="noopener" class="btn btn-soft">
+          <a actions href="https://wa.me/201100764511" target="_blank" rel="noopener" class="btn btn-soft">
             <lucide-icon name="message-circle" [size]="16" /> {{ 'pay.contactSupport' | t }}
           </a>
           <a actions [routerLink]="itemLink()" class="btn btn-primary">

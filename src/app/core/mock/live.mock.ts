@@ -17,6 +17,7 @@ export const LIVE_CLASSES_MOCK: LiveClass[] = [
     access: { type: 'paid', priceEgp: 350 },
     seatsTaken: 312,
     maxSeats: 400,
+    thumbnail: '/images/thumb-grammar.svg',
   },
   {
     id: 'reading-inference',
@@ -34,6 +35,7 @@ export const LIVE_CLASSES_MOCK: LiveClass[] = [
     maxSeats: 400,
     viewers: 286,
     playbackUrl: undefined,
+    thumbnail: '/images/thumb-exam.svg',
   },
   {
     id: 'phrasal-verbs',
@@ -51,6 +53,7 @@ export const LIVE_CLASSES_MOCK: LiveClass[] = [
     maxSeats: 400,
     replayUntil: '2026-11-19T22:00:00Z',
     stats: { durationMin: 118, attended: 188, questions: 146 },
+    thumbnail: '/images/thumb-phrasal.svg',
   },
   {
     id: 'exam-night',
@@ -66,6 +69,7 @@ export const LIVE_CLASSES_MOCK: LiveClass[] = [
     access: { type: 'paid', priceEgp: 350 },
     seatsTaken: 41,
     maxSeats: 400,
+    thumbnail: '/images/thumb-exam.svg',
   },
 ];
 

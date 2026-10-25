@@ -243,7 +243,7 @@ export const SETTINGS_MOCK: AcademySettings = {
     message: 'Welcome to the new academic term! Book your live sessions early to secure your seat.',
     type: 'announcement',
     dismissible: true,
-    linkText: 'Explore sessions',
-    linkUrl: '/live',
+    linkText: '',
+    linkUrl: '',
   },
 };

@@ -13,7 +13,7 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
   host: { class: 'block' },
   template: `
     <article class="card flex h-full flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lift border border-line/60">
-      <!-- Video Element & Preview (No placeholder) -->
+      <!-- Video Element & Preview with Thumbnail -->
       <div class="relative aspect-[16/9] overflow-hidden bg-neutral-950 group">
         <video
           #cardVideo
@@ -21,6 +21,7 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
           playsinline
           controlsList="nodownload"
           preload="metadata"
+          [poster]="lecture().thumbnailUrl || '/images/thumb-grammar.svg'"
           [controls]="isPlaying()"
           [src]="locked() ? null : lecture().videoUrl"
           (play)="isPlaying.set(true)"
@@ -28,6 +29,15 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
           (ended)="isPlaying.set(false)"
           (click)="togglePlay(cardVideo)"
         ></video>
+
+        <!-- Thumbnail Image (shown when paused / not yet played) -->
+        @if (!isPlaying()) {
+          <img
+            [src]="lecture().thumbnailUrl || '/images/thumb-grammar.svg'"
+            [alt]="lecture().title | loc"
+            class="pointer-events-none absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        }
 
         <!-- Stage & Duration Badges -->
         <span class="pointer-events-none absolute start-3 top-3 rounded-md bg-white/95 px-2.5 py-1 font-display text-[0.6875rem] font-semibold text-ink shadow-card z-10">
@@ -43,7 +53,7 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
 
         <!-- Locked overlay (paid, or registered-only for guests) -->
         @if (locked()) {
-          <div class="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-primary/90 to-[#2B1D19]/95 text-white">
+          <div class="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-primary/85 to-[#2B1D19]/90 backdrop-blur-sm text-white">
             <span class="grid h-12 w-12 place-items-center rounded-full border border-white/25 bg-white/10">
               <lucide-icon name="lock" [size]="20" />
             </span>
@@ -57,7 +67,7 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
         } @else if (!isPlaying()) {
           <div
             (click)="togglePlay(cardVideo)"
-            class="absolute inset-0 z-20 flex cursor-pointer items-center justify-center bg-black/35 backdrop-blur-[1px] transition-all hover:bg-black/20"
+            class="absolute inset-0 z-20 flex cursor-pointer items-center justify-center bg-black/30 backdrop-blur-[1px] transition-all hover:bg-black/15"
           >
             <div class="grid h-12 w-12 place-items-center rounded-full bg-primary text-white shadow-xl transition-transform duration-300 group-hover:scale-110 active:scale-95 ring-2 ring-white/40">
               <lucide-icon name="play" [size]="20" class="fill-white ms-0.5" />
