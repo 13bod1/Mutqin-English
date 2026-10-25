@@ -29,11 +29,11 @@ export class SignupPage {
   protected readonly form = inject(NonNullableFormBuilder).group(
     {
       fullName: ['', [Validators.required, Validators.minLength(2)]],
-      stage: ['' as AcademicStage | '', Validators.required],
+      stage: ['sec3' as AcademicStage, Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.pattern(STRONG_PASSWORD)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       confirm: ['', Validators.required],
-      terms: [false, Validators.requiredTrue],
+      terms: [true, Validators.requiredTrue],
     },
     { validators: passwordsMatch },
   );

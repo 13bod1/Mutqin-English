@@ -35,7 +35,7 @@ interface NavItem {
               </span>
             }
             <span class="opacity-95">{{ p.message }}</span>
-            @if (p.linkText && p.linkUrl) {
+            @if (p.linkText && p.linkUrl && p.linkText !== 'Explore sessions' && p.linkText !== 'Explore Sessions') {
               <a [routerLink]="p.linkUrl" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
                 {{ p.linkText }} &rarr;
               </a>
@@ -64,6 +64,11 @@ interface NavItem {
               <span class="absolute -end-1 -top-0.5 flex h-2.5 w-2.5" aria-label="Live session in progress">
                 <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
                 <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+              </span>
+            }
+            @if (item.path === '/announcements' && announcementsCount() > 0) {
+              <span class="ms-1.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[0.6875rem] font-bold text-primary">
+                {{ announcementsCount() }}
               </span>
             }
           </a>
@@ -233,9 +238,14 @@ export class HeaderComponent {
     }
   }
 
+  protected readonly announcementsCount = computed(() =>
+    this.adminSvc.announcements().filter((a) => a.state !== 'draft').length
+  );
+
   protected readonly nav: NavItem[] = [
     { path: '/', key: 'nav.home', exact: true },
     { path: '/lectures', key: 'nav.lectures' },
+    { path: '/announcements', key: 'nav.announcements' },
     { path: '/live', key: 'nav.live' },
     { path: '/quizzes', key: 'nav.quizzes' },
     { path: '/progress', key: 'nav.progress' },

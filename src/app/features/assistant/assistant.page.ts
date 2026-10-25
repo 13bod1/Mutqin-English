@@ -10,7 +10,7 @@ import { LocalizePipe, TranslatePipe } from '../../core/i18n/translate.pipe';
 import { AdminPayment, AdminStudent } from '../../core/models/admin';
 import { LiveClass } from '../../core/models/live';
 
-type AssistantTab = 'receipts' | 'attendance' | 'qa' | 'boundaries';
+type AssistantTab = 'receipts' | 'attendance' | 'qa' | 'announcements' | 'boundaries';
 
 interface StudentQuestion {
   id: string;
@@ -175,6 +175,10 @@ interface StudentQuestion {
           <button type="button" role="tab" [class.seg-on]="tab() === 'qa'" (click)="tab.set('qa')">
             <lucide-icon name="messages-square" [size]="16" class="inline me-1.5" />
             {{ i18n.lang() === 'ar' ? 'استفسارات الطلاب' : 'Student Q&A' }} ({{ pendingQuestionsCount() }})
+          </button>
+          <button type="button" role="tab" [class.seg-on]="tab() === 'announcements'" (click)="tab.set('announcements')">
+            <lucide-icon name="megaphone" [size]="16" class="inline me-1.5" />
+            {{ i18n.lang() === 'ar' ? 'نشر الإعلانات' : 'Announcements' }} ({{ admin.announcements().length }})
           </button>
           <button type="button" role="tab" [class.seg-on]="tab() === 'boundaries'" (click)="tab.set('boundaries')">
             <lucide-icon name="shield-ban" [size]="16" class="inline me-1.5" />
@@ -455,7 +459,97 @@ interface StudentQuestion {
           </div>
         }
 
-        <!-- TAB 4: PERMISSION BOUNDARIES -->
+        <!-- TAB: ANNOUNCEMENTS -->
+        @if (tab() === 'announcements') {
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left 2 cols: Existing announcements -->
+            <div class="lg:col-span-2 space-y-4">
+              <div class="card p-5 space-y-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h2 class="font-display text-base font-bold text-ink">
+                      {{ i18n.lang() === 'ar' ? 'الإعلانات الحالية المنشورة للطلاب' : 'Published Student Announcements' }}
+                    </h2>
+                    <p class="text-xs text-ink-muted">
+                      {{ i18n.lang() === 'ar' ? 'تظهر هذه الإعلانات مباشرة لجميع الطلاب في صفحة الإعلانات' : 'These bulletins appear live in the student announcements portal' }}
+                    </p>
+                  </div>
+                  <span class="tag tone-brand">{{ admin.announcements().length }} {{ i18n.lang() === 'ar' ? 'إعلان' : 'announcements' }}</span>
+                </div>
+
+                <div class="space-y-3">
+                  @for (ann of admin.announcements(); track ann.id) {
+                    <div class="p-3.5 rounded-card border border-line bg-surface-page space-y-2">
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                          <span class="icon-tile h-7 w-7"><lucide-icon [name]="ann.icon || 'megaphone'" [size]="14" /></span>
+                          <span class="font-display font-bold text-sm text-ink">{{ ann.title }}</span>
+                          @if (ann.pinned) {
+                            <span class="tag tone-gold text-[0.625rem]">{{ i18n.lang() === 'ar' ? 'مثبت' : 'Pinned' }}</span>
+                          }
+                        </div>
+                        <span class="tag tone-neutral text-[0.625rem]">{{ 'admin.ann.aud.' + ann.audience | t }}</span>
+                      </div>
+                      <p class="text-xs text-ink-body">{{ ann.body }}</p>
+                      <div class="flex items-center justify-between text-[0.6875rem] text-ink-muted pt-1 border-t border-line/40">
+                        <span>{{ ann.at | date: 'd MMM, h:mm a' }}</span>
+                        <button type="button" (click)="deleteAnnouncement(ann.id)" class="text-danger hover:underline">
+                          {{ i18n.lang() === 'ar' ? 'حذف' : 'Delete' }}
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Right col: Broadcast Notice Form -->
+            <div class="space-y-4">
+              <div class="card p-5 space-y-4 shadow-sm border-primary/20">
+                <div class="flex items-center gap-2 text-primary font-bold font-display text-sm">
+                  <lucide-icon name="send" [size]="16" class="flip-rtl" />
+                  {{ i18n.lang() === 'ar' ? 'نشر تبليغ سريع للطلاب' : 'Broadcast Student Notice' }}
+                </div>
+
+                @if (annSuccess()) {
+                  <div class="p-3 rounded-card bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 flex items-center gap-2">
+                    <lucide-icon name="circle-check" [size]="14" />
+                    {{ i18n.lang() === 'ar' ? 'تم نشر الإعلان وظهر للطلاب بنجاح!' : 'Notice published to student portal!' }}
+                  </div>
+                }
+
+                <div class="space-y-3">
+                  <div>
+                    <label class="field-label text-xs">{{ i18n.lang() === 'ar' ? 'عنوان التبليغ' : 'Notice Title' }}</label>
+                    <input type="text" [(ngModel)]="annTitle" class="input h-9 text-xs" [placeholder]="i18n.lang() === 'ar' ? 'مثال: موعد تسليم واجب الوحدة الثانية' : 'e.g. Unit 2 homework deadline'" />
+                  </div>
+
+                  <div>
+                    <label class="field-label text-xs">{{ i18n.lang() === 'ar' ? 'نص الإشعار' : 'Notice Message' }}</label>
+                    <textarea rows="4" [(ngModel)]="annBody" class="input h-auto py-2 text-xs" [placeholder]="i18n.lang() === 'ar' ? 'اكتب تفاصيل التوجيه أو التنبيه...' : 'Enter message details...'"></textarea>
+                  </div>
+
+                  <div>
+                    <label class="field-label text-xs">{{ i18n.lang() === 'ar' ? 'الفئة المستهدفة' : 'Target Audience' }}</label>
+                    <select [(ngModel)]="annAudience" class="input h-9 text-xs">
+                      <option value="all">{{ i18n.lang() === 'ar' ? 'جميع الطلاب' : 'All Students' }}</option>
+                      <option value="sec3">{{ i18n.lang() === 'ar' ? 'طلاب الثانوية العامة (Sec 3)' : 'Sec 3 Students' }}</option>
+                      <option value="sec2">{{ i18n.lang() === 'ar' ? 'طلاب الصف الثاني الثانوي (Sec 2)' : 'Sec 2 Students' }}</option>
+                      <option value="sec1">{{ i18n.lang() === 'ar' ? 'طلاب الصف الأول الثانوي (Sec 1)' : 'Sec 1 Students' }}</option>
+                    </select>
+                  </div>
+
+                  <button type="button" (click)="postAssistantAnnouncement()" [disabled]="!annTitle.trim() || !annBody.trim()" class="btn btn-primary btn-sm w-full">
+                    <lucide-icon name="send" [size]="14" class="flip-rtl me-1.5" />
+                    {{ i18n.lang() === 'ar' ? 'نشر الإعلان فوراً' : 'Broadcast Notice' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- TAB 5: PERMISSION BOUNDARIES -->
         @if (tab() === 'boundaries') {
           <div class="card p-5 sm:p-6 space-y-6">
             <div>
@@ -557,6 +651,34 @@ export class AssistantPage {
   protected readonly zoomedStudent = signal<string>('');
   protected readonly attendanceMap = signal<Record<string, boolean>>({});
   protected readonly replyDrafts: Record<string, string> = {};
+
+  protected annTitle = '';
+  protected annBody = '';
+  protected annAudience: 'all' | 'sec1' | 'sec2' | 'sec3' = 'all';
+  protected readonly annSuccess = signal(false);
+
+  protected postAssistantAnnouncement(): void {
+    const title = this.annTitle.trim();
+    const body = this.annBody.trim();
+    if (!title || !body) return;
+
+    this.admin.publish({
+      id: 'ann_' + Date.now(),
+      title,
+      body,
+      icon: 'megaphone',
+      audience: this.annAudience,
+      at: new Date().toISOString(),
+      state: 'sent',
+      pinned: false,
+      channels: ['inApp'],
+    });
+
+    this.annTitle = '';
+    this.annBody = '';
+    this.annSuccess.set(true);
+    setTimeout(() => this.annSuccess.set(false), 3000);
+  }
 
   protected readonly pendingPayments = computed(() =>
     this.admin.payments().filter((p) => p.status === 'pending')
@@ -668,6 +790,15 @@ export class AssistantPage {
       )
     );
     this.replyDrafts[questionId] = '';
+  }
+
+  protected deleteAnnouncement(id: string): void {
+    this.admin.announcements.update((list) => {
+      const updated = list.filter((a) => a.id !== id);
+      try { localStorage.setItem('mutqin_admin_announcements', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+    window.dispatchEvent(new CustomEvent('mutqin_announcements_updated'));
   }
 
   protected logout(): void {

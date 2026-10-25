@@ -45,7 +45,16 @@ type Tab = 'upcoming' | 'past';
               <tr>
                 <td>
                   <div class="flex items-center gap-3">
-                    <span class="icon-tile" [class]="s.status === 'ended' ? 'tone-neutral' : 'bg-surface-highlight/70'"><lucide-icon name="radio" [size]="18" /></span>
+                    @if (s.thumbnail) {
+                      <div class="relative h-12 w-20 shrink-0 overflow-hidden rounded-lg bg-ink/10 border border-line/60">
+                        <img [src]="s.thumbnail" [alt]="s.title.en" class="h-full w-full object-cover" />
+                        <span class="absolute inset-0 flex items-center justify-center bg-black/25">
+                          <lucide-icon name="radio" [size]="14" class="text-white" />
+                        </span>
+                      </div>
+                    } @else {
+                      <span class="icon-tile" [class]="s.status === 'ended' ? 'tone-neutral' : 'bg-surface-highlight/70'"><lucide-icon name="radio" [size]="18" /></span>
+                    }
                     <div><p class="font-display font-semibold text-ink">{{ s.title | loc }}</p><p class="text-xs text-ink-muted">{{ 'stagesShort.' + s.stage | t }} · {{ 'common.minutes' | t: { n: s.durationMin } }}</p></div>
                   </div>
                 </td>
@@ -107,6 +116,27 @@ type Tab = 'upcoming' | 'past';
           }
           <span class="mt-1 block text-xs text-ink-muted">Optional. Only shown to enrolled students while the session is live.</span>
         </label>
+        <div class="space-y-2">
+          <span class="field-label">{{ i18n.lang() === 'ar' ? 'صورة الغلاف (Thumbnail)' : 'Session Thumbnail' }}</span>
+          <div class="flex items-center gap-3">
+            <div class="relative h-14 w-24 shrink-0 overflow-hidden rounded-lg border border-line bg-surface-tint">
+              @if (d.thumbnail) {
+                <img [src]="d.thumbnail" alt="Preview" class="h-full w-full object-cover" />
+              } @else {
+                <span class="flex h-full w-full items-center justify-center text-ink-muted"><lucide-icon name="image" [size]="20" /></span>
+              }
+            </div>
+            <input type="text" class="input input-plain flex-1 text-sm [unicode-bidi:plaintext]" dir="ltr"
+              placeholder="/images/thumb-grammar.svg or image URL"
+              [ngModel]="d.thumbnail ?? ''" (ngModelChange)="patch({ thumbnail: $event || undefined })" />
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <button type="button" class="btn btn-soft btn-xs text-xs" (click)="patch({ thumbnail: '/images/thumb-grammar.svg' })">Grammar</button>
+            <button type="button" class="btn btn-soft btn-xs text-xs" (click)="patch({ thumbnail: '/images/thumb-exam.svg' })">Exam</button>
+            <button type="button" class="btn btn-soft btn-xs text-xs" (click)="patch({ thumbnail: '/images/thumb-phrasal.svg' })">Phrasal</button>
+            <button type="button" class="btn btn-soft btn-xs text-xs" (click)="patch({ thumbnail: '/images/thumb-phonetics.svg' })">Phonetics</button>
+          </div>
+        </div>
         <app-access-editor [value]="d.access" (valueChange)="patch({ access: $event })" [defaultPrice]="350" />
         <button footer type="button" class="btn btn-soft" (click)="draft.set(null)">{{ 'admin.cancel' | t }}</button>
         <button footer type="button" class="btn btn-primary" [disabled]="!valid()" (click)="save()">{{ 'admin.save' | t }}</button>
@@ -177,6 +207,7 @@ export class AdminLivePage {
     this.draft.set({
       id: 'live-' + Date.now(), title: { en: '', ar: '' }, description: { en: '', ar: '' }, stage: 'sec3',
       startsAt: '2026-11-19T17:00:00Z', durationMin: 120, status: 'scheduled', access: { type: 'paid', priceEgp: 350 }, seatsTaken: 0, maxSeats: 400,
+      thumbnail: '/images/thumb-grammar.svg',
     });
   }
 

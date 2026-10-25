@@ -10,6 +10,7 @@ export const EN = {
   nav: {
     home: 'Home',
     lectures: 'Recorded Lectures',
+    announcements: 'Announcements',
     quizzes: 'Quizzes & Exercises',
     live: 'Live Sessions',
     liveNow: 'Live now',
@@ -427,6 +428,7 @@ export const EN = {
     login: 'Log In',
     signup: 'Create Account',
     lectures: 'Recorded Lectures',
+    announcements: 'Announcements',
     quizzes: 'Quizzes & Exercises',
     progress: 'My Progress',
     notFound: 'Page not found',

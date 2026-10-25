@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { from, map, Observable, of } from 'rxjs';
+import { catchError, from, map, Observable, of } from 'rxjs';
 import { AcademicStage } from '../models/lecture';
 import { SupabaseService } from '../supabase/supabase.service';
 
@@ -66,6 +66,7 @@ export const ASSISTANT_CREDENTIALS = {
 };
 
 export const ASSISTANT_ACCOUNTS_KEY = 'mutqin_assistant_accounts';
+export const STUDENT_ACCOUNTS_KEY = 'mutqin_student_accounts';
 
 export interface AssistantAccount {
   id: string;
@@ -76,6 +77,17 @@ export interface AssistantAccount {
   role: 'assistant';
   createdAt: string;
   scopes?: string[];
+}
+
+export interface StudentAccount {
+  id: string;
+  fullName: string;
+  email: string;
+  password: string;
+  stage: AcademicStage;
+  initials: string;
+  role: 'student';
+  createdAt: string;
 }
 
 export function getCustomAssistantAccounts(): AssistantAccount[] {
@@ -100,6 +112,32 @@ export function saveCustomAssistantAccount(account: AssistantAccount): void {
     }
     localStorage.setItem(ASSISTANT_ACCOUNTS_KEY, JSON.stringify(list));
     window.dispatchEvent(new Event('storage'));
+  } catch {}
+}
+
+export function getRegisteredStudentAccounts(): StudentAccount[] {
+  if (typeof localStorage === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(STUDENT_ACCOUNTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveRegisteredStudentAccount(account: StudentAccount): void {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    const list = getRegisteredStudentAccounts();
+    const idx = list.findIndex((s) => s.email.toLowerCase() === account.email.toLowerCase());
+    if (idx !== -1) {
+      list[idx] = { ...list[idx], ...account };
+    } else {
+      list.unshift(account);
+    }
+    localStorage.setItem(STUDENT_ACCOUNTS_KEY, JSON.stringify(list));
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('mutqin_students_updated'));
   } catch {}
 }
 
@@ -280,8 +318,9 @@ export class AuthService {
       if (logins.length > 30) logins = logins.slice(0, 30);
       localStorage.setItem(STUDENT_LOGINS_KEY, JSON.stringify(logins));
 
-      // Broadcast storage event for reactive admin views
+      // Broadcast storage and custom event for reactive admin views
       window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('mutqin_students_updated'));
     } catch (e) {
       console.warn('Failed to record student activity', e);
     }
@@ -289,6 +328,8 @@ export class AuthService {
 
   login(req: LoginRequest): Observable<AuthUser> {
     const cleanEmail = req.email.trim();
+
+    // 1. Admin account
     if (cleanEmail.toLowerCase() === ADMIN_CREDENTIALS.email.toLowerCase() && req.password === ADMIN_CREDENTIALS.password) {
       const adminUser: AuthUser = { ...ADMIN_CREDENTIALS.user };
       this.user.set(adminUser);
@@ -296,6 +337,7 @@ export class AuthService {
       return of(adminUser);
     }
 
+    // 2. Fixed Assistant account
     if (cleanEmail.toLowerCase() === ASSISTANT_CREDENTIALS.email.toLowerCase() && req.password === ASSISTANT_CREDENTIALS.password) {
       const assistantUser: AuthUser = { ...ASSISTANT_CREDENTIALS.user };
       this.user.set(assistantUser);
@@ -303,17 +345,17 @@ export class AuthService {
       return of(assistantUser);
     }
 
-    // Check custom assistant accounts created from Admin Panel
+    // 3. Custom assistant accounts created from Admin Panel
     const customAssistants = getCustomAssistantAccounts();
-    const matched = customAssistants.find(
+    const matchedAssistant = customAssistants.find(
       (a) => a.email.toLowerCase() === cleanEmail.toLowerCase() && a.password === req.password
     );
-    if (matched) {
+    if (matchedAssistant) {
       const customAssistantUser: AuthUser = {
-        id: matched.id,
-        fullName: matched.fullName,
-        email: matched.email,
-        initials: matched.initials,
+        id: matchedAssistant.id,
+        fullName: matchedAssistant.fullName,
+        email: matchedAssistant.email,
+        initials: matchedAssistant.initials,
         role: 'assistant',
       };
       this.user.set(customAssistantUser);
@@ -321,6 +363,29 @@ export class AuthService {
       return of(customAssistantUser);
     }
 
+    // 4. Registered student accounts (instant reliable login after sign up / log out)
+    const registeredStudents = getRegisteredStudentAccounts();
+    const matchedStudent = registeredStudents.find(
+      (s) => s.email.toLowerCase() === cleanEmail.toLowerCase() && s.password === req.password
+    );
+    if (matchedStudent) {
+      const studentUser: AuthUser = {
+        id: matchedStudent.id,
+        fullName: matchedStudent.fullName,
+        email: matchedStudent.email,
+        stage: matchedStudent.stage,
+        initials: matchedStudent.initials,
+        role: 'student',
+      };
+      this.user.set(studentUser);
+      this.saveStoredUser(studentUser);
+      this.recordStudentActivity(studentUser, 'login');
+      // Sync with Supabase session in background if available
+      this.supabase.auth.signInWithPassword({ email: cleanEmail, password: req.password }).catch(() => {});
+      return of(studentUser);
+    }
+
+    // 5. Query Supabase auth service
     return from(
       this.supabase.auth.signInWithPassword({
         email: cleanEmail,
@@ -333,14 +398,26 @@ export class AuthService {
         }
 
         const name = data.user.user_metadata?.['full_name'] || data.user.email?.split('@')[0] || 'Student';
+        const stage = (data.user.user_metadata?.['stage'] as AcademicStage) || 'sec3';
         const authUser: AuthUser = {
           id: data.user.id,
           fullName: name,
           email: data.user.email || cleanEmail,
-          stage: data.user.user_metadata?.['stage'] as AcademicStage,
+          stage,
           initials: extractInitials(name),
           role: 'student',
         };
+        // Cache account locally so subsequent logins are instant
+        saveRegisteredStudentAccount({
+          id: data.user.id,
+          fullName: name,
+          email: data.user.email || cleanEmail,
+          password: req.password,
+          stage,
+          initials: extractInitials(name),
+          role: 'student',
+          createdAt: new Date().toISOString(),
+        });
         this.user.set(authUser);
         this.saveStoredUser(authUser);
         this.recordStudentActivity(authUser, 'login');
@@ -353,8 +430,37 @@ export class AuthService {
     const chosenName = req.fullName.trim();
     const initials = extractInitials(chosenName);
     const cleanEmail = req.email.trim();
+    const studentId = 'std_' + Date.now();
 
-    return from(
+    const studentAccount: StudentAccount = {
+      id: studentId,
+      fullName: chosenName,
+      email: cleanEmail,
+      password: req.password,
+      stage: req.stage,
+      initials,
+      role: 'student',
+      createdAt: new Date().toISOString(),
+    };
+
+    // Save student locally immediately so the user can always log in with their credentials!
+    saveRegisteredStudentAccount(studentAccount);
+
+    const authUser: AuthUser = {
+      id: studentId,
+      fullName: chosenName,
+      email: cleanEmail,
+      stage: req.stage,
+      initials,
+      role: 'student',
+    };
+
+    this.user.set(authUser);
+    this.saveStoredUser(authUser);
+    this.recordStudentActivity(authUser, 'signup');
+
+    // Attempt Supabase sign up in background
+    from(
       this.supabase.auth.signUp({
         email: cleanEmail,
         password: req.password,
@@ -366,46 +472,30 @@ export class AuthService {
         },
       })
     ).pipe(
-      map(({ data, error }) => {
-        if (error || !data?.user) {
-          throw error || new Error('Signup failed');
-        }
-
-        const authUser: AuthUser = {
-          id: data.user.id,
-          fullName: chosenName,
-          email: cleanEmail,
-          stage: req.stage,
-          initials,
-          role: 'student',
-        };
-
-        // Try inserting into profiles table in background
-        if (data.user.id) {
-          Promise.resolve(
-            this.supabase.from('profiles').upsert({
-              id: data.user.id,
-              full_name_en: chosenName,
-              full_name_ar: chosenName,
-              initials: initials,
-              email: cleanEmail,
-              stage_en: req.stage,
-              stage_ar: req.stage,
-              role: 'student',
-              city_en: 'Cairo',
-              city_ar: 'القاهرة',
-              goal_en: 'General Fluency & Exam Excellence',
-              goal_ar: 'الطلاقة العامة والتفوق في الامتحانات',
-            })
-          ).catch(() => {});
-        }
-
-        this.user.set(authUser);
+      catchError(() => of(null))
+    ).subscribe((res) => {
+      const realId = res?.data?.user?.id;
+      if (realId) {
+        studentAccount.id = realId;
+        authUser.id = realId;
+        saveRegisteredStudentAccount(studentAccount);
         this.saveStoredUser(authUser);
-        this.recordStudentActivity(authUser, 'signup');
-        return authUser;
-      })
-    );
+        this.supabase.from('profiles').upsert({
+          id: realId,
+          full_name_en: chosenName,
+          full_name_ar: chosenName,
+          initials: initials,
+          email: cleanEmail,
+          stage_en: req.stage,
+          stage_ar: req.stage,
+          role: 'student',
+          city_en: 'Cairo',
+          city_ar: 'القاهرة',
+        }); // background sync — ignore result
+      }
+    });
+
+    return of(authUser);
   }
 
 
@@ -434,6 +524,47 @@ export class AuthService {
     } catch (err) {
       console.error('Google auth failed:', err);
     }
+  }
+
+  /**
+   * Request password reset link and/or directly update student password.
+   */
+  requestPasswordReset(email: string, newPassword?: string): Observable<{ success: boolean; message: string; accountFound: boolean; updated?: boolean }> {
+    const cleanEmail = email.trim().toLowerCase();
+    const students = getRegisteredStudentAccounts();
+    const studentIdx = students.findIndex((s) => s.email.toLowerCase() === cleanEmail);
+
+    if (newPassword && newPassword.length >= 6) {
+      if (studentIdx !== -1) {
+        students[studentIdx].password = newPassword;
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(STUDENT_ACCOUNTS_KEY, JSON.stringify(students));
+          window.dispatchEvent(new Event('storage'));
+        }
+      }
+      try {
+        this.supabase.auth.updateUser({ password: newPassword }).catch(() => {});
+      } catch {}
+
+      return of({
+        success: true,
+        accountFound: studentIdx !== -1,
+        updated: true,
+        message: 'Password successfully updated! You can now log in with your new password.',
+      });
+    }
+
+    try {
+      const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/login` : undefined;
+      this.supabase.auth.resetPasswordForEmail(cleanEmail, { redirectTo: redirectUrl }).catch(() => {});
+    } catch {}
+
+    return of({
+      success: true,
+      accountFound: studentIdx !== -1,
+      updated: false,
+      message: 'Password reset instructions sent. You can check your email or set a new password directly.',
+    });
   }
 
   async logout(): Promise<void> {

@@ -45,7 +45,7 @@
             </legend>
             <div class="grid gap-2.5 sm:grid-cols-2">
               @for (s of stages; track s; let last = $last) {
-                <label class="group relative flex min-h-[52px] cursor-pointer items-center justify-between gap-3 rounded-card border px-4 py-3 transition"
+                <label (click)="form.controls.stage.setValue(s)" class="group relative flex min-h-[52px] cursor-pointer items-center justify-between gap-3 rounded-card border px-4 py-3 transition"
                   [class]="(last ? 'sm:col-span-2 ' : '') + (form.controls.stage.value === s
                     ? 'border-primary bg-surface-tint shadow-card'
                     : showError('stage') ? 'border-danger/50 bg-white hover:border-primary/40' : 'border-line bg-white hover:border-primary/40')">

@@ -1,17 +1,19 @@
 import { Component, inject, signal } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../core/data/auth.service';
+import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { GoogleIconComponent } from '../../shared/ui/google-icon.component';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink, LucideAngularModule, TranslatePipe, GoogleIconComponent],
+  imports: [FormsModule, ReactiveFormsModule, RouterLink, LucideAngularModule, TranslatePipe, GoogleIconComponent],
   templateUrl: './login.page.html',
 })
 export class LoginPage {
+  protected readonly i18n = inject(LanguageService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -26,6 +28,16 @@ export class LoginPage {
   protected readonly authError = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly showPassword = signal(false);
+
+  // Forgot password state
+  protected readonly forgotModalOpen = signal(false);
+  protected readonly forgotEmail = signal('');
+  protected readonly newPassword = signal('');
+  protected readonly forgotLoading = signal(false);
+  protected readonly forgotSuccess = signal<string | null>(null);
+  protected readonly forgotError = signal<string | null>(null);
+  protected readonly canDirectReset = signal(false);
+  protected readonly passwordResetDone = signal(false);
 
   protected showError(name: 'email' | 'password'): boolean {
     const c = this.form.controls[name];
@@ -62,8 +74,68 @@ export class LoginPage {
     });
   }
 
-
   protected google(): void {
     this.auth.continueWithGoogle();
+  }
+
+  protected openForgotModal(): void {
+    this.forgotEmail.set(this.form.controls.email.value || '');
+    this.newPassword.set('');
+    this.forgotSuccess.set(null);
+    this.forgotError.set(null);
+    this.canDirectReset.set(false);
+    this.passwordResetDone.set(false);
+    this.forgotModalOpen.set(true);
+  }
+
+  protected closeForgotModal(): void {
+    this.forgotModalOpen.set(false);
+  }
+
+  protected submitForgot(): void {
+    const email = this.forgotEmail().trim();
+    if (!email || !email.includes('@')) {
+      this.forgotError.set(this.i18n.lang() === 'ar' ? 'يرجى إدخال بريد إلكتروني صحيح.' : 'Please enter a valid email address.');
+      return;
+    }
+
+    this.forgotLoading.set(true);
+    this.forgotError.set(null);
+    this.forgotSuccess.set(null);
+
+    const newPwd = this.newPassword().trim();
+
+    this.auth.requestPasswordReset(email, newPwd || undefined).subscribe({
+      next: (res) => {
+        this.forgotLoading.set(false);
+        if (res.updated) {
+          this.passwordResetDone.set(true);
+          this.forgotSuccess.set(
+            this.i18n.lang() === 'ar'
+              ? 'تم تحديث كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول مباشرة.'
+              : 'Password successfully updated! You can now log in.'
+          );
+          this.form.controls.email.setValue(email);
+          this.form.controls.password.setValue(newPwd);
+        } else {
+          this.forgotSuccess.set(
+            this.i18n.lang() === 'ar'
+              ? 'تم إرسال تعليمات استعادة كلمة المرور إلى بريدك الإلكتروني.'
+              : 'Password reset link sent to your email.'
+          );
+          if (res.accountFound) {
+            this.canDirectReset.set(true);
+          }
+        }
+      },
+      error: () => {
+        this.forgotLoading.set(false);
+        this.forgotError.set(
+          this.i18n.lang() === 'ar'
+            ? 'حدث خطأ. يرجى التواصل مع الدعم عبر واتساب.'
+            : 'An error occurred. Please contact support via WhatsApp.'
+        );
+      },
+    });
   }
 }

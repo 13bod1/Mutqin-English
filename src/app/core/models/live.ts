@@ -21,6 +21,8 @@ export interface LiveClass {
   viewers?: number;
   /** HLS playback URL — only returned by the API to students with access. */
   playbackUrl?: string;
+  /** Optional cover/thumbnail image. */
+  thumbnail?: string;
   /** Set once ended. */
   replayUntil?: string;
   stats?: { durationMin: number; attended: number; questions: number };

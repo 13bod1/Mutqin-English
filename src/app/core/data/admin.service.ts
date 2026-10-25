@@ -47,20 +47,48 @@ function saveStorage(key: string, val: any): void {
 
 function loadStudents(): AdminStudent[] {
   const base = loadStorage<AdminStudent[]>(STUDENTS_KEY, STUDENTS_MOCK);
-  const registered = loadStorage<AdminStudent[]>('mutqin_admin_students', []);
+  const registeredAccounts = loadStorage<any[]>('mutqin_student_accounts', []);
+  const registeredLegacy = loadStorage<AdminStudent[]>('mutqin_admin_students', []);
   const map = new Map<string, AdminStudent>();
 
-  for (const s of base) {
+  // 1. Base / mock students
+  for (const s of STUDENTS_MOCK) {
     if (s.email) map.set(s.email.toLowerCase(), s);
     else if (s.id) map.set(s.id, s);
   }
-  for (const r of registered) {
+  for (const b of base) {
+    if (b.email) map.set(b.email.toLowerCase(), b);
+    else if (b.id) map.set(b.id, b);
+  }
+  for (const r of registeredLegacy) {
     if (r.email) {
       const existing = map.get(r.email.toLowerCase());
       map.set(r.email.toLowerCase(), existing ? { ...existing, ...r, status: 'active' } : r);
     }
   }
-  return Array.from(map.values());
+
+  // 2. Put newly registered student accounts at the top!
+  for (const acc of registeredAccounts) {
+    if (acc.email) {
+      const studentObj: AdminStudent = {
+        id: acc.id,
+        name: acc.fullName || acc.name || acc.email.split('@')[0],
+        email: acc.email,
+        stage: acc.stage || 'sec3',
+        joinedAt: acc.createdAt ? acc.createdAt.split('T')[0] : new Date().toISOString().split('T')[0],
+        lecturesDone: 0,
+        lecturesTotal: 40,
+        avgScore: null,
+        status: 'active',
+      };
+      map.set(acc.email.toLowerCase(), studentObj);
+    }
+  }
+
+  const all = Array.from(map.values());
+  // Sort newly registered students first
+  all.sort((a, b) => (b.joinedAt || '').localeCompare(a.joinedAt || ''));
+  return all;
 }
 
 function loadPayments(): AdminPayment[] {
@@ -74,11 +102,64 @@ function loadPayments(): AdminPayment[] {
 
 function loadSettings(): AcademySettings {
   const s = loadStorage<AcademySettings>(SETTINGS_KEY, SETTINGS_MOCK);
+  let changed = false;
   if (!s.etisalatNumber) {
     s.etisalatNumber = '01100764511';
+    changed = true;
+  }
+  if (s.popupMessage && (s.popupMessage.linkText === 'Explore sessions' || s.popupMessage.linkText?.toLowerCase().includes('explore session'))) {
+    s.popupMessage.linkText = '';
+    s.popupMessage.linkUrl = '';
+    changed = true;
+  }
+  if (changed) {
     saveStorage(SETTINGS_KEY, s);
   }
   return s;
+}
+
+function loadLiveClasses(): LiveClass[] {
+  const list = loadStorage<LiveClass[]>(LIVE_KEY, LIVE_CLASSES_MOCK);
+  let changed = false;
+  const updated = list.map((item) => {
+    if (!item.thumbnail) {
+      changed = true;
+      const fallback = item.id.includes('grammar')
+        ? '/images/thumb-grammar.svg'
+        : item.id.includes('phrasal')
+        ? '/images/thumb-phrasal.svg'
+        : '/images/thumb-exam.svg';
+      return { ...item, thumbnail: fallback };
+    }
+    return item;
+  });
+  if (changed) {
+    saveStorage(LIVE_KEY, updated);
+  }
+  return updated;
+}
+
+function loadLectures(): AdminLecture[] {
+  const list = loadStorage<AdminLecture[]>(LECTURES_KEY, ADMIN_LECTURES_MOCK);
+  let changed = false;
+  const updated = list.map((item) => {
+    if (!item.thumbnailUrl) {
+      changed = true;
+      const fallback = item.topic === 'grammar'
+        ? '/images/thumb-grammar.svg'
+        : item.topic === 'phrasal'
+        ? '/images/thumb-phrasal.svg'
+        : item.topic === 'phonetics'
+        ? '/images/thumb-phonetics.svg'
+        : '/images/thumb-exam.svg';
+      return { ...item, thumbnailUrl: fallback };
+    }
+    return item;
+  });
+  if (changed) {
+    saveStorage(LECTURES_KEY, updated);
+  }
+  return updated;
 }
 
 function loadAssistants(): AssistantMetric[] {
@@ -121,8 +202,8 @@ export class AdminService {
   readonly students = signal<AdminStudent[]>(loadStudents());
   readonly staff = signal<StaffMember[]>(loadStorage(STAFF_KEY, STAFF_MOCK));
   readonly payments = signal<AdminPayment[]>(loadPayments());
-  readonly lectures = signal<AdminLecture[]>(loadStorage(LECTURES_KEY, ADMIN_LECTURES_MOCK));
-  readonly liveClasses = signal<LiveClass[]>(loadStorage(LIVE_KEY, LIVE_CLASSES_MOCK));
+  readonly lectures = signal<AdminLecture[]>(loadLectures());
+  readonly liveClasses = signal<LiveClass[]>(loadLiveClasses());
   readonly announcements = signal<Announcement[]>(loadStorage(ANNOUNCEMENTS_KEY, ANNOUNCEMENTS_MOCK));
   readonly assistants = signal<AssistantMetric[]>(loadAssistants());
   readonly weeklyActivity = WEEKLY_ACTIVITY_MOCK;
@@ -135,16 +216,23 @@ export class AdminService {
     this.syncRealStudents();
     this.applyInitialThemes();
     if (typeof window !== 'undefined') {
-      window.addEventListener('storage', () => {
+      const refreshAll = () => {
         this.students.set(loadStudents());
         this.recentLogins.set(loadStorage(LOGINS_KEY, []));
         this.staff.set(loadStorage(STAFF_KEY, STAFF_MOCK));
         this.payments.set(loadPayments());
         this.announcements.set(loadStorage(ANNOUNCEMENTS_KEY, ANNOUNCEMENTS_MOCK));
         this.liveClasses.set(loadStorage(LIVE_KEY, LIVE_CLASSES_MOCK));
+        this.lectures.set(loadStorage(LECTURES_KEY, ADMIN_LECTURES_MOCK));
         this.assistants.set(loadAssistants());
         this.applyInitialThemes();
-      });
+      };
+
+      window.addEventListener('storage', refreshAll);
+      window.addEventListener('mutqin_students_updated', () => this.students.set(loadStudents()));
+      window.addEventListener('mutqin_lectures_updated', () => this.lectures.set(loadStorage(LECTURES_KEY, ADMIN_LECTURES_MOCK)));
+      window.addEventListener('mutqin_announcements_updated', () => this.announcements.set(loadStorage(ANNOUNCEMENTS_KEY, ANNOUNCEMENTS_MOCK)));
+      window.addEventListener('mutqin_theme_updated', () => this.applyInitialThemes());
     }
   }
 
@@ -153,6 +241,7 @@ export class AdminService {
     const s = loadSettings();
     if (s.theme) {
       document.documentElement.setAttribute('data-theme', s.theme);
+      this.activeTheme.set(s.theme);
     }
     const userTheme = s.userPortalTheme || 'classic';
     document.documentElement.setAttribute('data-user-theme', userTheme);
@@ -321,6 +410,16 @@ export class AdminService {
     this.setPayment(id, { status: 'rejected', note });
   }
 
+  /** Add newly submitted payment */
+  addPayment(p: AdminPayment): void {
+    this.payments.update((list) => {
+      const updated = [p, ...list];
+      saveStorage(PAYMENTS_KEY, updated);
+      return updated;
+    });
+    window.dispatchEvent(new Event('storage'));
+  }
+
   /** PUT /api/admin/lectures/:id (or POST for new) */
   saveLecture(l: AdminLecture): void {
     this.lectures.update((list) => {
@@ -328,6 +427,8 @@ export class AdminService {
       saveStorage(LECTURES_KEY, updated);
       return updated;
     });
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('mutqin_lectures_updated'));
   }
 
   /** PUT /api/admin/live-sessions/:id (or POST for new) */
@@ -337,6 +438,7 @@ export class AdminService {
       saveStorage(LIVE_KEY, updated);
       return updated;
     });
+    window.dispatchEvent(new Event('storage'));
   }
 
   /** POST /api/admin/announcements */
@@ -346,6 +448,8 @@ export class AdminService {
       saveStorage(ANNOUNCEMENTS_KEY, updated);
       return updated;
     });
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('mutqin_announcements_updated'));
   }
 
   deleteAnnouncement(id: string): void {
@@ -354,6 +458,8 @@ export class AdminService {
       saveStorage(ANNOUNCEMENTS_KEY, updated);
       return updated;
     });
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('mutqin_announcements_updated'));
   }
 
   /** Add or invite a student */
@@ -363,6 +469,8 @@ export class AdminService {
       saveStorage(STUDENTS_KEY, updated);
       return updated;
     });
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('mutqin_students_updated'));
   }
 
   /** Update student status */
@@ -374,14 +482,6 @@ export class AdminService {
     });
   }
 
-  /** Add a new submitted payment (e.g. from receipt checkout) */
-  addPayment(p: AdminPayment): void {
-    this.payments.update((list) => {
-      const updated = [p, ...list];
-      saveStorage(PAYMENTS_KEY, updated);
-      return updated;
-    });
-  }
 
   /** Add assistant metric */
   addAssistantMetric(metric: AssistantMetric): void {

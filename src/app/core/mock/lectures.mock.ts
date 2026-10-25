@@ -28,6 +28,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
     resources: { en: '2 PDF guides + 1 quiz', ar: 'ملفان PDF + اختبار' },
+    thumbnailUrl: '/images/thumb-grammar.svg',
     videoUrl: RECORDED_LECTURE_VIDEOS[0],
   },
   {
@@ -48,6 +49,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
     resources: { en: '1 audio drill + 1 PDF guide', ar: 'تمرين صوتي + ملف PDF' },
+    thumbnailUrl: '/images/thumb-phonetics.svg',
     videoUrl: RECORDED_LECTURE_VIDEOS[1],
   },
   {
@@ -67,6 +69,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
     resources: { en: '3 practice sheets + video solution', ar: '3 أوراق تدريب + حل بالفيديو' },
+    thumbnailUrl: '/images/thumb-grammar.svg',
     videoUrl: RECORDED_LECTURE_VIDEOS[2],
   },
   {
@@ -87,6 +90,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
     resources: { en: '2 practice sheets + 1 quiz', ar: 'ورقتا تدريب + اختبار' },
+    thumbnailUrl: '/images/thumb-exam.svg',
     videoUrl: RECORDED_LECTURE_VIDEOS[3],
   },
   {
@@ -106,6 +110,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
     resources: { en: '4 PDF guides + chapter summary', ar: '4 ملفات PDF + ملخص الفصول' },
+    thumbnailUrl: '/images/thumb-exam.svg',
     videoUrl: RECORDED_LECTURE_VIDEOS[4],
   },
   {
@@ -125,6 +130,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
     resources: { en: '2 PDF guides + 1 quiz', ar: 'ملفان PDF + اختبار' },
+    thumbnailUrl: '/images/thumb-grammar.svg',
     videoUrl: RECORDED_LECTURE_VIDEOS[5],
   },
   {
@@ -145,6 +151,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
     resources: { en: '1 flashcard set + 1 quiz', ar: 'مجموعة بطاقات + اختبار' },
+    thumbnailUrl: '/images/thumb-phrasal.svg',
     videoUrl: RECORDED_LECTURE_VIDEOS[0],
   },
   {
@@ -164,6 +171,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
     resources: { en: '1 PDF guide + 1 quiz', ar: 'ملف PDF + اختبار' },
+    thumbnailUrl: '/images/thumb-grammar.svg',
     videoUrl: RECORDED_LECTURE_VIDEOS[1],
   },
   {
@@ -183,6 +191,7 @@ export const LECTURES_MOCK: Lecture[] = [
     },
     instructor: { en: 'Mr. Adel Mostafa', ar: 'أ. عادل مصطفى' },
     resources: { en: '2 audio drills', ar: 'تمرينان صوتيان' },
+    thumbnailUrl: '/images/thumb-phonetics.svg',
     videoUrl: RECORDED_LECTURE_VIDEOS[2],
   },
 ];

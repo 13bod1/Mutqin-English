@@ -383,12 +383,20 @@ export class AdminSettingsPage {
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-user-theme', t);
     }
+    const cur = this.form();
+    if (cur) {
+      this.admin.saveSettings({ ...cur, userPortalTheme: t }).subscribe();
+    }
   }
 
   protected setThemeMode(m: SiteTheme): void {
     this.set('theme', m);
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', m);
+    }
+    const cur = this.form();
+    if (cur) {
+      this.admin.saveSettings({ ...cur, theme: m }).subscribe();
     }
   }
 
