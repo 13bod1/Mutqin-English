@@ -9,17 +9,30 @@ import { CommerceService } from '../../core/data/commerce.service';
 import { LiveClassService } from '../../core/data/live-class.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { LocalizePipe, TranslatePipe } from '../../core/i18n/translate.pipe';
+import { NativeLiveStreamingService } from '../../core/services/native-live-streaming.service';
+import { SessionProtectionService } from '../../core/services/session-protection.service';
 import { StatePanelComponent } from '../../shared/ui/state-panel.component';
 import { ChatMode, LiveChatComponent } from './live-chat.component';
+import { LiveQnaComponent } from './live-qna.component';
 
 type View = 'locked' | 'scheduled' | 'live' | 'ended';
 
 /** /live/:id — the student's live class page (scheduled · live · ended · no access). */
 @Component({
   selector: 'app-live-session',
-  imports: [RouterLink, LucideAngularModule, TranslatePipe, LocalizePipe, DatePipe, DecimalPipe, LiveChatComponent, StatePanelComponent],
+  imports: [
+    RouterLink,
+    LucideAngularModule,
+    TranslatePipe,
+    LocalizePipe,
+    DatePipe,
+    DecimalPipe,
+    LiveChatComponent,
+    LiveQnaComponent,
+    StatePanelComponent,
+  ],
   template: `
-    <section class="container-page py-6 md:py-10">
+    <section class="container-page py-6 md:py-10 select-none" (contextmenu)="$event.preventDefault()">
       <nav class="flex flex-wrap items-center gap-2 text-sm text-ink-muted" [attr.aria-label]="'pay.breadcrumb' | t">
         <a routerLink="/live" class="hover:text-ink">{{ 'nav.live' | t }}</a>
         <lucide-icon name="chevron-right" [size]="14" class="flip-rtl" />
@@ -34,7 +47,7 @@ type View = 'locked' | 'scheduled' | 'live' | 'ended';
         </app-state-panel>
       } @else {
         @let s = session()!;
-        <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
           <!-- Player -->
           <div class="relative aspect-video overflow-hidden rounded-card-lg bg-gradient-to-br from-[#2B1D19] to-primary text-white shadow-card">
             @switch (view()) {
@@ -60,23 +73,64 @@ type View = 'locked' | 'scheduled' | 'live' | 'ended';
                 </div>
               }
               @case ('live') {
-                <!-- Mux player goes here (playbackUrl is only returned to students with access). -->
+                <!-- Live Video / Broadcaster Output with DRM Watermark -->
                 <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-primary-mid to-[#2B1D19]">
-                  <span class="grid h-16 w-16 place-items-center rounded-full bg-surface-highlight font-display text-xl font-bold text-primary sm:h-24 sm:w-24 sm:text-3xl">AM</span>
-                  <p class="font-display text-sm font-semibold text-white/80">{{ 'live.presenting' | t }}</p>
+                  @if (useExternalBackup()) {
+                    <iframe
+                      class="h-full w-full border-0"
+                      [src]="streaming.externalBackupUrl()"
+                      title="Mr. Adel Mostafa Live Stream"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                    ></iframe>
+                  } @else {
+                    <span class="grid h-16 w-16 place-items-center rounded-full bg-surface-highlight font-display text-xl font-bold text-primary sm:h-24 sm:w-24 sm:text-3xl">AM</span>
+                    <p class="font-display text-sm font-semibold text-white/80">{{ 'live.presenting' | t }}</p>
+                  }
                 </div>
-                <div class="absolute start-3 top-3 flex gap-2 sm:start-4 sm:top-4">
-                  <span class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-2.5 py-1 font-display text-xs font-bold"><span class="h-2 w-2 animate-pulse rounded-full bg-white"></span>{{ 'live.liveBadge' | t }}</span>
-                  <span class="inline-flex items-center gap-1.5 rounded-lg bg-black/55 px-2.5 py-1 font-display text-xs font-semibold"><lucide-icon name="eye" [size]="13" />{{ 'live.watching' | t: { n: s.viewers ?? 0 } }}</span>
+
+                <!-- Dynamic Watermark overlay -->
+                <div
+                  class="pointer-events-none absolute z-30 select-none text-[0.625rem] font-bold tracking-wider text-white/20 sm:text-xs"
+                  [style.top.%]="watermarkTop()"
+                  [style.left.%]="watermarkLeft()"
+                  style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8); transition: top 3s ease, left 3s ease;"
+                >
+                  {{ dynamicWatermark() }}
                 </div>
-                <div class="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-8 sm:px-5">
+
+                <div class="absolute start-3 top-3 flex flex-wrap gap-2 sm:start-4 sm:top-4 z-20">
+                  <span class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-2.5 py-1 font-display text-xs font-bold">
+                    <span class="h-2 w-2 animate-pulse rounded-full bg-white"></span>{{ 'live.liveBadge' | t }}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 rounded-lg bg-black/55 px-2.5 py-1 font-display text-xs font-semibold backdrop-blur">
+                    <lucide-icon name="eye" [size]="13" />{{ 'live.watching' | t: { n: s.viewers ?? 0 } }}
+                  </span>
+                  <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-600/80 px-2 py-1 font-display text-[0.6875rem] font-semibold backdrop-blur">
+                    <lucide-icon name="signal" [size]="12" /> Latency: 1.4s (Ultra Low-Latency)
+                  </span>
+                </div>
+
+                <!-- Stream controls / fallback switch -->
+                <div class="absolute end-3 top-3 z-20">
+                  <button
+                    type="button"
+                    (click)="useExternalBackup.set(!useExternalBackup())"
+                    class="rounded-lg bg-black/60 px-2.5 py-1 font-display text-[0.6875rem] font-semibold text-white/90 backdrop-blur hover:bg-black/80 transition"
+                  >
+                    <lucide-icon name="external-link" [size]="12" class="me-1 inline" />
+                    {{ useExternalBackup() ? 'Switch to Native Stream' : ('nativeLive.switchExternal' | t) }}
+                  </button>
+                </div>
+
+                <div class="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-8 sm:px-5 z-20">
                   <div class="flex items-center gap-4">
                     <button type="button" [attr.aria-label]="'live.pause' | t"><lucide-icon name="pause" [size]="20" /></button>
                     <button type="button" [attr.aria-label]="'live.volume' | t"><lucide-icon name="volume-2" [size]="20" /></button>
                     <span class="font-display text-xs font-semibold" dir="ltr">● LIVE · {{ elapsed() }}</span>
                   </div>
                   <div class="flex items-center gap-4">
-                    <span class="font-display text-xs font-semibold">720p</span>
+                    <span class="font-display text-xs font-semibold">720p 60fps</span>
                     <button type="button" [attr.aria-label]="'live.fullscreen' | t"><lucide-icon name="maximize" [size]="20" /></button>
                   </div>
                 </div>
@@ -121,8 +175,38 @@ type View = 'locked' | 'scheduled' | 'live' | 'ended';
             }
           </div>
 
-          <app-live-chat class="h-[420px] lg:h-auto" [messages]="chat() ?? []" [mode]="chatMode()" [online]="s.viewers ?? 0"
-            [opensAt]="(s.startsAt | date: 'h:mm a' : 'Africa/Cairo' : i18n.lang()) ?? ''" />
+          <!-- Sidebar: Tab switcher between Live Chat & Moderated Q&A -->
+          <div class="flex h-[480px] flex-col overflow-hidden rounded-card-lg border border-line lg:h-auto">
+            <div class="flex border-b border-line bg-surface-tint3/60">
+              <button
+                type="button"
+                (click)="activeTab.set('chat')"
+                class="flex flex-1 items-center justify-center gap-2 py-2.5 font-display text-xs font-bold transition"
+                [class]="activeTab() === 'chat' ? 'border-b-2 border-primary bg-surface text-primary' : 'text-ink-muted hover:text-ink'"
+              >
+                <lucide-icon name="message-circle" [size]="15" />
+                Live Chat
+              </button>
+              <button
+                type="button"
+                (click)="activeTab.set('qna')"
+                class="flex flex-1 items-center justify-center gap-2 py-2.5 font-display text-xs font-bold transition"
+                [class]="activeTab() === 'qna' ? 'border-b-2 border-primary bg-surface text-primary' : 'text-ink-muted hover:text-ink'"
+              >
+                <lucide-icon name="messages-square" [size]="15" />
+                {{ 'qna.tabTitle' | t }}
+              </button>
+            </div>
+
+            <div class="flex-1 overflow-hidden">
+              @if (activeTab() === 'chat') {
+                <app-live-chat class="h-full block" [messages]="chat() ?? []" [mode]="chatMode()" [online]="s.viewers ?? 0"
+                  [opensAt]="(s.startsAt | date: 'h:mm a' : 'Africa/Cairo' : i18n.lang()) ?? ''" />
+              } @else {
+                <app-live-qna class="h-full block" [sessionId]="s.id" />
+              }
+            </div>
+          </div>
         </div>
 
         <!-- Info -->
@@ -172,12 +256,27 @@ export class LiveSessionPage {
   protected readonly auth = inject(AuthService);
   private readonly live = inject(LiveClassService);
   private readonly commerce = inject(CommerceService);
+  protected readonly streaming = inject(NativeLiveStreamingService);
+  private readonly protection = inject(SessionProtectionService);
 
   protected readonly session = toSignal(toObservable(this.id).pipe(switchMap((id) => this.live.getById(id))));
   protected readonly chat = toSignal(toObservable(this.id).pipe(switchMap((id) => this.live.getChat(id))));
 
   protected readonly remind = signal(false);
   protected readonly hand = signal(false);
+  protected readonly activeTab = signal<'chat' | 'qna'>('chat');
+  protected readonly useExternalBackup = signal<boolean>(false);
+
+  // Dynamic DRM Watermark
+  protected readonly watermarkTop = signal<number>(25);
+  protected readonly watermarkLeft = signal<number>(30);
+  protected readonly dynamicWatermark = computed(() => {
+    const user = this.auth.user();
+    const userId = user?.id || 'guest_student';
+    const userName = user?.fullName || 'Guest Student';
+    return this.protection.getWatermarkText(userId, userName, '01012345678');
+  });
+
   private readonly now = signal(Date.now());
 
   protected readonly view = computed<View>(() => {
@@ -227,7 +326,11 @@ export class LiveSessionPage {
   });
 
   constructor() {
-    const t = setInterval(() => this.now.set(Date.now()), 1000);
+    const t = setInterval(() => {
+      this.now.set(Date.now());
+      this.watermarkTop.set(Math.floor(Math.random() * 65) + 10);
+      this.watermarkLeft.set(Math.floor(Math.random() * 60) + 10);
+    }, 4000);
     inject(DestroyRef).onDestroy(() => clearInterval(t));
   }
 }

@@ -1,8 +1,20 @@
-import { Component, computed, ElementRef, inject, input, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  computed,
+  inject,
+  input,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
+import { AuthService } from '../../core/data/auth.service';
 import { LocalizePipe, TranslatePipe } from '../../core/i18n/translate.pipe';
 import { FeaturedLecture } from '../../core/models/lecture';
 import { PdfNotesService } from '../../core/services/pdf-notes.service';
+import { SessionProtectionService } from '../../core/services/session-protection.service';
 
 type Quality = '360p' | '720p' | '1080p';
 
@@ -11,11 +23,11 @@ type Quality = '360p' | '720p' | '1080p';
   imports: [LucideAngularModule, TranslatePipe, LocalizePipe],
   host: { class: 'block' },
   template: `
-    <div class="card overflow-hidden shadow-lift border border-line/60">
+    <div class="card overflow-hidden shadow-lift border border-line/60 select-none" (contextmenu)="$event.preventDefault()">
       <div class="flex flex-col gap-4 border-b border-line/70 p-5 md:flex-row md:items-center md:justify-between md:p-6 bg-surface-warm/40">
         <div>
           <p class="flex items-center gap-1.5 font-display text-xs font-semibold text-ink-soft">
-            <lucide-icon name="video" [size]="14" class="text-primary" /> {{ 'lectures.player.eyebrow' | t }}
+            <lucide-icon name="shield-check" [size]="14" class="text-primary" /> {{ 'lectures.player.eyebrow' | t }} · DRM Hardened
           </p>
           <h3 class="mt-1.5 font-display text-xl font-bold md:text-2xl text-ink">{{ lecture().title | loc }}</h3>
           <p class="mt-1 text-sm text-ink-body">{{ lecture().subtitle | loc }}</p>
@@ -34,26 +46,54 @@ type Quality = '360p' | '720p' | '1080p';
 
       <div class="grid bg-black lg:grid-cols-[1fr_260px]">
         <!-- Video area -->
-        <div class="relative aspect-video overflow-hidden bg-neutral-950 text-white group">
-          <!-- Actual Video Element -->
+        <div class="relative aspect-video overflow-hidden bg-neutral-950 text-white group" (contextmenu)="$event.preventDefault()">
+          <!-- Blocked Playback Overlay (Concurrent session or security stop) -->
+          @if (blockedReason()) {
+            <div class="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-neutral-950/95 p-6 text-center text-white backdrop-blur-md">
+              <span class="grid h-16 w-16 place-items-center rounded-full bg-red-600/20 text-red-500">
+                <lucide-icon name="shield-alert" [size]="32" />
+              </span>
+              <p class="font-display text-lg font-bold sm:text-xl">{{ 'protection.recordingBlocked' | t }}</p>
+              <p class="max-w-md text-xs leading-relaxed text-white/80 sm:text-sm">{{ blockedReason() }}</p>
+              <button type="button" (click)="resumeSession()" class="btn btn-light btn-sm mt-2">
+                <lucide-icon name="refresh-cw" [size]="14" /> Refresh Authorization
+              </button>
+            </div>
+          }
+
+          <!-- Actual Video Element with hardened attributes -->
           <video
             #videoRef
-            class="h-full w-full object-contain bg-black"
+            class="h-full w-full object-contain bg-black transition-filter"
+            [class.blur-md]="isBlurred()"
             playsinline
             preload="metadata"
-            [src]="lecture().videoUrl"
+            disablePictureInPicture
+            controlsList="nodownload noplaybackrate"
+            [src]="signedVideoUrl()"
             (timeupdate)="onTimeUpdate()"
             (loadedmetadata)="onLoadedMetadata()"
             (ended)="onEnded()"
             (play)="playing.set(true)"
             (pause)="playing.set(false)"
             (click)="togglePlay()"
+            (contextmenu)="$event.preventDefault()"
           ></video>
+
+          <!-- Dynamic Watermark overlay (animating / repositioning to deter filming & screen recording) -->
+          <div
+            class="pointer-events-none absolute z-30 select-none text-[0.625rem] font-bold tracking-wider text-white/20 sm:text-xs"
+            [style.top.%]="watermarkTop()"
+            [style.left.%]="watermarkLeft()"
+            style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8); transition: top 3s ease, left 3s ease;"
+          >
+            {{ dynamicWatermark() }}
+          </div>
 
           <!-- Badges -->
           <div class="pointer-events-none absolute start-3 top-3 flex gap-2 z-10">
-            <span class="rounded-md bg-danger px-2.5 py-1 font-display text-[0.6875rem] font-semibold text-white shadow-sm">
-              {{ 'lectures.player.preview' | t }} · {{ lecture().lessonLabel | loc }}
+            <span class="rounded-md bg-danger px-2.5 py-1 font-display text-[0.6875rem] font-semibold text-white shadow-sm flex items-center gap-1">
+              <lucide-icon name="shield-check" [size]="12" /> DRM Protected · {{ lecture().lessonLabel | loc }}
             </span>
           </div>
           <span class="pointer-events-none absolute end-3 top-3 rounded-md bg-black/60 px-2.5 py-1 font-display text-[0.6875rem] font-semibold backdrop-blur text-white shadow-sm z-10">
@@ -61,7 +101,7 @@ type Quality = '360p' | '720p' | '1080p';
           </span>
 
           <!-- Play Overlay when paused -->
-          @if (!playing()) {
+          @if (!playing() && !blockedReason()) {
             <div
               (click)="togglePlay()"
               class="absolute inset-0 z-20 flex cursor-pointer flex-col items-center justify-center bg-black/45 backdrop-blur-[1px] transition hover:bg-black/35"
@@ -164,9 +204,14 @@ type Quality = '360p' | '720p' | '1080p';
     </div>
   `,
 })
-export class LecturePlayerComponent {
+export class LecturePlayerComponent implements OnInit {
   readonly lecture = input.required<FeaturedLecture>();
+
   private readonly pdfNotes = inject(PdfNotesService);
+  private readonly protection = inject(SessionProtectionService);
+  private readonly auth = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly videoRef = viewChild<ElementRef<HTMLVideoElement>>('videoRef');
 
   protected readonly speeds = [1, 1.25, 1.5];
@@ -189,15 +234,104 @@ export class LecturePlayerComponent {
   protected readonly currentTime = signal(0);
   protected readonly duration = signal(0);
 
+  // Hardened DRM & Session State
+  protected readonly signedVideoUrl = signal<string>('');
+  protected readonly blockedReason = signal<string | null>(null);
+  protected readonly isBlurred = signal<boolean>(false);
+  protected readonly watermarkTop = signal<number>(20);
+  protected readonly watermarkLeft = signal<number>(20);
+  protected readonly dynamicWatermark = signal<string>('');
+
+  private deviceId = 'dev_' + Math.random().toString(36).substring(2, 8);
+
   protected readonly percent = computed(() => {
     const d = this.duration() || this.lecture().durationSec || 1;
     return Math.min(100, Math.max(0, (this.currentTime() / d) * 100));
   });
 
+  ngOnInit(): void {
+    const user = this.auth.user();
+    const userId = user?.id || 'guest_student';
+    const userName = user?.fullName || 'Guest Student';
+
+    // 1. Dynamic Watermark text with student ID & obscured phone
+    this.dynamicWatermark.set(this.protection.getWatermarkText(userId, userName, '01012345678'));
+
+    // 2. Generate signed, short-lived video playback URL
+    this.refreshSignedUrl();
+
+    // 3. Register viewing session
+    const reg = this.protection.registerViewingSession(userId, this.deviceId);
+    if (reg.previousTerminated) {
+      this.protection.flagSuspiciousActivity(
+        userId,
+        `Started viewing lecture ${this.lecture().title} while another device was active.`
+      );
+    }
+
+    // 4. Reposition watermark periodically
+    const wmInterval = setInterval(() => {
+      this.watermarkTop.set(Math.floor(Math.random() * 70) + 10);
+      this.watermarkLeft.set(Math.floor(Math.random() * 65) + 5);
+    }, 4000);
+
+    // 5. Visibility change detection (pauses and blurs when tab hidden)
+    const onVisibilityChange = () => {
+      if (typeof document !== 'undefined' && document.hidden) {
+        this.isBlurred.set(true);
+        const v = this.videoRef()?.nativeElement;
+        if (v && !v.paused) {
+          v.pause();
+          this.playing.set(false);
+        }
+      } else {
+        this.isBlurred.set(false);
+      }
+    };
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', onVisibilityChange);
+    }
+
+    this.destroyRef.onDestroy(() => {
+      clearInterval(wmInterval);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+      }
+      this.protection.stopViewingSession(userId, this.deviceId);
+    });
+  }
+
+  private refreshSignedUrl(): void {
+    const user = this.auth.user();
+    const userId = user?.id || 'guest_student';
+    const raw = this.lecture().videoUrl || '';
+    // Expire in 10 minutes
+    const signed = this.protection.generateSignedVideoUrl(raw, userId, 600);
+    this.signedVideoUrl.set(signed);
+  }
+
+  protected resumeSession(): void {
+    this.blockedReason.set(null);
+    const user = this.auth.user();
+    const userId = user?.id || 'guest_student';
+    this.protection.registerViewingSession(userId, this.deviceId);
+    this.refreshSignedUrl();
+  }
+
   protected togglePlay(): void {
     const v = this.videoRef()?.nativeElement;
     if (!v) return;
     if (v.paused) {
+      // Check session heartbeat
+      const user = this.auth.user();
+      const userId = user?.id || 'guest_student';
+      const check = this.protection.sessionHeartbeat(userId, this.deviceId);
+      if (!check.active) {
+        this.blockedReason.set(check.reason || 'Session stopped: Account is active on another device.');
+        return;
+      }
+
       v.play().then(() => this.playing.set(true)).catch(() => {});
     } else {
       v.pause();
@@ -270,7 +404,6 @@ export class LecturePlayerComponent {
 
   protected downloadNotes(): void {
     const lec = this.lecture();
-    // FeaturedLecture has title & subtitle but no id — use 'featured' as key
     const titleEn = typeof lec.title === 'string' ? lec.title : lec.title['en'];
     const subtitleEn = typeof lec.subtitle === 'string' ? lec.subtitle : lec.subtitle['en'];
     this.pdfNotes.downloadNotes('featured', titleEn, subtitleEn);

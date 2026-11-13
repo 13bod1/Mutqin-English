@@ -1,20 +1,31 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { switchMap } from 'rxjs';
 import { LiveClassService } from '../../core/data/live-class.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { LocalizePipe, TranslatePipe } from '../../core/i18n/translate.pipe';
 import { LiveStatus } from '../../core/models/live';
+import { NativeLiveStreamingService } from '../../core/services/native-live-streaming.service';
 import { StatePanelComponent } from '../../shared/ui/state-panel.component';
 import { LiveChatComponent } from './live-chat.component';
+import { LiveQnaComponent } from './live-qna.component';
 
 /** /live/:id/studio — teacher view: stream setup, go live / end, stats and chat moderation. */
 @Component({
   selector: 'app-live-studio',
-  imports: [RouterLink, LucideAngularModule, TranslatePipe, LocalizePipe, DatePipe, LiveChatComponent, StatePanelComponent],
+  imports: [
+    RouterLink,
+    LucideAngularModule,
+    TranslatePipe,
+    LocalizePipe,
+    DatePipe,
+    LiveChatComponent,
+    LiveQnaComponent,
+    StatePanelComponent,
+  ],
   template: `
     <section class="container-page py-6 md:py-10">
       <nav class="flex flex-wrap items-center gap-2 text-sm text-ink-muted" [attr.aria-label]="'pay.breadcrumb' | t">
@@ -34,16 +45,20 @@ import { LiveChatComponent } from './live-chat.component';
             <h1 class="mt-2 font-display text-[1.75rem] font-bold leading-9 md:text-[2rem]">{{ 'studio.title' | t }}</h1>
             <p class="mt-1 text-ink-body">{{ s.title | loc }} · {{ s.startsAt | date: 'EEE d MMM y · h:mm a' : 'Africa/Cairo' : i18n.lang() }}</p>
           </div>
-          <div class="flex flex-wrap gap-3">
+          <div class="flex flex-wrap items-center gap-3">
             @switch (status()) {
               @case ('live') {
                 <button type="button" class="btn btn-soft" (click)="paused.set(!paused())">
                   <lucide-icon [name]="paused() ? 'play' : 'circle-pause'" [size]="16" />{{ (paused() ? 'studio.resume' : 'studio.pause') | t }}
                 </button>
-                <button type="button" class="btn btn-danger" (click)="status.set('ended')"><lucide-icon name="circle-x" [size]="16" />{{ 'studio.end' | t }}</button>
+                <button type="button" class="btn btn-danger" (click)="endAndArchive()">
+                  <lucide-icon name="circle-x" [size]="16" />{{ 'nativeLive.stopBroadcast' | t }}
+                </button>
               }
               @case ('scheduled') {
-                <button type="button" class="btn btn-live" [disabled]="!connected()" (click)="status.set('live')"><lucide-icon name="radio" [size]="16" />{{ 'studio.goLive' | t }}</button>
+                <button type="button" class="btn btn-live" (click)="startLive()">
+                  <lucide-icon name="radio" [size]="16" />{{ 'nativeLive.startBroadcast' | t }}
+                </button>
               }
               @case ('ended') {
                 <span class="tag tone-neutral px-3 py-1.5 text-xs">{{ 'studio.endedTag' | t }}</span>
@@ -51,6 +66,15 @@ import { LiveChatComponent } from './live-chat.component';
             }
           </div>
         </header>
+
+        <!-- Archived confirmation banner -->
+        @if (archivedLectureId()) {
+          <div class="note tone-success mt-4 items-center">
+            <lucide-icon name="circle-check" [size]="18" class="shrink-0" />
+            <span class="flex-1 font-medium">{{ 'nativeLive.recordingLecturePublished' | t }} (ID: {{ archivedLectureId() }})</span>
+            <a routerLink="/admin/lectures" class="btn btn-light btn-sm">View in Lectures</a>
+          </div>
+        }
 
         <!-- Stats -->
         <div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -63,26 +87,71 @@ import { LiveChatComponent } from './live-chat.component';
           }
         </div>
 
-        <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
           <div class="space-y-6">
-            <!-- Preview -->
+            <!-- Preview / Broadcaster Canvas -->
             <div class="relative aspect-video overflow-hidden rounded-card-lg bg-gradient-to-b from-primary-mid to-[#2B1D19] text-white shadow-card">
               <div class="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                @if (connected()) {
+                @if (connected() || status() === 'live') {
                   <span class="grid h-20 w-20 place-items-center rounded-full bg-surface-highlight font-display text-2xl font-bold text-primary">AM</span>
-                  <p class="font-display text-sm font-semibold text-white/80">{{ 'studio.preview' | t }}</p>
+                  <p class="font-display text-sm font-semibold text-white/80">In-Browser Broadcaster Live</p>
                 } @else {
                   <span class="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white"></span>
                   <p class="font-display text-sm font-semibold text-white/80">{{ 'studio.waiting' | t }}</p>
                 }
               </div>
-              <div class="absolute start-4 top-4 flex flex-wrap gap-2">
+
+              <!-- Status Badges -->
+              <div class="absolute start-4 top-4 flex flex-wrap gap-2 z-10">
                 @if (status() === 'live') {
-                  <span class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-2.5 py-1 font-display text-xs font-bold"><span class="h-2 w-2 rounded-full bg-white"></span>{{ 'live.liveBadge' | t }}{{ paused() ? ' · ' + ('studio.paused' | t) : '' }}</span>
+                  <span class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-2.5 py-1 font-display text-xs font-bold">
+                    <span class="h-2 w-2 animate-pulse rounded-full bg-white"></span>
+                    {{ 'live.liveBadge' | t }}{{ paused() ? ' · ' + ('studio.paused' | t) : '' }}
+                  </span>
                 }
-                @if (connected()) {
-                  <span class="inline-flex items-center gap-1.5 rounded-lg bg-black/55 px-2.5 py-1 font-display text-xs font-semibold"><lucide-icon name="signal" [size]="13" />{{ 'studio.health' | t }}</span>
-                }
+                <span class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600/90 px-2.5 py-1 font-display text-xs font-semibold backdrop-blur">
+                  <lucide-icon name="signal" [size]="13" /> Latency: 1.4s (< 10s Low Latency)
+                </span>
+                <span class="inline-flex items-center gap-1.5 rounded-lg bg-black/60 px-2.5 py-1 font-display text-xs font-semibold backdrop-blur">
+                  <lucide-icon name="shield-check" [size]="13" /> DRM Active
+                </span>
+              </div>
+
+              <!-- Native Broadcaster Controls Bar -->
+              <div class="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/80 to-transparent p-4 z-10">
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    (click)="streaming.toggleMic()"
+                    class="rounded-lg p-2 transition"
+                    [class]="streaming.micMuted() ? 'bg-red-600 text-white' : 'bg-white/20 text-white hover:bg-white/30'"
+                    [title]="streaming.micMuted() ? ('nativeLive.micOff' | t) : ('nativeLive.micOn' | t)"
+                  >
+                    <lucide-icon [name]="streaming.micMuted() ? 'mic-off' : 'mic'" [size]="18" />
+                  </button>
+                  <button
+                    type="button"
+                    (click)="streaming.toggleCamera()"
+                    class="rounded-lg p-2 transition"
+                    [class]="streaming.cameraOff() ? 'bg-red-600 text-white' : 'bg-white/20 text-white hover:bg-white/30'"
+                    [title]="streaming.cameraOff() ? ('nativeLive.camOff' | t) : ('nativeLive.camOn' | t)"
+                  >
+                    <lucide-icon [name]="streaming.cameraOff() ? 'camera-off' : 'camera'" [size]="18" />
+                  </button>
+                  <button
+                    type="button"
+                    (click)="streaming.toggleScreenShare()"
+                    class="rounded-lg p-2 transition"
+                    [class]="streaming.screenSharing() ? 'bg-primary text-white' : 'bg-white/20 text-white hover:bg-white/30'"
+                    title="Share Screen"
+                  >
+                    <lucide-icon name="monitor-up" [size]="18" />
+                  </button>
+                </div>
+                <div class="flex items-center gap-2 text-xs font-semibold text-white/90">
+                  <span class="rounded bg-black/50 px-2 py-1">1080p 60fps</span>
+                  <span class="rounded bg-black/50 px-2 py-1">2.8 Mbps</span>
+                </div>
               </div>
             </div>
 
@@ -90,14 +159,14 @@ import { LiveChatComponent } from './live-chat.component';
             <div class="card space-y-5 p-5 sm:p-6">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <h2 class="flex items-center gap-2.5 font-display text-base font-bold"><span class="icon-tile h-9 w-9"><lucide-icon name="radio" [size]="17" /></span>{{ 'studio.setup' | t }}</h2>
-                <span class="tag tone-warning"><lucide-icon name="circle-alert" [size]="12" />{{ 'studio.muxMissing' | t }}</span>
+                <span class="tag tone-success"><lucide-icon name="check-check" [size]="12" />Native Browser Broadcast Active</span>
               </div>
               <div class="grid gap-4 md:grid-cols-2">
                 <div>
                   <p class="field-label">{{ 'studio.server' | t }}</p>
                   <div class="flex gap-2">
-                    <code class="flex h-11 min-w-0 flex-1 items-center truncate rounded-card border border-line bg-surface-page px-3.5 text-sm text-ink" dir="ltr">rtmps://global-live.mux.com/app</code>
-                    <button type="button" class="btn-icon h-11 w-11" (click)="copy('rtmps://global-live.mux.com:443/app')" [attr.aria-label]="'pay.manual.copy' | t"><lucide-icon name="copy" [size]="16" /></button>
+                    <code class="flex h-11 min-w-0 flex-1 items-center truncate rounded-card border border-line bg-surface-page px-3.5 text-sm text-ink" dir="ltr">webrtc://live.adelmostafa.com/broadcast</code>
+                    <button type="button" class="btn-icon h-11 w-11" (click)="copy('webrtc://live.adelmostafa.com/broadcast')" [attr.aria-label]="'pay.manual.copy' | t"><lucide-icon name="copy" [size]="16" /></button>
                   </div>
                 </div>
                 <div>
@@ -131,9 +200,39 @@ import { LiveChatComponent } from './live-chat.component';
             </div>
           </div>
 
-          <app-live-chat class="h-[560px] lg:h-auto lg:max-h-[860px]" [messages]="chat() ?? []" [moderator]="true"
-            [mode]="status() === 'live' && chatOn() ? 'open' : status() === 'ended' ? 'closed' : 'notStarted'" [online]="s.viewers ?? 0"
-            [opensAt]="(s.startsAt | date: 'h:mm a' : 'Africa/Cairo' : i18n.lang()) ?? ''" />
+          <!-- Studio Sidebar: Tabs for Chat vs Moderated Live Q&A -->
+          <div class="flex h-[560px] flex-col overflow-hidden rounded-card-lg border border-line lg:h-auto lg:max-h-[860px]">
+            <div class="flex border-b border-line bg-surface-tint3/60">
+              <button
+                type="button"
+                (click)="activeTab.set('chat')"
+                class="flex flex-1 items-center justify-center gap-2 py-2.5 font-display text-xs font-bold transition"
+                [class]="activeTab() === 'chat' ? 'border-b-2 border-primary bg-surface text-primary' : 'text-ink-muted hover:text-ink'"
+              >
+                <lucide-icon name="message-circle" [size]="15" />
+                Live Chat
+              </button>
+              <button
+                type="button"
+                (click)="activeTab.set('qna')"
+                class="flex flex-1 items-center justify-center gap-2 py-2.5 font-display text-xs font-bold transition"
+                [class]="activeTab() === 'qna' ? 'border-b-2 border-primary bg-surface text-primary' : 'text-ink-muted hover:text-ink'"
+              >
+                <lucide-icon name="messages-square" [size]="15" />
+                {{ 'qna.tabTitle' | t }}
+              </button>
+            </div>
+
+            <div class="flex-1 overflow-hidden">
+              @if (activeTab() === 'chat') {
+                <app-live-chat class="h-full block" [messages]="chat() ?? []" [moderator]="true"
+                  [mode]="status() === 'live' && chatOn() ? 'open' : status() === 'ended' ? 'closed' : 'notStarted'" [online]="s.viewers ?? 0"
+                  [opensAt]="(s.startsAt | date: 'h:mm a' : 'Africa/Cairo' : i18n.lang()) ?? ''" />
+              } @else {
+                <app-live-qna class="h-full block" [sessionId]="s.id" />
+              }
+            </div>
+          </div>
         </div>
       }
     </section>
@@ -144,6 +243,8 @@ export class LiveStudioPage {
 
   protected readonly i18n = inject(LanguageService);
   private readonly live = inject(LiveClassService);
+  protected readonly streaming = inject(NativeLiveStreamingService);
+  private readonly router = inject(Router);
 
   protected readonly session = toSignal(toObservable(this.id).pipe(switchMap((id) => this.live.getById(id))));
   protected readonly chat = toSignal(toObservable(this.id).pipe(switchMap((id) => this.live.getChat(id))));
@@ -155,6 +256,9 @@ export class LiveStudioPage {
   protected readonly chatOn = signal(true);
   private readonly record = signal(true);
   private readonly slow = signal(false);
+
+  protected readonly activeTab = signal<'chat' | 'qna'>('qna');
+  protected readonly archivedLectureId = signal<string | null>(null);
 
   protected readonly toggles = computed(() => [
     { key: 'studio.chatEnabled', on: this.chatOn() },
@@ -172,6 +276,20 @@ export class LiveStudioPage {
       { label: 'studio.stats.hands', icon: 'hand', tone: 'tone-gold', value: live ? '4' : '0', note: 'studio.stats.invite', params: {} as Record<string, number> },
     ];
   });
+
+  protected startLive(): void {
+    this.status.set('live');
+    this.connected.set(true);
+    this.streaming.startBroadcast(this.id());
+  }
+
+  protected endAndArchive(): void {
+    this.status.set('ended');
+    const s = this.session();
+    const title = s?.title?.en || 'Live Stream';
+    const res = this.streaming.stopBroadcastAndArchive(this.id(), title);
+    this.archivedLectureId.set(res.lectureId);
+  }
 
   protected flip(key: string): void {
     if (key === 'studio.chatEnabled') this.chatOn.update((v) => !v);

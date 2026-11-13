@@ -135,4 +135,7 @@ export interface AcademySettings {
   userPortalTheme?: UserPortalTheme;
   popupMessage: PopupMessageSettings;
   liveStreamUrl?: string;
+  guardianReportsEnabled?: boolean;
+  webPushEnabled?: boolean;
+  drmStrictProtection?: boolean;
 }

@@ -1,0 +1,19 @@
+{
+  "name": "Mr. Adel Mostafa Educational Platform",
+  "short_name": "أكاديمية أ. عادل مصطفى",
+  "description": "Comprehensive English Learning & Thanawya Amma Revision Platform by Mr. Adel Mostafa",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1c1412",
+  "theme_color": "#8B2500",
+  "orientation": "portrait-primary",
+  "categories": ["education", "books"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "48x48 72x72 96x96 128x128 192x192 256x256 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

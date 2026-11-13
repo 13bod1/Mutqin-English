@@ -2,15 +2,46 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AdminService } from '../../core/data/admin.service';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
+import { PwaNotificationService } from '../../core/services/pwa-notification.service';
 import { FooterComponent } from './footer.component';
 import { HeaderComponent } from './header.component';
 
-/** Page frame shared by every route: header, content, footer. */
+/** Page frame shared by every route: header, content, footer, PWA offline & install prompts. */
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, LucideAngularModule],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, LucideAngularModule, TranslatePipe],
   host: { class: 'flex min-h-dvh flex-col' },
   template: `
+    <!-- PWA Offline Banner -->
+    @if (!pwa.isOnline()) {
+      <aside class="sticky top-0 z-50 flex items-center justify-between bg-amber-600 px-4 py-2 text-xs font-bold text-white shadow-md">
+        <div class="flex items-center gap-2">
+          <lucide-icon name="wifi-off" [size]="16" />
+          <span>{{ 'pwa.offlineBanner' | t }}</span>
+        </div>
+        <span class="rounded bg-black/20 px-2 py-0.5 text-[0.6875rem] font-semibold">Offline Mode</span>
+      </aside>
+    }
+
+    <!-- PWA Custom Install Prompt Banner -->
+    @if (pwa.canInstall()) {
+      <aside class="flex items-center justify-between border-b border-primary/20 bg-primary/10 px-4 py-2.5 text-xs text-ink">
+        <div class="flex items-center gap-2">
+          <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary font-display text-xs font-extrabold text-white">AM</span>
+          <span class="font-medium">{{ 'pwa.installPrompt' | t }}</span>
+        </div>
+        <button
+          type="button"
+          (click)="pwa.promptInstall()"
+          class="btn btn-primary btn-sm px-3 py-1 text-xs"
+        >
+          <lucide-icon name="download" [size]="13" />
+          {{ 'pwa.installBtn' | t }}
+        </button>
+      </aside>
+    }
+
     <app-header />
     <main id="main" class="flex-1"><router-outlet /></main>
     <app-footer />
@@ -34,9 +65,9 @@ import { HeaderComponent } from './header.component';
 })
 export class ShellComponent {
   protected readonly admin = inject(AdminService);
+  protected readonly pwa = inject(PwaNotificationService);
 
   constructor() {
     this.admin.applyInitialThemes();
   }
 }
-

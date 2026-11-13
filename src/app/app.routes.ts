@@ -96,6 +96,21 @@ export const routes: Routes = [
         loadComponent: () => import('./features/progress/progress.page').then((m) => m.ProgressPage),
       },
       {
+        path: 'guardian/report/:token',
+        title: 'guardian.title',
+        loadComponent: () => import('./features/guardian/guardian-report.page').then((m) => m.GuardianReportPage),
+      },
+      {
+        path: 'guardian/:token',
+        title: 'guardian.title',
+        loadComponent: () => import('./features/guardian/guardian-report.page').then((m) => m.GuardianReportPage),
+      },
+      {
+        path: 'guardian',
+        title: 'guardian.title',
+        loadComponent: () => import('./features/guardian/guardian-report.page').then((m) => m.GuardianReportPage),
+      },
+      {
         path: '**',
         title: 'titles.notFound',
         loadComponent: () => import('./features/not-found.page').then((m) => m.NotFoundPage),

@@ -14,11 +14,14 @@ export class QuizService {
   /** GET /api/quizzes */
   getModules(): Observable<QuizModule[]> {
     return from(
-      this.supabase
-        .from('quiz_modules')
-        .select('*')
-        .eq('is_published', true)
-        .order('sort_order', { ascending: true })
+      Promise.race([
+        this.supabase
+          .from('quiz_modules')
+          .select('*')
+          .eq('is_published', true)
+          .order('sort_order', { ascending: true }),
+        new Promise<any>((_, reject) => setTimeout(() => reject(new Error('timeout')), 1500)),
+      ])
     ).pipe(
       map(({ data, error }) => {
         if (error || !data || data.length === 0) {
@@ -42,11 +45,14 @@ export class QuizService {
   /** GET /api/quizzes/:id/questions */
   getQuestions(moduleId: string): Observable<QuizQuestion[]> {
     return from(
-      this.supabase
-        .from('quiz_questions')
-        .select('*')
-        .eq('module_id', moduleId)
-        .order('sort_order', { ascending: true })
+      Promise.race([
+        this.supabase
+          .from('quiz_questions')
+          .select('*')
+          .eq('module_id', moduleId)
+          .order('sort_order', { ascending: true }),
+        new Promise<any>((_, reject) => setTimeout(() => reject(new Error('timeout')), 1500)),
+      ])
     ).pipe(
       map(({ data, error }) => {
         if (error || !data || data.length === 0) {

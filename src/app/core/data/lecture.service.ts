@@ -115,12 +115,15 @@ export class LectureService {
   /** GET /api/lectures/featured */
   getFeaturedLecture(): Observable<FeaturedLecture> {
     return from(
-      this.supabase
-        .from('featured_lectures')
-        .select('*')
-        .eq('is_active', true)
-        .limit(1)
-        .maybeSingle()
+      Promise.race([
+        this.supabase
+          .from('featured_lectures')
+          .select('*')
+          .eq('is_active', true)
+          .limit(1)
+          .maybeSingle(),
+        new Promise<any>((_, reject) => setTimeout(() => reject(new Error('timeout')), 1500)),
+      ])
     ).pipe(
       map(({ data, error }) => {
         if (error || !data) {

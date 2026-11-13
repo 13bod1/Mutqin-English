@@ -389,10 +389,13 @@ export class AuthService {
 
     // 5. Query Supabase auth service
     return from(
-      this.supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password: req.password,
-      })
+      Promise.race([
+        this.supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password: req.password,
+        }),
+        new Promise<any>((_, reject) => setTimeout(() => reject(new Error('Network offline')), 1500)),
+      ])
     ).pipe(
       map(({ data, error }) => {
         if (error || !data?.user) {
