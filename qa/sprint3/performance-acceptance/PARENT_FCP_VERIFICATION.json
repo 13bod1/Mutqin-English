@@ -1,0 +1,442 @@
+{
+  "boundary": "Parent measured actual local Angular production bundle, three independent browser processes, cache disabled, no SW, external network blocked. Does not prove staging capacity, provider push, or licensed DRM.",
+  "profile": {
+    "latencyMs": 20,
+    "downloadBytesPerSecond": 524288,
+    "uploadBytesPerSecond": 393216,
+    "cpuRate": 4
+  },
+  "samples": [
+    {
+      "sample": 1,
+      "firstContentfulPaintMs": 1876,
+      "thresholdMs": 1800,
+      "passed": false,
+      "title": "Learn English with Confidence · Mr. Adel Mostafa",
+      "appRootChildren": 2,
+      "resources": [
+        {
+          "name": "/styles-CDCIYJKV.css",
+          "encodedBodySize": 116830,
+          "duration": 1019.5999999940395
+        },
+        {
+          "name": "/chunk-LXKUJQ7A.js",
+          "encodedBodySize": 8255,
+          "duration": 93.90000000596046
+        },
+        {
+          "name": "/chunk-VFQQWHVG.js",
+          "encodedBodySize": 1097,
+          "duration": 61.60000002384186
+        },
+        {
+          "name": "/chunk-2ZAW47LT.js",
+          "encodedBodySize": 88141,
+          "duration": 855
+        },
+        {
+          "name": "/chunk-FK3NDIBO.js",
+          "encodedBodySize": 26697,
+          "duration": 341.09999999403954
+        },
+        {
+          "name": "/chunk-KQWIAIEB.js",
+          "encodedBodySize": 9921,
+          "duration": 154.90000000596046
+        },
+        {
+          "name": "/chunk-ETXX5YU7.js",
+          "encodedBodySize": 222796,
+          "duration": 1448.2000000178814
+        },
+        {
+          "name": "/chunk-L6Q24BDS.js",
+          "encodedBodySize": 362571,
+          "duration": 1728.300000011921
+        },
+        {
+          "name": "/main-CBFYSRBF.js",
+          "encodedBodySize": 37905,
+          "duration": 589.6999999880791
+        },
+        {
+          "name": "/media/plus-jakarta-sans-latin-500-normal-NGHMNRZC.woff2",
+          "encodedBodySize": 12312,
+          "duration": 200.89999997615814
+        },
+        {
+          "name": "/media/inter-latin-400-normal-55WT6UWF.woff2",
+          "encodedBodySize": 23664,
+          "duration": 218.60000002384186
+        },
+        {
+          "name": "/chunk-BQNQCKDU.js",
+          "encodedBodySize": 31432,
+          "duration": 102.89999997615814
+        },
+        {
+          "name": "/rest/v1/announcements",
+          "encodedBodySize": 0,
+          "duration": 8.600000023841858
+        },
+        {
+          "name": "/chunk-HPQJAXWE.js",
+          "encodedBodySize": 1355,
+          "duration": 42.70000001788139
+        },
+        {
+          "name": "/chunk-Y2RVPV4E.js",
+          "encodedBodySize": 1000,
+          "duration": 42.69999998807907
+        },
+        {
+          "name": "/chunk-2B2VYVWJ.js",
+          "encodedBodySize": 2633,
+          "duration": 42.5
+        },
+        {
+          "name": "/rest/v1/platform_stats",
+          "encodedBodySize": 0,
+          "duration": 267.59999999403954
+        },
+        {
+          "name": "/rest/v1/instructors",
+          "encodedBodySize": 0,
+          "duration": 267.2999999821186
+        },
+        {
+          "name": "/rest/v1/testimonials",
+          "encodedBodySize": 0,
+          "duration": 266.7999999821186
+        },
+        {
+          "name": "/rest/v1/site_videos",
+          "encodedBodySize": 0,
+          "duration": 266
+        },
+        {
+          "name": "/media/inter-latin-700-normal-SU5XVJMF.woff2",
+          "encodedBodySize": 24356,
+          "duration": 488.7000000178814
+        },
+        {
+          "name": "/media/inter-latin-600-normal-R6Y2SZCR.woff2",
+          "encodedBodySize": 24452,
+          "duration": 488.59999999403954
+        },
+        {
+          "name": "/media/plus-jakarta-sans-latin-700-normal-3BBEPNMU.woff2",
+          "encodedBodySize": 12244,
+          "duration": 408.40000000596046
+        },
+        {
+          "name": "/media/plus-jakarta-sans-latin-600-normal-EJXYMLOY.woff2",
+          "encodedBodySize": 12188,
+          "duration": 407.59999999403954
+        },
+        {
+          "name": "/media/ibm-plex-sans-arabic-latin-400-normal-W2AG3YJR.woff2",
+          "encodedBodySize": 19164,
+          "duration": 370.40000000596046
+        },
+        {
+          "name": "/media/alexandria-latin-700-normal-3C2FNEIP.woff2",
+          "encodedBodySize": 13220,
+          "duration": 108.09999999403954
+        }
+      ]
+    },
+    {
+      "sample": 2,
+      "firstContentfulPaintMs": 276,
+      "thresholdMs": 1800,
+      "passed": true,
+      "title": "Learn English with Confidence · Mr. Adel Mostafa",
+      "appRootChildren": 2,
+      "resources": [
+        {
+          "name": "/styles-CDCIYJKV.css",
+          "encodedBodySize": 116830,
+          "duration": 1145.300000011921
+        },
+        {
+          "name": "/chunk-LXKUJQ7A.js",
+          "encodedBodySize": 8255,
+          "duration": 130.19999998807907
+        },
+        {
+          "name": "/chunk-VFQQWHVG.js",
+          "encodedBodySize": 1097,
+          "duration": 51.89999997615814
+        },
+        {
+          "name": "/chunk-2ZAW47LT.js",
+          "encodedBodySize": 88141,
+          "duration": 971.4000000059605
+        },
+        {
+          "name": "/chunk-FK3NDIBO.js",
+          "encodedBodySize": 26697,
+          "duration": 331.69999998807907
+        },
+        {
+          "name": "/chunk-KQWIAIEB.js",
+          "encodedBodySize": 9921,
+          "duration": 144.09999999403954
+        },
+        {
+          "name": "/chunk-ETXX5YU7.js",
+          "encodedBodySize": 222796,
+          "duration": 1562.800000011921
+        },
+        {
+          "name": "/chunk-L6Q24BDS.js",
+          "encodedBodySize": 362571,
+          "duration": 1844.5999999940395
+        },
+        {
+          "name": "/main-CBFYSRBF.js",
+          "encodedBodySize": 37905,
+          "duration": 612.9000000059605
+        },
+        {
+          "name": "/media/plus-jakarta-sans-latin-500-normal-NGHMNRZC.woff2",
+          "encodedBodySize": 12312,
+          "duration": 407.90000000596046
+        },
+        {
+          "name": "/media/inter-latin-400-normal-55WT6UWF.woff2",
+          "encodedBodySize": 23664,
+          "duration": 695.5
+        },
+        {
+          "name": "/media/alexandria-latin-400-normal-LAGZBPKL.woff2",
+          "encodedBodySize": 12816,
+          "duration": 290.59999999403954
+        },
+        {
+          "name": "/media/alexandria-arabic-400-normal-4HF7F2LT.woff2",
+          "encodedBodySize": 12500,
+          "duration": 149.30000001192093
+        },
+        {
+          "name": "/chunk-BQNQCKDU.js",
+          "encodedBodySize": 31432,
+          "duration": 104.69999998807907
+        },
+        {
+          "name": "/rest/v1/announcements",
+          "encodedBodySize": 0,
+          "duration": 2.4000000059604645
+        },
+        {
+          "name": "/chunk-HPQJAXWE.js",
+          "encodedBodySize": 1355,
+          "duration": 43.900000005960464
+        },
+        {
+          "name": "/chunk-Y2RVPV4E.js",
+          "encodedBodySize": 1000,
+          "duration": 43.80000001192093
+        },
+        {
+          "name": "/chunk-2B2VYVWJ.js",
+          "encodedBodySize": 2633,
+          "duration": 58.19999998807907
+        },
+        {
+          "name": "/rest/v1/platform_stats",
+          "encodedBodySize": 0,
+          "duration": 251.60000002384186
+        },
+        {
+          "name": "/rest/v1/instructors",
+          "encodedBodySize": 0,
+          "duration": 251.2000000178814
+        },
+        {
+          "name": "/rest/v1/testimonials",
+          "encodedBodySize": 0,
+          "duration": 250.59999999403954
+        },
+        {
+          "name": "/rest/v1/site_videos",
+          "encodedBodySize": 0,
+          "duration": 250.19999998807907
+        },
+        {
+          "name": "/media/inter-latin-700-normal-SU5XVJMF.woff2",
+          "encodedBodySize": 24356,
+          "duration": 490
+        },
+        {
+          "name": "/media/inter-latin-600-normal-R6Y2SZCR.woff2",
+          "encodedBodySize": 24452,
+          "duration": 505.09999999403954
+        },
+        {
+          "name": "/media/plus-jakarta-sans-latin-700-normal-3BBEPNMU.woff2",
+          "encodedBodySize": 12244,
+          "duration": 411.39999997615814
+        },
+        {
+          "name": "/media/plus-jakarta-sans-latin-600-normal-EJXYMLOY.woff2",
+          "encodedBodySize": 12188,
+          "duration": 411.2000000178814
+        },
+        {
+          "name": "/media/ibm-plex-sans-arabic-latin-400-normal-W2AG3YJR.woff2",
+          "encodedBodySize": 19164,
+          "duration": 354.90000000596046
+        }
+      ]
+    },
+    {
+      "sample": 3,
+      "firstContentfulPaintMs": 404,
+      "thresholdMs": 1800,
+      "passed": true,
+      "title": "Learn English with Confidence · Mr. Adel Mostafa",
+      "appRootChildren": 2,
+      "resources": [
+        {
+          "name": "/styles-CDCIYJKV.css",
+          "encodedBodySize": 116830,
+          "duration": 1103.199999988079
+        },
+        {
+          "name": "/chunk-LXKUJQ7A.js",
+          "encodedBodySize": 8255,
+          "duration": 134.7000000178814
+        },
+        {
+          "name": "/chunk-VFQQWHVG.js",
+          "encodedBodySize": 1097,
+          "duration": 56.19999998807907
+        },
+        {
+          "name": "/chunk-2ZAW47LT.js",
+          "encodedBodySize": 88141,
+          "duration": 972.7999999821186
+        },
+        {
+          "name": "/chunk-FK3NDIBO.js",
+          "encodedBodySize": 26697,
+          "duration": 340
+        },
+        {
+          "name": "/chunk-KQWIAIEB.js",
+          "encodedBodySize": 9921,
+          "duration": 148.90000000596046
+        },
+        {
+          "name": "/chunk-ETXX5YU7.js",
+          "encodedBodySize": 222796,
+          "duration": 1549
+        },
+        {
+          "name": "/chunk-L6Q24BDS.js",
+          "encodedBodySize": 362571,
+          "duration": 1831.0999999940395
+        },
+        {
+          "name": "/main-CBFYSRBF.js",
+          "encodedBodySize": 37905,
+          "duration": 620.5999999940395
+        },
+        {
+          "name": "/media/plus-jakarta-sans-latin-500-normal-NGHMNRZC.woff2",
+          "encodedBodySize": 12312,
+          "duration": 297.19999998807907
+        },
+        {
+          "name": "/media/inter-latin-400-normal-55WT6UWF.woff2",
+          "encodedBodySize": 23664,
+          "duration": 587.4000000059605
+        },
+        {
+          "name": "/media/alexandria-latin-400-normal-LAGZBPKL.woff2",
+          "encodedBodySize": 12816,
+          "duration": 250.2000000178814
+        },
+        {
+          "name": "/media/alexandria-arabic-400-normal-4HF7F2LT.woff2",
+          "encodedBodySize": 12500,
+          "duration": 169.5
+        },
+        {
+          "name": "/chunk-BQNQCKDU.js",
+          "encodedBodySize": 31432,
+          "duration": 119.60000002384186
+        },
+        {
+          "name": "/rest/v1/announcements",
+          "encodedBodySize": 0,
+          "duration": 3.5999999940395355
+        },
+        {
+          "name": "/chunk-HPQJAXWE.js",
+          "encodedBodySize": 1355,
+          "duration": 44.80000001192093
+        },
+        {
+          "name": "/chunk-Y2RVPV4E.js",
+          "encodedBodySize": 1000,
+          "duration": 44.70000001788139
+        },
+        {
+          "name": "/chunk-2B2VYVWJ.js",
+          "encodedBodySize": 2633,
+          "duration": 58.900000005960464
+        },
+        {
+          "name": "/rest/v1/platform_stats",
+          "encodedBodySize": 0,
+          "duration": 270.40000000596046
+        },
+        {
+          "name": "/rest/v1/instructors",
+          "encodedBodySize": 0,
+          "duration": 270.09999999403954
+        },
+        {
+          "name": "/rest/v1/testimonials",
+          "encodedBodySize": 0,
+          "duration": 269.59999999403954
+        },
+        {
+          "name": "/rest/v1/site_videos",
+          "encodedBodySize": 0,
+          "duration": 268.7999999821186
+        },
+        {
+          "name": "/media/inter-latin-700-normal-SU5XVJMF.woff2",
+          "encodedBodySize": 24356,
+          "duration": 513.7999999821186
+        },
+        {
+          "name": "/media/inter-latin-600-normal-R6Y2SZCR.woff2",
+          "encodedBodySize": 24452,
+          "duration": 513.7000000178814
+        },
+        {
+          "name": "/media/plus-jakarta-sans-latin-700-normal-3BBEPNMU.woff2",
+          "encodedBodySize": 12244,
+          "duration": 434.69999998807907
+        },
+        {
+          "name": "/media/plus-jakarta-sans-latin-600-normal-EJXYMLOY.woff2",
+          "encodedBodySize": 12188,
+          "duration": 434.5
+        },
+        {
+          "name": "/media/ibm-plex-sans-arabic-latin-400-normal-W2AG3YJR.woff2",
+          "encodedBodySize": 19164,
+          "duration": 404.40000000596046
+        }
+      ]
+    }
+  ],
+  "passed": false
+}
