@@ -3,20 +3,23 @@ import {
   DestroyRef,
   ElementRef,
   computed,
+  effect,
   inject,
   input,
   OnInit,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../core/data/auth.service';
 import { LocalizePipe, TranslatePipe } from '../../core/i18n/translate.pipe';
-import { FeaturedLecture } from '../../core/models/lecture';
+import { FeaturedLecture, Lecture, TranscriptItem } from '../../core/models/lecture';
 import { PdfNotesService } from '../../core/services/pdf-notes.service';
 import { SessionProtectionService } from '../../core/services/session-protection.service';
 
 type Quality = '360p' | '720p' | '1080p';
+type PlayerTab = 'transcript' | 'notes' | 'playlist';
 
 @Component({
   selector: 'app-lecture-player',
@@ -24,6 +27,7 @@ type Quality = '360p' | '720p' | '1080p';
   host: { class: 'block' },
   template: `
     <div class="card overflow-hidden shadow-lift border border-line/60 select-none" (contextmenu)="$event.preventDefault()">
+      <!-- Player Header -->
       <div class="flex flex-col gap-4 border-b border-line/70 p-5 md:flex-row md:items-center md:justify-between md:p-6 bg-surface-warm/40">
         <div>
           <p class="flex items-center gap-1.5 font-display text-xs font-semibold text-ink-soft">
@@ -44,9 +48,26 @@ type Quality = '360p' | '720p' | '1080p';
         </div>
       </div>
 
-      <div class="grid bg-black lg:grid-cols-[1fr_260px]">
+      <div class="grid bg-black lg:grid-cols-[1fr_320px]">
         <!-- Video area -->
         <div class="relative aspect-video overflow-hidden bg-neutral-950 text-white group" (contextmenu)="$event.preventDefault()">
+          
+          <!-- Anti-Recording / Anti-Capture Security Blackout Overlay -->
+          @if (isBlackedOut()) {
+            <div class="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-black/95 p-6 text-center text-white backdrop-blur-md">
+              <span class="grid h-16 w-16 place-items-center rounded-full bg-red-600/20 text-red-500 animate-pulse">
+                <lucide-icon name="shield-alert" [size]="36" />
+              </span>
+              <p class="font-display text-lg font-bold sm:text-xl">{{ 'protection.screenCaptureAlert' | t }}</p>
+              <p class="max-w-md text-xs leading-relaxed text-white/80 sm:text-sm">
+                {{ blackoutMessage() || ('protection.focusLostPaused' | t) }}
+              </p>
+              <button type="button" (click)="resumeFromBlackout()" class="btn btn-primary btn-sm mt-3">
+                <lucide-icon name="play" [size]="14" class="fill-white" /> {{ 'protection.resumePlay' | t }}
+              </button>
+            </div>
+          }
+
           <!-- Blocked Playback Overlay (Concurrent session or security stop) -->
           @if (blockedReason()) {
             <div class="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-neutral-950/95 p-6 text-center text-white backdrop-blur-md">
@@ -65,7 +86,7 @@ type Quality = '360p' | '720p' | '1080p';
           <video
             #videoRef
             class="h-full w-full object-contain bg-black transition-filter"
-            [class.blur-md]="isBlurred()"
+            [class.blur-md]="isBlurred() || isBlackedOut()"
             playsinline
             preload="metadata"
             disablePictureInPicture
@@ -80,12 +101,21 @@ type Quality = '360p' | '720p' | '1080p';
             (contextmenu)="$event.preventDefault()"
           ></video>
 
-          <!-- Dynamic Watermark overlay (animating / repositioning to deter filming & screen recording) -->
+          <!-- Layer 1: Diagonal Full-Frame Security Matrix Watermark (Deters phone filming & OBS capture) -->
+          <div class="pointer-events-none absolute inset-0 z-20 flex flex-wrap items-center justify-around opacity-[0.06] overflow-hidden select-none text-[0.625rem] font-bold uppercase tracking-widest text-white rotate-[-15deg] scale-125">
+            @for (n of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track n) {
+              <div class="p-6 whitespace-nowrap">
+                ADEL MOSTAFA ACADEMY • {{ watermarkStudentTag() }} • PROTECTED
+              </div>
+            }
+          </div>
+
+          <!-- Layer 2: Moving Dynamic Watermark overlay (animating / repositioning smoothly) -->
           <div
-            class="pointer-events-none absolute z-30 select-none text-[0.625rem] font-bold tracking-wider text-white/20 sm:text-xs"
+            class="pointer-events-none absolute z-30 select-none text-[0.625rem] font-bold tracking-wider text-white/30 sm:text-xs"
             [style.top.%]="watermarkTop()"
             [style.left.%]="watermarkLeft()"
-            style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8); transition: top 3s ease, left 3s ease;"
+            style="text-shadow: 1px 1px 2px rgba(0,0,0,0.85); transition: top 3.5s ease, left 3.5s ease;"
           >
             {{ dynamicWatermark() }}
           </div>
@@ -101,7 +131,7 @@ type Quality = '360p' | '720p' | '1080p';
           </span>
 
           <!-- Play Overlay when paused -->
-          @if (!playing() && !blockedReason()) {
+          @if (!playing() && !blockedReason() && !isBlackedOut()) {
             <div
               (click)="togglePlay()"
               class="absolute inset-0 z-20 flex cursor-pointer flex-col items-center justify-center bg-black/45 backdrop-blur-[1px] transition hover:bg-black/35"
@@ -120,7 +150,7 @@ type Quality = '360p' | '720p' | '1080p';
           }
 
           <!-- Caption overlay -->
-          @if (lecture().captionHighlight && !audioMode()) {
+          @if (lecture().captionHighlight && !audioMode() && !isBlackedOut()) {
             <div class="pointer-events-none absolute inset-x-3 bottom-14 flex flex-col items-center gap-1.5 sm:bottom-16 z-10">
               <p class="rounded-md bg-black/75 px-3.5 py-1.5 text-center text-xs font-medium sm:text-sm backdrop-blur border border-white/10" dir="ltr" lang="en">
                 {{ lecture().captionBefore }}<span class="text-gold font-bold underline decoration-gold/60 underline-offset-4">{{ lecture().captionHighlight }}</span>{{ lecture().captionAfter }}
@@ -171,22 +201,164 @@ type Quality = '360p' | '720p' | '1080p';
           </div>
         </div>
 
-        <!-- Side panel -->
-        <aside class="hidden flex-col gap-4 border-s border-white/10 bg-[#1c1412] p-4 text-white lg:flex">
-          <p class="font-display text-xs font-bold uppercase tracking-wider text-white/60">{{ 'lectures.player.resources' | t }}</p>
-          @for (r of resources; track r.key) {
-            <button type="button" class="flex items-center gap-2.5 rounded-card bg-white/5 px-3 py-2.5 text-sm text-white/85 transition hover:bg-white/10 hover:text-white">
-              <lucide-icon [name]="r.icon" [size]="15" class="text-gold" />{{ r.key | t }}
+        <!-- Interactive Studio Side Panel (Transcript, Notes & All Videos) -->
+        <aside class="flex flex-col border-s border-white/10 bg-[#17100e] text-white h-[420px] lg:h-auto overflow-hidden">
+          <!-- Side Panel Navigation Tabs -->
+          <div class="flex border-b border-white/10 bg-black/40 text-xs font-semibold">
+            <button
+              type="button"
+              (click)="activeTab.set('transcript')"
+              class="flex-1 py-3 px-2 text-center transition flex items-center justify-center gap-1.5 border-b-2"
+              [class]="activeTab() === 'transcript' ? 'border-primary text-gold bg-white/5' : 'border-transparent text-white/60 hover:text-white'"
+            >
+              <lucide-icon name="captions" [size]="14" />
+              <span>{{ 'protection.transcriptTab' | t }}</span>
             </button>
-          }
-          <div class="mt-auto rounded-card bg-white/5 p-3 text-xs leading-5 text-white/70" dir="ltr" lang="en">
-            <p class="mb-1 font-display font-bold text-white/90">{{ 'lectures.player.transcript' | t }}</p>
-            English lesson by <span class="text-gold font-semibold">Mr. Adel Mostafa</span>. Practice real-world grammar and fluency patterns.
+            <button
+              type="button"
+              (click)="activeTab.set('notes')"
+              class="flex-1 py-3 px-2 text-center transition flex items-center justify-center gap-1.5 border-b-2"
+              [class]="activeTab() === 'notes' ? 'border-primary text-gold bg-white/5' : 'border-transparent text-white/60 hover:text-white'"
+            >
+              <lucide-icon name="file-text" [size]="14" />
+              <span>{{ 'protection.notesTab' | t }}</span>
+            </button>
+            <button
+              type="button"
+              (click)="activeTab.set('playlist')"
+              class="flex-1 py-3 px-2 text-center transition flex items-center justify-center gap-1.5 border-b-2"
+              [class]="activeTab() === 'playlist' ? 'border-primary text-gold bg-white/5' : 'border-transparent text-white/60 hover:text-white'"
+            >
+              <lucide-icon name="layers" [size]="14" />
+              <span>{{ 'protection.playlistTab' | t }}</span>
+            </button>
           </div>
+
+          <!-- TAB 1: INTERACTIVE TRANSCRIPT -->
+          @if (activeTab() === 'transcript') {
+            <div class="flex flex-1 flex-col overflow-hidden p-3">
+              <div class="flex items-center justify-between mb-2 pb-2 border-b border-white/10 text-xs">
+                <span class="text-white/60 font-medium">{{ (lecture().transcript?.length || 0) }} sections</span>
+                <!-- Language Toggle for Transcript -->
+                <div class="flex items-center gap-1 bg-white/10 rounded p-0.5">
+                  <button
+                    type="button"
+                    (click)="transcriptLang.set('ar')"
+                    class="px-2 py-0.5 rounded text-[0.6875rem] font-semibold transition"
+                    [class]="transcriptLang() === 'ar' ? 'bg-primary text-white' : 'text-white/70 hover:text-white'"
+                  >عربي</button>
+                  <button
+                    type="button"
+                    (click)="transcriptLang.set('en')"
+                    class="px-2 py-0.5 rounded text-[0.6875rem] font-semibold transition"
+                    [class]="transcriptLang() === 'en' ? 'bg-primary text-white' : 'text-white/70 hover:text-white'"
+                  >EN</button>
+                </div>
+              </div>
+
+              <!-- Scrollable Transcript Lines synced with video -->
+              <div class="flex-1 overflow-y-auto space-y-2 pe-1 text-xs">
+                @for (item of lecture().transcript; track item.startSec) {
+                  <div
+                    (click)="seekTo(item.startSec)"
+                    class="group flex gap-2.5 p-2 rounded-card transition cursor-pointer border border-transparent"
+                    [class]="isLineActive(item) ? 'bg-primary/20 border-primary/50 text-white shadow-sm' : 'hover:bg-white/5 text-white/75'"
+                    [attr.title]="'protection.seekToLine' | t"
+                  >
+                    <span
+                      class="shrink-0 tabular-nums px-1.5 py-0.5 rounded font-mono text-[0.6875rem] transition"
+                      [class]="isLineActive(item) ? 'bg-primary text-white font-bold' : 'bg-white/10 text-white/60 group-hover:text-gold'"
+                    >
+                      {{ format(item.startSec) }}
+                    </span>
+                    <p class="leading-relaxed" [dir]="transcriptLang() === 'ar' ? 'rtl' : 'ltr'">
+                      {{ transcriptLang() === 'ar' ? item.textAr : item.textEn }}
+                    </p>
+                  </div>
+                } @empty {
+                  <div class="flex flex-col items-center justify-center h-full p-4 text-center text-white/50">
+                    <lucide-icon name="captions" [size]="24" class="mb-2 opacity-40" />
+                    <p>{{ 'protection.noTranscript' | t }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- TAB 2: STUDY NOTES & RESOURCES -->
+          @if (activeTab() === 'notes') {
+            <div class="flex flex-1 flex-col overflow-y-auto p-4 space-y-4 text-xs">
+              <div class="rounded-card bg-white/5 p-3.5 border border-white/10">
+                <p class="font-display font-bold text-sm text-gold mb-1.5">{{ 'lectures.player.note' | t }}</p>
+                <p class="leading-relaxed text-white/80">{{ lecture().note | loc }}</p>
+              </div>
+
+              <div>
+                <p class="font-display font-bold text-white/60 uppercase tracking-wider mb-2">{{ 'lectures.player.resources' | t }}</p>
+                <div class="space-y-2">
+                  <button type="button" (click)="downloadNotes()" class="w-full flex items-center justify-between rounded-card bg-white/5 p-2.5 text-white/85 hover:bg-white/10 transition">
+                    <span class="flex items-center gap-2">
+                      <lucide-icon name="file-text" [size]="15" class="text-gold" />
+                      {{ 'lectures.player.downloadNotes' | t }}
+                    </span>
+                    <lucide-icon name="download" [size]="13" class="text-white/60" />
+                  </button>
+                  <a routerLink="/quizzes" class="w-full flex items-center justify-between rounded-card bg-white/5 p-2.5 text-white/85 hover:bg-white/10 transition">
+                    <span class="flex items-center gap-2">
+                      <lucide-icon name="list-checks" [size]="15" class="text-gold" />
+                      {{ 'lectures.player.quiz' | t }}
+                    </span>
+                    <lucide-icon name="arrow-right" [size]="13" class="text-white/60 flip-rtl" />
+                  </a>
+                </div>
+              </div>
+
+              <div class="mt-auto rounded-card bg-white/5 p-3 text-white/70 border border-white/5">
+                <p class="font-bold text-white/90 mb-1">Instructor</p>
+                <p>English course by <span class="text-gold font-semibold">Mr. Adel Mostafa</span>.</p>
+              </div>
+            </div>
+          }
+
+          <!-- TAB 3: PLAYLIST (WATCH ALL VIDEOS IN STUDIO PREVIEW) -->
+          @if (activeTab() === 'playlist') {
+            <div class="flex flex-1 flex-col overflow-y-auto p-3 space-y-2 text-xs">
+              <p class="text-white/60 font-semibold px-1 py-1">Available Recorded Lectures ({{ allLectures().length || 9 }})</p>
+              @for (lec of (allLectures().length ? allLectures() : defaultLecturesList); track lec.id) {
+                <div
+                  (click)="selectLecture(lec)"
+                  class="flex items-start gap-2.5 p-2.5 rounded-card transition cursor-pointer border"
+                  [class]="isCurrentLecture(lec) ? 'bg-primary/25 border-primary text-white shadow-sm ring-1 ring-primary/40' : 'bg-white/5 border-transparent hover:bg-white/10 text-white/80'"
+                >
+                  <span class="grid h-7 w-7 shrink-0 place-items-center rounded bg-black/40 text-[0.6875rem] font-bold"
+                    [class.text-gold]="isCurrentLecture(lec)">
+                    @if (isCurrentLecture(lec) && playing()) {
+                      <lucide-icon name="volume-2" [size]="14" class="text-gold animate-pulse" />
+                    } @else {
+                      {{ lec.order }}
+                    }
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <p class="font-display font-semibold line-clamp-1" [class.text-gold]="isCurrentLecture(lec)">
+                      {{ lec.title | loc }}
+                    </p>
+                    <p class="text-[0.6875rem] text-white/60 line-clamp-1 mt-0.5">
+                      {{ 'stagesShort.' + lec.stage | t }} • {{ 'common.minutes' | t: { n: lec.durationMin } }}
+                    </p>
+                  </div>
+                  @if (isCurrentLecture(lec)) {
+                    <span class="shrink-0 text-[0.625rem] font-bold text-gold bg-gold/15 px-1.5 py-0.5 rounded">
+                      Playing
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+          }
         </aside>
       </div>
 
-      <!-- Speed Selector on mobile -->
+      <!-- Speed & Quality Selector Bar -->
       <div class="flex flex-wrap items-center gap-2 border-t border-line/70 p-4 text-xs bg-surface-warm/30">
         <span class="font-display font-semibold text-ink-soft sm:hidden">{{ 'lectures.player.speed' | t }}</span>
         @for (s of speeds; track s) {
@@ -206,6 +378,8 @@ type Quality = '360p' | '720p' | '1080p';
 })
 export class LecturePlayerComponent implements OnInit {
   readonly lecture = input.required<FeaturedLecture>();
+  readonly allLectures = input<Lecture[]>([]);
+  readonly lectureSelect = output<Lecture>();
 
   private readonly pdfNotes = inject(PdfNotesService);
   private readonly protection = inject(SessionProtectionService);
@@ -220,11 +394,6 @@ export class LecturePlayerComponent implements OnInit {
     { value: '720p', key: 'lectures.player.hd720' },
     { value: '1080p', key: 'lectures.player.hd1080' },
   ];
-  protected readonly resources = [
-    { key: 'lectures.player.quiz', icon: 'list-checks' },
-    { key: 'lectures.player.transcript', icon: 'captions' },
-    { key: 'lectures.player.notes', icon: 'file-text' },
-  ];
 
   protected readonly playing = signal(false);
   protected readonly isMuted = signal(false);
@@ -234,25 +403,44 @@ export class LecturePlayerComponent implements OnInit {
   protected readonly currentTime = signal(0);
   protected readonly duration = signal(0);
 
-  // Hardened DRM & Session State
+  // Tabs & Transcripts
+  protected readonly activeTab = signal<PlayerTab>('transcript');
+  protected readonly transcriptLang = signal<'ar' | 'en'>('ar');
+
+  // Hardened Anti-Recording & DRM Session State
   protected readonly signedVideoUrl = signal<string>('');
   protected readonly blockedReason = signal<string | null>(null);
   protected readonly isBlurred = signal<boolean>(false);
+  protected readonly isBlackedOut = signal<boolean>(false);
+  protected readonly blackoutMessage = signal<string>('');
   protected readonly watermarkTop = signal<number>(20);
   protected readonly watermarkLeft = signal<number>(20);
   protected readonly dynamicWatermark = signal<string>('');
+  protected readonly watermarkStudentTag = signal<string>('');
 
   private deviceId = 'dev_' + Math.random().toString(36).substring(2, 8);
+
+  protected readonly defaultLecturesList: Lecture[] = [];
 
   protected readonly percent = computed(() => {
     const d = this.duration() || this.lecture().durationSec || 1;
     return Math.min(100, Math.max(0, (this.currentTime() / d) * 100));
   });
 
+  constructor() {
+    // Whenever lecture changes, immediately refresh signed url and reinitialize video for THAT lecture!
+    effect(() => {
+      const l = this.lecture();
+      this.onLectureChanged(l);
+    });
+  }
+
   ngOnInit(): void {
     const user = this.auth.user();
     const userId = user?.id || 'guest_student';
     const userName = user?.fullName || 'Guest Student';
+
+    this.watermarkStudentTag.set(`${userName} (${userId})`);
 
     // 1. Dynamic Watermark text with student ID & obscured phone
     this.dynamicWatermark.set(this.protection.getWatermarkText(userId, userName, '01012345678'));
@@ -273,33 +461,97 @@ export class LecturePlayerComponent implements OnInit {
     const wmInterval = setInterval(() => {
       this.watermarkTop.set(Math.floor(Math.random() * 70) + 10);
       this.watermarkLeft.set(Math.floor(Math.random() * 65) + 5);
-    }, 4000);
+    }, 3500);
 
-    // 5. Visibility change detection (pauses and blurs when tab hidden)
+    // 5. Anti-recording & Anti-Capture Event Listeners
     const onVisibilityChange = () => {
       if (typeof document !== 'undefined' && document.hidden) {
-        this.isBlurred.set(true);
-        const v = this.videoRef()?.nativeElement;
-        if (v && !v.paused) {
-          v.pause();
-          this.playing.set(false);
+        this.triggerSecurityBlackout('Playback paused because tab was hidden to protect lecture copyright.');
+      }
+    };
+
+    const onWindowBlur = () => {
+      if (this.playing()) {
+        this.triggerSecurityBlackout('Playback paused because the window lost focus to protect lecture content.');
+      }
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      const isPrintScreen = e.key === 'PrintScreen' || e.keyCode === 44;
+      const isSnippingTool = (e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 's' || e.key === 'S');
+      const isMacScreenCapture = e.metaKey && e.shiftKey && ['3', '4', '5'].includes(e.key);
+      const isDevTools = ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i', 'I', 'j', 'J', 'c', 'C'].includes(e.key)) || e.key === 'F12';
+
+      if (isPrintScreen || isSnippingTool || isMacScreenCapture || isDevTools) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.triggerSecurityBlackout('Screen capture shortcut detected (' + (e.key || 'PrintScreen') + ').');
+        
+        // Clean clipboard
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText('⚠️ محتوى منصة مستر عادل مصطفى محمي بحقوق الطبع والنشر. تسجيل وتصوير الشاشة محظور تماماً.').catch(() => {});
         }
-      } else {
-        this.isBlurred.set(false);
       }
     };
 
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', onVisibilityChange);
+      window.addEventListener('blur', onWindowBlur);
+      window.addEventListener('keydown', onKeyDown);
+    }
+
+    // 6. Monkey-patch screen capture API (getDisplayMedia) to block in-browser recording extensions
+    if (typeof navigator !== 'undefined' && navigator.mediaDevices && (navigator.mediaDevices as any).getDisplayMedia) {
+      try {
+        const origGetDisplayMedia = (navigator.mediaDevices as any).getDisplayMedia.bind(navigator.mediaDevices);
+        (navigator.mediaDevices as any).getDisplayMedia = async (...args: any[]) => {
+          this.triggerSecurityBlackout('In-browser screen sharing or recording attempt blocked.');
+          throw new DOMException('Screen recording is strictly prohibited during lecture playback.', 'NotAllowedError');
+        };
+      } catch {}
     }
 
     this.destroyRef.onDestroy(() => {
       clearInterval(wmInterval);
       if (typeof document !== 'undefined') {
         document.removeEventListener('visibilitychange', onVisibilityChange);
+        window.removeEventListener('blur', onWindowBlur);
+        window.removeEventListener('keydown', onKeyDown);
       }
       this.protection.stopViewingSession(userId, this.deviceId);
     });
+  }
+
+  private triggerSecurityBlackout(msg: string): void {
+    const v = this.videoRef()?.nativeElement;
+    if (v && !v.paused) {
+      v.pause();
+      this.playing.set(false);
+    }
+    this.isBlackedOut.set(true);
+    this.blackoutMessage.set(msg);
+    const user = this.auth.user();
+    this.protection.flagSuspiciousActivity(user?.id || 'guest', msg);
+  }
+
+  protected resumeFromBlackout(): void {
+    this.isBlackedOut.set(false);
+    this.blackoutMessage.set('');
+    this.togglePlay();
+  }
+
+  private onLectureChanged(l: FeaturedLecture): void {
+    this.refreshSignedUrl();
+    this.currentTime.set(0);
+    this.duration.set(l.durationSec);
+    this.blockedReason.set(null);
+    this.isBlackedOut.set(false);
+    const v = this.videoRef()?.nativeElement;
+    if (v) {
+      v.src = this.signedVideoUrl();
+      v.load();
+      v.play().then(() => this.playing.set(true)).catch(() => {});
+    }
   }
 
   private refreshSignedUrl(): void {
@@ -381,6 +633,30 @@ export class LecturePlayerComponent implements OnInit {
     this.currentTime.set(v.currentTime);
   }
 
+  protected seekTo(sec: number): void {
+    const v = this.videoRef()?.nativeElement;
+    if (!v) return;
+    v.currentTime = sec;
+    this.currentTime.set(sec);
+    if (v.paused) {
+      v.play().then(() => this.playing.set(true)).catch(() => {});
+    }
+  }
+
+  protected isLineActive(item: TranscriptItem): boolean {
+    const ct = this.currentTime();
+    return ct >= item.startSec && ct <= item.endSec;
+  }
+
+  protected isCurrentLecture(lec: Lecture): boolean {
+    const cur = this.lecture();
+    return cur.id === lec.id || (cur.title.en === lec.title.en);
+  }
+
+  protected selectLecture(lec: Lecture): void {
+    this.lectureSelect.emit(lec);
+  }
+
   protected toggleFullscreen(): void {
     const v = this.videoRef()?.nativeElement;
     if (!v) return;
@@ -406,6 +682,6 @@ export class LecturePlayerComponent implements OnInit {
     const lec = this.lecture();
     const titleEn = typeof lec.title === 'string' ? lec.title : lec.title['en'];
     const subtitleEn = typeof lec.subtitle === 'string' ? lec.subtitle : lec.subtitle['en'];
-    this.pdfNotes.downloadNotes('featured', titleEn, subtitleEn);
+    this.pdfNotes.downloadNotes(lec.id || 'featured', titleEn, subtitleEn);
   }
 }

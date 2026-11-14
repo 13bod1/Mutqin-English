@@ -12,32 +12,14 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
   imports: [RouterLink, LucideAngularModule, TranslatePipe, LocalizePipe],
   host: { class: 'block' },
   template: `
-    <article class="card flex h-full flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lift border border-line/60">
+    <article class="card flex h-full flex-col overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lift border border-line/60" (contextmenu)="$event.preventDefault()">
       <!-- Video Element & Preview with Thumbnail -->
-      <div class="relative aspect-[16/9] overflow-hidden bg-neutral-950 group">
-        <video
-          #cardVideo
-          class="h-full w-full object-cover cursor-pointer"
-          playsinline
-          controlsList="nodownload"
-          preload="metadata"
-          [poster]="lecture().thumbnailUrl || '/images/thumb-grammar.svg'"
-          [controls]="isPlaying()"
-          [src]="locked() ? null : lecture().videoUrl"
-          (play)="isPlaying.set(true)"
-          (pause)="isPlaying.set(false)"
-          (ended)="isPlaying.set(false)"
-          (click)="togglePlay(cardVideo)"
-        ></video>
-
-        <!-- Thumbnail Image (shown when paused / not yet played) -->
-        @if (!isPlaying()) {
-          <img
-            [src]="lecture().thumbnailUrl || '/images/thumb-grammar.svg'"
-            [alt]="lecture().title | loc"
-            class="pointer-events-none absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        }
+      <div class="relative aspect-[16/9] overflow-hidden bg-neutral-950 group select-none">
+        <img
+          [src]="lecture().thumbnailUrl || '/images/thumb-grammar.svg'"
+          [alt]="lecture().title | loc"
+          class="pointer-events-none absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
 
         <!-- Stage & Duration Badges -->
         <span class="pointer-events-none absolute start-3 top-3 rounded-md bg-white/95 px-2.5 py-1 font-display text-[0.6875rem] font-semibold text-ink shadow-card z-10">
@@ -64,14 +46,17 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
               <span class="font-display text-sm font-semibold">{{ 'access.registeredOnly' | t }}</span>
             }
           </div>
-        } @else if (!isPlaying()) {
+        } @else {
           <div
-            (click)="togglePlay(cardVideo)"
-            class="absolute inset-0 z-20 flex cursor-pointer items-center justify-center bg-black/30 backdrop-blur-[1px] transition-all hover:bg-black/15"
+            (click)="onWatch()"
+            class="absolute inset-0 z-20 flex cursor-pointer items-center justify-center bg-black/35 backdrop-blur-[1px] transition-all hover:bg-black/20"
           >
             <div class="grid h-12 w-12 place-items-center rounded-full bg-primary text-white shadow-xl transition-transform duration-300 group-hover:scale-110 active:scale-95 ring-2 ring-white/40">
               <lucide-icon name="play" [size]="20" class="fill-white ms-0.5" />
             </div>
+            <span class="absolute bottom-3 start-3 rounded bg-black/60 px-2 py-0.5 font-display text-[0.6875rem] font-medium text-white/90">
+              {{ 'lectures.player.eyebrow' | t }}
+            </span>
           </div>
         }
       </div>
@@ -90,7 +75,7 @@ import { PdfNotesService } from '../../core/services/pdf-notes.service';
         </div>
 
         @if (!locked()) {
-          <button type="button" (click)="onWatch(cardVideo)" class="btn btn-primary mt-4 w-full">
+          <button type="button" (click)="onWatch()" class="btn btn-primary mt-4 w-full">
             <lucide-icon name="circle-play" [size]="16" />
             {{ 'lectures.catalog.watch' | t }}
           </button>
@@ -136,8 +121,10 @@ export class LectureCardComponent {
     }
   }
 
-  protected onWatch(video: HTMLVideoElement): void {
+  protected onWatch(video?: HTMLVideoElement): void {
     this.watch.emit(this.lecture());
-    this.togglePlay(video);
+    if (video) {
+      this.togglePlay(video);
+    }
   }
 }

@@ -88,6 +88,7 @@ export class LecturesPage {
 
   protected playLecture(l: Lecture): void {
     const feat: FeaturedLecture = {
+      id: l.id,
       title: l.title,
       subtitle: {
         en: `Instructor: ${l.instructor.en} • ${l.unit.en}`,
@@ -104,6 +105,7 @@ export class LecturesPage {
       positionSec: 0,
       durationSec: l.durationMin * 60,
       videoUrl: l.videoUrl,
+      transcript: l.transcript,
     };
     this.selectedLecture.set(feat);
     const el = document.getElementById('main-player');

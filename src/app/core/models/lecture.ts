@@ -5,6 +5,13 @@ export type AcademicStage = 'prep' | 'sec1' | 'sec2' | 'sec3' | 'university';
 export type LectureTopic = 'grammar' | 'phrasal' | 'phonetics' | 'exam';
 export type DurationBucket = 'short' | 'medium' | 'long';
 
+export interface TranscriptItem {
+  startSec: number;
+  endSec: number;
+  textEn: string;
+  textAr: string;
+}
+
 export interface Lecture {
   id: string;
   title: LocalizedText;
@@ -21,6 +28,7 @@ export interface Lecture {
   videoUrl?: string;
   /** Free, included for registered students (default) or paid individually. */
   access?: Access;
+  transcript?: TranscriptItem[];
 }
 
 /** A lecture the signed-in student has started (GET /api/me/continue-watching). */
@@ -32,6 +40,7 @@ export interface ContinueWatchingItem {
 
 /** Lecture shown in the interactive player preview (GET /api/lectures/featured). */
 export interface FeaturedLecture {
+  id?: string;
   title: LocalizedText;
   subtitle: LocalizedText;
   lessonLabel: LocalizedText;
@@ -42,6 +51,7 @@ export interface FeaturedLecture {
   positionSec: number;
   durationSec: number;
   videoUrl?: string;
+  transcript?: TranscriptItem[];
 }
 
 export interface LectureFilters {

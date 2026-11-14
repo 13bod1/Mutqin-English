@@ -104,7 +104,7 @@
 <!-- Player preview -->
 <section id="main-player" class="container-page pt-12">
   @if (activeFeatured(); as f) {
-    <app-lecture-player [lecture]="f" />
+    <app-lecture-player [lecture]="f" [allLectures]="lectures() || []" (lectureSelect)="playLecture($event)" />
   } @else {
     <div class="aspect-video animate-pulse rounded-card-lg bg-surface-tint3"></div>
   }

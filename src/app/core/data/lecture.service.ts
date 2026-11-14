@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, from, map, Observable, of, throwError, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CONTINUE_WATCHING_MOCK, FEATURED_LECTURE_MOCK, LECTURES_MOCK, RECORDED_LECTURE_VIDEOS } from '../mock/lectures.mock';
+import { CONTINUE_WATCHING_MOCK, FEATURED_LECTURE_MOCK, LECTURE_TRANSCRIPTS, LECTURES_MOCK, RECORDED_LECTURE_VIDEOS } from '../mock/lectures.mock';
 import { ContinueWatchingItem, DurationBucket, FeaturedLecture, Lecture, LectureFilters } from '../models/lecture';
 import { Lang } from '../models/localized';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -28,6 +28,7 @@ function loadLocalAdminLectures(): Lecture[] {
             thumbnailUrl: l.thumbnailUrl,
             videoUrl: l.videoUrl || RECORDED_LECTURE_VIDEOS[idx % RECORDED_LECTURE_VIDEOS.length],
             access: l.access,
+            transcript: l.transcript || LECTURE_TRANSCRIPTS[l.id] || LECTURE_TRANSCRIPTS['featured'],
           }));
         }
       }
@@ -100,6 +101,7 @@ export class LectureService {
           access: l.access_type
             ? { type: l.access_type, priceEgp: l.price_egp ?? undefined }
             : undefined,
+          transcript: l.transcript || LECTURE_TRANSCRIPTS[l.id] || LECTURE_TRANSCRIPTS['featured'],
         }));
       }),
       catchError((err) => {
@@ -163,6 +165,7 @@ export class LectureService {
           positionSec: data.position_sec,
           durationSec: data.duration_sec,
           videoUrl: data.video_url || RECORDED_LECTURE_VIDEOS[0],
+          transcript: data.transcript || LECTURE_TRANSCRIPTS['featured'],
         };
       }),
       catchError((err) => {
