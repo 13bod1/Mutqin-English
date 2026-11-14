@@ -63,10 +63,66 @@
 
   <!-- Fonts are self-hosted via @fontsource (see angular.json styles). -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- Schema.org JSON-LD Structured Data for Google Search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://mutqin-english-amber.vercel.app/#website",
+        "url": "https://mutqin-english-amber.vercel.app/",
+        "name": "Adel Mostafa English | مستر عادل مصطفى",
+        "description": "منصة مستر عادل مصطفى لتعليم اللغة الإنجليزية للثانوية العامة والإعدادية أونلاين",
+        "inLanguage": ["ar", "en"]
+      },
+      {
+        "@type": "EducationalOrganization",
+        "@id": "https://mutqin-english-amber.vercel.app/#organization",
+        "name": "أكاديمية مستر عادل مصطفى للغة الإنجليزية",
+        "alternateName": "Mr. Adel Mostafa English Academy",
+        "url": "https://mutqin-english-amber.vercel.app/",
+        "logo": "https://mutqin-english-amber.vercel.app/favicon.svg",
+        "description": "دروس ومحاضرات لغة إنجليزية أونلاين، بث مباشر، واختبارات تفاعلية لطلاب الثانوية العامة والإعدادية في مصر"
+      },
+      {
+        "@type": "Course",
+        "name": "كورس اللغة الإنجليزية للثانوية العامة والإعدادية",
+        "description": "شرح شامل لمنهج اللغة الإنجليزية، قواعد، مفردات، امتحانات وتدريبات تفاعلية مع مستر عادل مصطفى",
+        "provider": {
+          "@type": "Person",
+          "name": "عادل مصطفى",
+          "alternateName": "Adel Mostafa"
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+    <!-- Prerendered SEO fallback crawlable by Googlebot before Angular JS executes -->
+    <div style="padding: 2rem; font-family: sans-serif; text-align: center; max-width: 800px; margin: 0 auto;" dir="rtl">
+      <h1 style="color: #8B2500; font-size: 1.8rem; margin-bottom: 1rem;">مستر عادل مصطفى — منصة تعليم اللغة الإنجليزية</h1>
+      <p style="font-size: 1.1rem; line-height: 1.6; color: #374151;">
+        أهلاً بكم في المنصة التعليمية لمستر عادل مصطفى. دروس ومحاضرات إنجليزي أونلاين للمرحلة الثانوية والإعدادية، جلسات بث مباشر، تدريبات تفاعلية ومتابعة مستمرة.
+      </p>
+      <nav style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/lectures" style="color: #8B2500; font-weight: bold; text-decoration: underline;">المحاضرات</a>
+        <a href="/live" style="color: #8B2500; font-weight: bold; text-decoration: underline;">البث المباشر</a>
+        <a href="/quizzes" style="color: #8B2500; font-weight: bold; text-decoration: underline;">الاختبارات</a>
+        <a href="/login" style="color: #8B2500; font-weight: bold; text-decoration: underline;">تسجيل الدخول</a>
+        <a href="/signup" style="color: #8B2500; font-weight: bold; text-decoration: underline;">إنشاء حساب</a>
+      </nav>
+    </div>
+  </app-root>
+  <noscript>
+    <div style="padding: 2rem; text-align: center; font-family: sans-serif;" dir="rtl">
+      <h2>يجب تفعيل الجافاسكريبت لتشغيل المنصة</h2>
+      <p>منصة مستر عادل مصطفى لتعليم اللغة الإنجليزية تتطلب تفعيل JavaScript للوصول لجميع الدروس والمحاضرات.</p>
+    </div>
+  </noscript>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
