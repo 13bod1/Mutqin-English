@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../core/data/auth.service';
@@ -196,6 +197,7 @@ export class LiveQnaComponent {
   protected readonly i18n = inject(LanguageService);
   protected readonly auth = inject(AuthService);
   protected readonly qna = inject(LiveQnaService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly showRules = signal<boolean>(false);
   protected readonly moderatorFilter = signal<'all' | 'pending' | 'approved' | 'answered'>('all');
@@ -203,6 +205,16 @@ export class LiveQnaComponent {
   protected readonly errorMessage = signal<string | null>(null);
 
   protected newQuestionText = '';
+  private cooldownTimer: ReturnType<typeof setInterval> | null = null;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.cooldownTimer !== null) {
+        clearInterval(this.cooldownTimer);
+        this.cooldownTimer = null;
+      }
+    });
+  }
 
   protected readonly isStaff = computed(() => {
     const role = this.auth.user()?.role;
@@ -213,15 +225,11 @@ export class LiveQnaComponent {
     return this.i18n.lang() === 'ar' ? QNA_HOUSE_RULES.ar : QNA_HOUSE_RULES.en;
   });
 
-  // Questions signal from service
-  protected readonly questions = computed(() => {
-    let list: LiveQuestion[] = [];
-    this.qna.questions$.subscribe((l) => (list = l));
-    return list;
-  });
+  // Questions signal from service with automatic DestroyRef teardown
+  protected readonly questions = toSignal(this.qna.questions$, { initialValue: [] });
 
   protected readonly filteredQuestions = computed(() => {
-    const currentStudentId = this.auth.user()?.id || 'guest';
+    const currentStudentId = this.auth.user()?.id;
     const sId = this.sessionId();
     const all = this.questions().filter((q) => !sId || q.liveSessionId === sId);
 
@@ -233,7 +241,7 @@ export class LiveQnaComponent {
 
     // Student view: approved/answered, plus their own pending questions
     return all.filter(
-      (q) => q.status === 'approved' || q.status === 'answered' || q.studentId === currentStudentId
+      (q) => q.status === 'approved' || q.status === 'answered' || (!!currentStudentId && q.studentId === currentStudentId)
     );
   });
 
@@ -245,8 +253,13 @@ export class LiveQnaComponent {
     if (!this.newQuestionText.trim()) return;
 
     const user = this.auth.user();
-    const studentId = user?.id || 'u_' + Math.random().toString(36).substring(2, 6);
-    const studentName = user?.fullName || 'Student ' + studentId.slice(0, 4);
+    if (!user?.id) {
+      this.errorMessage.set(this.i18n.lang() === 'ar' ? 'يجب تسجيل الدخول لطرح سؤال.' : 'You must be logged in to ask a question.');
+      return;
+    }
+
+    const studentId = user.id;
+    const studentName = user.fullName || 'Student ' + studentId.slice(0, 4);
 
     const res = this.qna.submitQuestion(this.sessionId(), studentId, studentName, this.newQuestionText);
     if (!res.success) {
@@ -262,17 +275,26 @@ export class LiveQnaComponent {
   }
 
   protected moderate(questionId: string, status: LiveQuestionStatus): void {
+    if (!this.isStaff()) return;
+
     const staffName = this.auth.user()?.fullName || 'Staff Assistant';
     this.qna.updateQuestionStatus(questionId, status, staffName);
   }
 
   private startCooldown(sec: number): void {
+    if (this.cooldownTimer !== null) {
+      clearInterval(this.cooldownTimer);
+      this.cooldownTimer = null;
+    }
     this.cooldownSeconds.set(sec);
-    const interval = setInterval(() => {
+    this.cooldownTimer = setInterval(() => {
       const current = this.cooldownSeconds();
       if (current <= 1) {
         this.cooldownSeconds.set(0);
-        clearInterval(interval);
+        if (this.cooldownTimer !== null) {
+          clearInterval(this.cooldownTimer);
+          this.cooldownTimer = null;
+        }
       } else {
         this.cooldownSeconds.set(current - 1);
       }

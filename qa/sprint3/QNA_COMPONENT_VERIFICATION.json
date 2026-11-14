@@ -1,0 +1,65 @@
+{
+  "component": {
+    "suite": "QnA Component Reactivity & Security Acceptance Diagnostic",
+    "boundary": "Verifies LiveQnaComponent with toSignal(questions$), DestroyRef cleanup, guest submission block, and isStaff moderation guard under real Angular injection context.",
+    "cases": [
+      {
+        "name": "component_instantiation_under_injection_context",
+        "passed": true
+      },
+      {
+        "name": "initial_questions_loaded_reactively_via_toSignal",
+        "passed": true
+      },
+      {
+        "name": "authenticated_student_submit_causes_reactive_signal_update",
+        "passed": true
+      },
+      {
+        "name": "guest_submit_is_rejected_without_random_id_fallback",
+        "passed": true
+      },
+      {
+        "name": "non_staff_moderation_call_is_blocked",
+        "passed": true
+      },
+      {
+        "name": "staff_moderation_call_approves_and_updates_reactively",
+        "passed": true
+      },
+      {
+        "name": "destroy_ref_cleans_up_cooldown_timer",
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "timestamp": "2026-11-14T02:17:20.730Z"
+  },
+  "regression": {
+    "unit": {
+      "total": 173,
+      "failed": 0,
+      "skipped": 0,
+      "passed": 173,
+      "failures": [],
+      "junit_hash": "61197fdf10b9e630b7f06645c51d9ae35cc13c1891d729d49a9cc29f3dd51a3c",
+      "exit_code": 0
+    },
+    "e2e": {
+      "stats": {
+        "startTime": "2026-11-14T02:19:20.003Z",
+        "duration": 36198.597,
+        "expected": 21,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "errors": [],
+      "exit_code": 0,
+      "report": "C:\\Users\\Samer\\AppData\\Local\\hermes\\profiles\\jira\\workspace\\samer_sherry_delivery\\merge_new_scope\\qna_fix\\final_acceptance\\e2e_report.json",
+      "global_timeout": false
+    },
+    "all_command_exit_zero": true
+  },
+  "boundary": "Real client component/service under Angular injection context, controlled auth signal. NOT server authorization, durable multiuser moderation or DRM proof."
+}
