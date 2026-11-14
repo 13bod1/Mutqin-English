@@ -23,6 +23,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const port = Number(Deno.env.get("PORT")) || 8000;
+
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -163,7 +165,17 @@ serve(async (req: Request) => {
     await Promise.all(
       subscriptions.map(async (sub) => {
         // SSRF Host Check
-        if (!ALLOWED_PUSH_HOST_PATTERN.test(sub.endpoint) || PRIVATE_HOST_PATTERN.test(sub.endpoint)) {
+        if (typeof sub.endpoint !== "string" || !ALLOWED_PUSH_HOST_PATTERN.test(sub.endpoint) || PRIVATE_HOST_PATTERN.test(sub.endpoint)) {
+          failedCount++;
+          return;
+        }
+        try {
+          const endpointUrl = new URL(sub.endpoint);
+          if (endpointUrl.protocol !== "https:" || endpointUrl.username || endpointUrl.password) {
+            failedCount++;
+            return;
+          }
+        } catch {
           failedCount++;
           return;
         }
@@ -215,10 +227,10 @@ serve(async (req: Request) => {
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (unexpectedError: any) {
+  } catch (_unexpectedError: any) {
     return new Response(
-      JSON.stringify({ error: "Internal dispatch error", message: unexpectedError.message || String(unexpectedError) }),
+      JSON.stringify({ error: "Internal dispatch error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
-});
+}, { port });

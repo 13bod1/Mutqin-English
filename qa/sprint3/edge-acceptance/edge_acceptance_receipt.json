@@ -1,0 +1,325 @@
+{
+  "timestamp": "2026-11-14T05:21:02Z",
+  "deno_version": "2.0.0 (x86_64-pc-windows-msvc)",
+  "sources": {
+    "protected_media_sha256": "baaccabe20679edcb6aacf5eec960e0fe4c0e6b1b979dd4e7702e36c8ebc7ef7",
+    "push_dispatch_sha256": "ff56e0c05962a26a8b4b2d97ad0d4dac2386a09f35f8534c9180c33c0000cb1a",
+    "crypto_verification_sha256": "bc5a95cec942b73c806c40151e2517eb5c238b94108693062ea3746b4cf29c27",
+    "deno_binary_sha256": "981daa9bdf288de35db7f85412c7ce317be30a26adc2879f971d08bf7649cf59"
+  },
+  "tests": [
+    {
+      "category": "typecheck",
+      "name": "deno_check_protected-media",
+      "passed": true,
+      "duration_ms": 107.79,
+      "output": ""
+    },
+    {
+      "category": "typecheck",
+      "name": "deno_check_push-dispatch",
+      "passed": true,
+      "duration_ms": 120.9,
+      "output": ""
+    },
+    {
+      "category": "crypto",
+      "name": "webpush_rfc8291_crypto_roundtrip",
+      "passed": true,
+      "duration_ms": 182.61,
+      "details": {
+        "test": "webpush_rfc8291_aes128gcm_crypto",
+        "status": "PASSED",
+        "duration_ms": 8.37,
+        "vapid_public_key_length": 87,
+        "vapid_subject": "mailto:edge-test@adelmostafa.com",
+        "subscription_endpoint": "https://fcm.googleapis.com/fcm/send/synthetic-device-test-token",
+        "content_encoding": "aes128gcm",
+        "has_encrypted_body": true,
+        "encrypted_body_bytes": 246,
+        "has_vapid_authorization": true,
+        "payload_matches_plaintext": true,
+        "tampered_secret_fail_closed": true,
+        "crypto_engine": "Deno 2.0.0 + npm:web-push@3.6.7 + npm:http_ece@1.2.0",
+        "external_boundary": "Synthetic local recipient; no remote FCM/Apple/Mozilla push service contacted"
+      }
+    },
+    {
+      "category": "protected-media",
+      "name": "pm_unconfigured_get_405",
+      "passed": true,
+      "status_code": 405,
+      "response": {
+        "error": "POST required"
+      },
+      "duration_ms": 14.0
+    },
+    {
+      "category": "protected-media",
+      "name": "pm_unconfigured_options_405",
+      "passed": true,
+      "status_code": 405,
+      "duration_ms": 16.07
+    },
+    {
+      "category": "protected-media",
+      "name": "pm_unconfigured_post_503",
+      "passed": true,
+      "status_code": 503,
+      "response": {
+        "error": "Protected media service is not configured"
+      },
+      "duration_ms": 17.03
+    },
+    {
+      "category": "protected-media",
+      "name": "pm_configured_missing_auth_401",
+      "passed": true,
+      "status_code": 401,
+      "response": {
+        "error": "Authentication required"
+      },
+      "duration_ms": 24.03
+    },
+    {
+      "category": "protected-media",
+      "name": "pm_configured_bad_auth_scheme_401",
+      "passed": true,
+      "status_code": 401,
+      "response": {
+        "error": "Authentication required"
+      },
+      "duration_ms": 15.2
+    },
+    {
+      "category": "protected-media",
+      "name": "pm_configured_invalid_jwt_failclosed",
+      "passed": true,
+      "status_code": 401,
+      "response": {
+        "error": "Invalid session"
+      },
+      "duration_ms": 2046.89
+    },
+    {
+      "category": "protected-media",
+      "name": "pm_server_liveness_check",
+      "passed": true,
+      "status_code": 405,
+      "duration_ms": 13.01
+    },
+    {
+      "category": "push-dispatch",
+      "name": "pd_unconfigured_options_cors_200",
+      "passed": true,
+      "status_code": 200,
+      "cors_header": "*",
+      "duration_ms": 2.0
+    },
+    {
+      "category": "push-dispatch",
+      "name": "pd_unconfigured_get_405",
+      "passed": true,
+      "status_code": 405,
+      "response": {
+        "error": "Method not allowed"
+      },
+      "duration_ms": 27.34
+    },
+    {
+      "category": "push-dispatch",
+      "name": "pd_unconfigured_put_405",
+      "passed": true,
+      "status_code": 405,
+      "duration_ms": 15.09
+    },
+    {
+      "category": "push-dispatch",
+      "name": "pd_unconfigured_post_503",
+      "passed": true,
+      "status_code": 503,
+      "response": {
+        "error": "Server misconfigured: missing Supabase credentials"
+      },
+      "duration_ms": 17.02
+    },
+    {
+      "category": "push-dispatch",
+      "name": "pd_missing_vapid_post_503",
+      "passed": true,
+      "status_code": 503,
+      "response": {
+        "error": "VAPID credentials not configured on server (VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY missing)"
+      },
+      "duration_ms": 15.0
+    },
+    {
+      "category": "push-dispatch",
+      "name": "pd_configured_missing_auth_401",
+      "passed": true,
+      "status_code": 401,
+      "response": {
+        "error": "Missing Authorization header"
+      },
+      "duration_ms": 14.0
+    },
+    {
+      "category": "push-dispatch",
+      "name": "pd_configured_invalid_jwt_failclosed",
+      "passed": true,
+      "status_code": 401,
+      "response": {
+        "error": "Unauthorized: invalid JWT"
+      },
+      "duration_ms": 2057.2
+    },
+    {
+      "category": "push-dispatch",
+      "name": "pd_server_liveness_check",
+      "passed": true,
+      "status_code": 200,
+      "duration_ms": 2.0
+    },
+    {
+      "category": "ssrf",
+      "name": "ssrf_push_gateway_matrix",
+      "passed": true,
+      "vector_count": 17,
+      "duration_ms": 109.96,
+      "vectors": [
+        {
+          "name": "fcm_standard",
+          "endpoint": "https://fcm.googleapis.com/fcm/send/token123",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "mozilla_push",
+          "endpoint": "https://updates.push.services.mozilla.com/wpush/v2/abc",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "windows_notify",
+          "endpoint": "https://notify.windows.com/?token=def",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "apple_webpush",
+          "endpoint": "https://web.push.apple.com/v1/push/xyz",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "apple_apns",
+          "endpoint": "https://push.apple.com/v1/push/xyz",
+          "expected": true,
+          "actual": true,
+          "passed": true
+        },
+        {
+          "name": "localhost",
+          "endpoint": "https://localhost:8080/push",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "loopback_ipv4",
+          "endpoint": "https://127.0.0.1:8080/push",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "ipv6_loopback",
+          "endpoint": "https://[::1]:8080/push",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "rfc1918_10",
+          "endpoint": "https://10.0.0.5/push",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "rfc1918_192_168",
+          "endpoint": "https://192.168.1.100/push",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "rfc1918_172_16",
+          "endpoint": "https://172.16.0.1/push",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "aws_link_local_metadata",
+          "endpoint": "https://169.254.169.254/latest/meta-data/",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "all_interfaces_0",
+          "endpoint": "https://0.0.0.0:8000/push",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "attacker_path_spoof",
+          "endpoint": "https://attacker.com/fcm.googleapis.com",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "subdomain_takeover_spoof",
+          "endpoint": "https://fcm.googleapis.com.attacker.com/push",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "userinfo_auth_injection",
+          "endpoint": "https://user:pass@fcm.googleapis.com/push",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        },
+        {
+          "name": "insecure_http_scheme",
+          "endpoint": "http://fcm.googleapis.com/push",
+          "expected": false,
+          "actual": false,
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_test_suites": 19,
+    "passed": 19,
+    "failed": 0,
+    "overall_status": "ALL_PASSED",
+    "unseen_external_gates": [
+      "Physical mobile devices (iOS/Android WebPush push registration)",
+      "Live remote push gateway delivery (FCM, Apple APNs, Mozilla WebPush)",
+      "Production Supabase GoTrue authentication traffic",
+      "Licensed DRM deployment"
+    ]
+  },
+  "total_duration_sec": 6.24
+}
