@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, DestroyRef, inject, input, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
@@ -7,7 +7,7 @@ import { AuthService } from '../../core/data/auth.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { LiveQuestion, LiveQuestionStatus } from '../../core/models/sprint3';
-import { LiveQnaService, QNA_HOUSE_RULES, SAMPLE_QUESTIONS } from '../../core/services/live-qna.service';
+import { LiveQnaService, QNA_HOUSE_RULES } from '../../core/services/live-qna.service';
 
 @Component({
   selector: 'app-live-qna',
@@ -173,7 +173,7 @@ import { LiveQnaService, QNA_HOUSE_RULES, SAMPLE_QUESTIONS } from '../../core/se
             type="text"
             [(ngModel)]="newQuestionText"
             name="question"
-            [disabled]="cooldownSeconds() > 0"
+            [disabled]="cooldownSeconds() > 0 || isSubmitting()"
             [placeholder]="'qna.askPlaceholder' | t"
             class="input input-sm flex-1 text-xs"
             autocomplete="off"
@@ -182,7 +182,7 @@ import { LiveQnaService, QNA_HOUSE_RULES, SAMPLE_QUESTIONS } from '../../core/se
           <button
             type="submit"
             class="btn btn-primary btn-sm px-3"
-            [disabled]="!newQuestionText.trim() || cooldownSeconds() > 0"
+            [disabled]="!newQuestionText.trim() || cooldownSeconds() > 0 || isSubmitting()"
           >
             <lucide-icon name="send" [size]="14" />
           </button>
@@ -191,7 +191,7 @@ import { LiveQnaService, QNA_HOUSE_RULES, SAMPLE_QUESTIONS } from '../../core/se
     </div>
   `,
 })
-export class LiveQnaComponent {
+export class LiveQnaComponent implements OnInit {
   readonly sessionId = input<string>('live_grammar_1');
 
   protected readonly i18n = inject(LanguageService);
@@ -203,9 +203,11 @@ export class LiveQnaComponent {
   protected readonly moderatorFilter = signal<'all' | 'pending' | 'approved' | 'answered'>('all');
   protected readonly cooldownSeconds = signal<number>(0);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly isSubmitting = signal<boolean>(false);
 
   protected newQuestionText = '';
   private cooldownTimer: ReturnType<typeof setInterval> | null = null;
+  private pollTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.destroyRef.onDestroy(() => {
@@ -213,7 +215,21 @@ export class LiveQnaComponent {
         clearInterval(this.cooldownTimer);
         this.cooldownTimer = null;
       }
+      if (this.pollTimer !== null) {
+        clearInterval(this.pollTimer);
+        this.pollTimer = null;
+      }
     });
+  }
+
+  ngOnInit(): void {
+    // Initial fetch
+    this.refreshQuestions();
+
+    // Bounded refresh polling every 10 seconds with DestroyRef lifecycle cleanup
+    this.pollTimer = setInterval(() => {
+      this.refreshQuestions();
+    }, 10000);
   }
 
   protected readonly isStaff = computed(() => {
@@ -228,8 +244,12 @@ export class LiveQnaComponent {
   // Questions signal from service with automatic DestroyRef teardown
   protected readonly questions = toSignal(this.qna.questions$, { initialValue: [] });
 
+  /**
+   * Filtered questions feed:
+   * - Staff: sees all questions according to moderation filter.
+   * - Students: only see approved or answered questions (AG-124: pending questions hidden from non-staff, including author).
+   */
   protected readonly filteredQuestions = computed(() => {
-    const currentStudentId = this.auth.user()?.id;
     const sId = this.sessionId();
     const all = this.questions().filter((q) => !sId || q.liveSessionId === sId);
 
@@ -239,46 +259,75 @@ export class LiveQnaComponent {
       return all.filter((q) => q.status === f);
     }
 
-    // Student view: approved/answered, plus their own pending questions
-    return all.filter(
-      (q) => q.status === 'approved' || q.status === 'answered' || (!!currentStudentId && q.studentId === currentStudentId)
-    );
+    // Student view: approved/answered only (AG-124 pending questions visible ONLY to staff)
+    return all.filter((q) => q.status === 'approved' || q.status === 'answered');
   });
 
   protected readonly pendingCount = computed(() => {
     return this.questions().filter((q) => q.status === 'pending').length;
   });
 
-  protected sendQuestion(): void {
-    if (!this.newQuestionText.trim()) return;
+  protected async sendQuestion(): Promise<void> {
+    const raw = this.newQuestionText.trim();
+    if (!raw) return;
 
     const user = this.auth.user();
+    // Reject guest users or unauthenticated callers
     if (!user?.id) {
-      this.errorMessage.set(this.i18n.lang() === 'ar' ? 'يجب تسجيل الدخول لطرح سؤال.' : 'You must be logged in to ask a question.');
+      this.errorMessage.set(
+        this.i18n.lang() === 'ar'
+          ? 'يجب تسجيل الدخول كطالب لطرح سؤال.'
+          : 'You must be logged in as a student to ask a question.'
+      );
       return;
     }
 
-    const studentId = user.id;
-    const studentName = user.fullName || 'Student ' + studentId.slice(0, 4);
+    if (this.cooldownSeconds() > 0 || this.isSubmitting()) return;
 
-    const res = this.qna.submitQuestion(this.sessionId(), studentId, studentName, this.newQuestionText);
-    if (!res.success) {
-      this.errorMessage.set(res.error || 'Failed to submit question.');
-      if (res.secondsRemaining) {
-        this.startCooldown(res.secondsRemaining);
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
+
+    try {
+      const studentId = user.id;
+      const studentName = user.fullName || 'Student ' + studentId.slice(0, 4);
+
+      const res = await this.qna.submitQuestionAsync(this.sessionId(), studentId, studentName, raw);
+      if (!res.success) {
+        this.errorMessage.set(res.error || 'Failed to submit question.');
+        if (res.secondsRemaining) {
+          this.startCooldown(res.secondsRemaining);
+        }
+      } else {
+        this.newQuestionText = '';
+        this.errorMessage.set(null);
+        this.startCooldown(15);
+        await this.refreshQuestions();
       }
-    } else {
-      this.newQuestionText = '';
-      this.errorMessage.set(null);
-      this.startCooldown(15);
+    } catch (err: any) {
+      this.errorMessage.set(err?.message || 'Error submitting question.');
+    } finally {
+      this.isSubmitting.set(false);
     }
   }
 
-  protected moderate(questionId: string, status: LiveQuestionStatus): void {
+  protected async moderate(questionId: string, status: LiveQuestionStatus): Promise<void> {
     if (!this.isStaff()) return;
 
     const staffName = this.auth.user()?.fullName || 'Staff Assistant';
-    this.qna.updateQuestionStatus(questionId, status, staffName);
+    try {
+      await this.qna.updateQuestionStatusAsync(questionId, status, staffName);
+      await this.refreshQuestions();
+    } catch (err: any) {
+      this.errorMessage.set(err?.message || 'Error updating question status.');
+    }
+  }
+
+  private async refreshQuestions(): Promise<void> {
+    try {
+      await this.qna.refresh(this.sessionId());
+    } catch (error: any) {
+      this.errorMessage.set(error?.message || 'Unable to refresh questions.');
+    }
   }
 
   private startCooldown(sec: number): void {

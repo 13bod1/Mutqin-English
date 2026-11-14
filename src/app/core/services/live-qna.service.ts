@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Optional } from '@angular/core';
 import { BehaviorSubject, Observable, map } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { LiveQuestion, LiveQuestionStatus } from '../models/sprint3';
+import { SupabaseService } from '../supabase/supabase.service';
 
 export const QNA_HOUSE_RULES = {
   en: [
@@ -27,18 +29,28 @@ export const SAMPLE_QUESTIONS: { body: string; topic: string }[] = [
   { body: 'Which transitional phrases are most effective for contrasting points in an essay?', topic: 'Writing Skills' },
 ];
 
+export interface SubmitQuestionResult {
+  success: boolean;
+  error?: string;
+  question?: LiveQuestion;
+  secondsRemaining?: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class LiveQnaService {
+  private readonly isProduction = environment.production;
   private readonly questionsSubject = new BehaviorSubject<LiveQuestion[]>([]);
   readonly questions$ = this.questionsSubject.asObservable();
 
-  // Track submission timestamps per student for the 15-second rate limit
+  // Track submission timestamps per student for in-memory rate limiting (dev/unit tests)
   private readonly lastSubmissionTime = new Map<string, number>();
 
-  constructor() {
-    this.seedInitialQuestions();
+  constructor(@Optional() private readonly supabase?: SupabaseService) {
+    if (!this.isProduction) {
+      this.seedInitialQuestions();
+    }
   }
 
   private seedInitialQuestions(): void {
@@ -90,14 +102,19 @@ export class LiveQnaService {
   }
 
   /**
-   * Submits a student live question with 15-second rate limit and XSS sanitation.
+   * Submits a student live question.
+   * In production, executes actual Supabase RPC `submit_live_question` and rejects mock fallback.
+   * In dev/unit tests, performs in-memory rate limiting and updates state synchronously.
    */
   submitQuestion(
     liveSessionId: string,
     studentId: string,
     studentName: string,
     rawBody: string
-  ): { success: boolean; error?: string; question?: LiveQuestion; secondsRemaining?: number } {
+  ): SubmitQuestionResult {
+    if (this.isProduction) return { success: false, error: 'Use authenticated asynchronous submission.' };
+
+    // In-memory mode for unit tests & dev
     const cleanBody = this.sanitizeText(rawBody);
     if (!cleanBody || cleanBody.length < 5) {
       return { success: false, error: 'Question must be at least 5 characters long.' };
@@ -122,7 +139,7 @@ export class LiveQnaService {
       studentId,
       studentName,
       body: cleanBody,
-      status: 'pending', // Starts pending moderation
+      status: 'pending',
       createdAt: new Date().toISOString(),
     };
 
@@ -132,6 +149,54 @@ export class LiveQnaService {
     this.questionsSubject.next(updated);
 
     return { success: true, question };
+  }
+
+  /**
+   * Production Supabase RPC submission
+   */
+  async submitQuestionAsync(liveSessionId: string, studentId: string, studentName: string, rawBody: string): Promise<SubmitQuestionResult> {
+    if (!this.isProduction) return this.submitQuestion(liveSessionId, studentId, studentName, rawBody);
+    if (!this.supabase) return { success: false, error: 'Shared backend unavailable.' };
+    return this.submitQuestionProd(liveSessionId, rawBody);
+  }
+
+  private async submitQuestionProd(
+    liveSessionId: string,
+    rawBody: string
+  ): Promise<SubmitQuestionResult> {
+    const cleanBody = this.sanitizeText(rawBody);
+    if (!cleanBody || cleanBody.length < 5) {
+      return { success: false, error: 'Question must be at least 5 characters long.' };
+    }
+
+    try {
+      const { data, error } = await this.supabase!.client.rpc('submit_live_question', {
+        p_session_id: liveSessionId,
+        p_body: cleanBody,
+      });
+
+      if (error) {
+        let secondsRemaining: number | undefined;
+        const match = error.message.match(/wait (\d+) seconds/i);
+        if (match) {
+          secondsRemaining = parseInt(match[1], 10);
+        }
+        return {
+          success: false,
+          error: error.message,
+          secondsRemaining,
+        };
+      }
+
+      const question = data?.question as LiveQuestion | undefined;
+      await this.refresh(liveSessionId);
+      return { success: true, question };
+    } catch (err: any) {
+      return {
+        success: false,
+        error: err?.message || 'Failed to submit live question.',
+      };
+    }
   }
 
   /**
@@ -161,12 +226,16 @@ export class LiveQnaService {
 
   /**
    * Moderates a question: approve, hide, or mark as answered.
+   * In production, executes actual Supabase RPC `moderate_live_question`.
+   * In dev/unit tests, updates local in-memory state.
    */
   updateQuestionStatus(
     questionId: string,
     status: LiveQuestionStatus,
     moderatedBy = 'Assistant'
   ): boolean {
+    if (this.isProduction) return false;
+
     const current = this.questionsSubject.getValue();
     const target = current.find((q) => q.id === questionId);
     if (!target) return false;
@@ -179,5 +248,64 @@ export class LiveQnaService {
 
     this.questionsSubject.next([...current]);
     return true;
+  }
+
+  /**
+   * Production Supabase RPC moderation
+   */
+  async updateQuestionStatusAsync(questionId: string, status: LiveQuestionStatus, moderatedBy = 'Assistant'): Promise<boolean> {
+    if (!this.isProduction) return this.updateQuestionStatus(questionId, status, moderatedBy);
+    if (!this.supabase) throw new Error('Shared backend unavailable.');
+    return this.updateQuestionStatusProd(questionId, status);
+  }
+
+  private async updateQuestionStatusProd(
+    questionId: string,
+    status: LiveQuestionStatus
+  ): Promise<boolean> {
+    const { error } = await this.supabase!.client.rpc('moderate_live_question', {
+      p_question_id: questionId,
+      p_status: status,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return true;
+  }
+
+  /**
+   * Refreshes questions feed from backend RLS table query
+   */
+  async refresh(liveSessionId: string): Promise<LiveQuestion[]> {
+    if (!this.isProduction) return this.questionsSubject.getValue();
+    if (!this.supabase) { this.questionsSubject.next([]); throw new Error('Shared backend unavailable.'); }
+
+    const { data, error } = await this.supabase.client
+      .from('live_questions')
+      .select('*')
+      .eq('session_id', liveSessionId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      this.questionsSubject.next([]);
+      throw new Error(error.message);
+    }
+
+    const mapped: LiveQuestion[] = (data || []).map((row: any) => ({
+      id: row.id,
+      liveSessionId: row.session_id,
+      studentId: row.student_id,
+      studentName: row.student_name,
+      body: row.body,
+      status: row.status as LiveQuestionStatus,
+      createdAt: row.created_at,
+      answeredAt: row.answered_at ?? undefined,
+      moderatedBy: row.moderated_by ?? undefined,
+    }));
+
+    this.questionsSubject.next(mapped);
+    return mapped;
   }
 }
