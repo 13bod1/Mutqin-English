@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "name": "protected_media_querystring_classified",
+      "passed": true
+    },
+    {
+      "name": "unrelated_origin_cache_preserved",
+      "passed": true
+    },
+    {
+      "name": "cross_origin_notification_target_not_opened",
+      "passed": true
+    },
+    {
+      "name": "credentials_api_request_never_served_from_cache",
+      "passed": true
+    }
+  ],
+  "boundary": "Actual service-worker source executed in Node VM. Not browser install/push provider acceptance."
+}

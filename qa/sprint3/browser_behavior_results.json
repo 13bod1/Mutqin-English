@@ -1,0 +1,327 @@
+{
+  "boundary": "Service workers explicitly disabled so controlled route fixtures reach the browser in every engine; SW safety has a separate source-execution report. Actual locally built production DOM. Backend data supplied by controlled local HTTP interception, not a live Supabase database/auth service.",
+  "checks": [
+    {
+      "browser": "chromium",
+      "name": "360px_layout_and_close_control",
+      "passed": true,
+      "actual": {
+        "viewport": 360,
+        "scroll": 360,
+        "overflow": false,
+        "closeBox": {
+          "x": 308,
+          "y": 40,
+          "width": 44,
+          "height": 44
+        }
+      }
+    },
+    {
+      "browser": "chromium",
+      "name": "popup_dismissal_survives_reload",
+      "passed": true
+    },
+    {
+      "browser": "chromium",
+      "name": "edited_popup_revision_reappears",
+      "passed": true
+    },
+    {
+      "browser": "chromium",
+      "name": "disabled_popup_absent",
+      "passed": true
+    },
+    {
+      "browser": "chromium",
+      "name": "announcement_empty_state",
+      "passed": true,
+      "actual": "No announcements at this time"
+    },
+    {
+      "browser": "chromium",
+      "name": "responsive_width_360",
+      "passed": true,
+      "actual": {
+        "viewport": 360,
+        "scroll": 360
+      }
+    },
+    {
+      "browser": "chromium",
+      "name": "responsive_width_390",
+      "passed": true,
+      "actual": {
+        "viewport": 390,
+        "scroll": 390
+      }
+    },
+    {
+      "browser": "chromium",
+      "name": "responsive_width_768",
+      "passed": true,
+      "actual": {
+        "viewport": 768,
+        "scroll": 768
+      }
+    },
+    {
+      "browser": "chromium",
+      "name": "responsive_width_1280",
+      "passed": true,
+      "actual": {
+        "viewport": 1280,
+        "scroll": 1280
+      }
+    },
+    {
+      "browser": "chromium",
+      "name": "Small Android emulation",
+      "passed": true,
+      "actual": {
+        "width": 360,
+        "scroll": 360,
+        "close": {
+          "x": 308,
+          "y": 40,
+          "width": 44,
+          "height": 44
+        }
+      }
+    },
+    {
+      "browser": "chromium",
+      "name": "iPhone 13 viewport emulation",
+      "passed": true,
+      "actual": {
+        "width": 390,
+        "scroll": 390,
+        "close": {
+          "x": 338,
+          "y": 32,
+          "width": 44,
+          "height": 44
+        }
+      }
+    },
+    {
+      "browser": "firefox",
+      "name": "360px_layout_and_close_control",
+      "passed": true,
+      "actual": {
+        "viewport": 360,
+        "scroll": 360,
+        "overflow": false,
+        "closeBox": {
+          "x": 308,
+          "y": 40,
+          "width": 44,
+          "height": 44
+        }
+      }
+    },
+    {
+      "browser": "firefox",
+      "name": "popup_dismissal_survives_reload",
+      "passed": true
+    },
+    {
+      "browser": "firefox",
+      "name": "edited_popup_revision_reappears",
+      "passed": true
+    },
+    {
+      "browser": "firefox",
+      "name": "disabled_popup_absent",
+      "passed": true
+    },
+    {
+      "browser": "firefox",
+      "name": "announcement_empty_state",
+      "passed": true,
+      "actual": "No announcements at this time"
+    },
+    {
+      "browser": "firefox",
+      "name": "Small Android emulation",
+      "passed": true,
+      "actual": {
+        "width": 360,
+        "scroll": 360,
+        "close": {
+          "x": 308,
+          "y": 40,
+          "width": 44,
+          "height": 44
+        }
+      }
+    },
+    {
+      "browser": "firefox",
+      "name": "iPhone 13 viewport emulation",
+      "passed": true,
+      "actual": {
+        "width": 390,
+        "scroll": 390,
+        "close": {
+          "x": 338,
+          "y": 32,
+          "width": 44,
+          "height": 44
+        }
+      }
+    },
+    {
+      "browser": "webkit",
+      "name": "360px_layout_and_close_control",
+      "passed": true,
+      "actual": {
+        "viewport": 360,
+        "scroll": 360,
+        "overflow": false,
+        "closeBox": {
+          "x": 308,
+          "y": 40,
+          "width": 44,
+          "height": 44
+        }
+      }
+    },
+    {
+      "browser": "webkit",
+      "name": "popup_dismissal_survives_reload",
+      "passed": true
+    },
+    {
+      "browser": "webkit",
+      "name": "edited_popup_revision_reappears",
+      "passed": true
+    },
+    {
+      "browser": "webkit",
+      "name": "disabled_popup_absent",
+      "passed": true
+    },
+    {
+      "browser": "webkit",
+      "name": "announcement_empty_state",
+      "passed": true,
+      "actual": "No announcements at this time"
+    },
+    {
+      "browser": "webkit",
+      "name": "Small Android emulation",
+      "passed": true,
+      "actual": {
+        "width": 360,
+        "scroll": 360,
+        "close": {
+          "x": 308,
+          "y": 40,
+          "width": 44,
+          "height": 44
+        }
+      }
+    },
+    {
+      "browser": "webkit",
+      "name": "iPhone 13 viewport emulation",
+      "passed": true,
+      "actual": {
+        "width": 390,
+        "scroll": 390,
+        "close": {
+          "x": 338,
+          "y": 32,
+          "width": 44,
+          "height": 44
+        }
+      }
+    }
+  ],
+  "contrastScope": "Every visible text element in the homepage snapshot is sampled; gradients/media backgrounds are marked unmeasured instead of a claimed full WCAG audit.",
+  "contrast": [
+    {
+      "theme": "light",
+      "accent": "classic",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0,
+      "failures": []
+    },
+    {
+      "theme": "light",
+      "accent": "navy",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0,
+      "failures": []
+    },
+    {
+      "theme": "light",
+      "accent": "emerald",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0,
+      "failures": []
+    },
+    {
+      "theme": "light",
+      "accent": "purple",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0,
+      "failures": []
+    },
+    {
+      "theme": "light",
+      "accent": "gold",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0,
+      "failures": []
+    },
+    {
+      "theme": "dark",
+      "accent": "classic",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0,
+      "failures": []
+    },
+    {
+      "theme": "dark",
+      "accent": "navy",
+      "measured": 46,
+      "unmeasured": 24,
+      "failed": 0,
+      "failures": []
+    },
+    {
+      "theme": "dark",
+      "accent": "emerald",
+      "measured": 73,
+      "unmeasured": 26,
+      "failed": 0,
+      "failures": []
+    },
+    {
+      "theme": "dark",
+      "accent": "purple",
+      "measured": 73,
+      "unmeasured": 26,
+      "failed": 0,
+      "failures": []
+    },
+    {
+      "theme": "dark",
+      "accent": "gold",
+      "measured": 73,
+      "unmeasured": 26,
+      "failed": 0,
+      "failures": []
+    }
+  ],
+  "all_behavior_checks_passed": true,
+  "full_wcag_acceptance": false
+}
