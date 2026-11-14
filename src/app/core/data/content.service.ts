@@ -23,6 +23,9 @@ export class ContentService {
         if (error || !data) {
           return PLATFORM_STATS_MOCK;
         }
+        if (!Number.isFinite(Number(data.rating)) || !Number.isFinite(Number(data.students_count)) || Number(data.rating) < 0 || Number(data.rating) > 5 || Number(data.students_count) < 0) {
+          return PLATFORM_STATS_MOCK;
+        }
         return {
           rating: Number(data.rating),
           studentsCount: Number(data.students_count),

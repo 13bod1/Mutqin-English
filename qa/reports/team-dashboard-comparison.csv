@@ -1,0 +1,191 @@
+stage,metric,expected,actual_browser_text,assertion_passed,boundary
+dashboard_matches_real_audit_three_reviews,Reviewed receipts,3,"REVIEWED RECEIPTS
+
+3
+
+PENDING RECEIPTS
+
+2
+
+AVERAGE REVIEW TIME
+
+30 min
+
+APPROVAL RATE
+
+66.7%
+
+REJECTION RATE
+
+33.3%",True,"Real PostgREST ledger, controlled GoTrue identity adapter"
+dashboard_matches_real_audit_three_reviews,Pending receipts,2,"REVIEWED RECEIPTS
+
+3
+
+PENDING RECEIPTS
+
+2
+
+AVERAGE REVIEW TIME
+
+30 min
+
+APPROVAL RATE
+
+66.7%
+
+REJECTION RATE
+
+33.3%",True,"Real PostgREST ledger, controlled GoTrue identity adapter"
+dashboard_matches_real_audit_three_reviews,Average review time,30 min,"REVIEWED RECEIPTS
+
+3
+
+PENDING RECEIPTS
+
+2
+
+AVERAGE REVIEW TIME
+
+30 min
+
+APPROVAL RATE
+
+66.7%
+
+REJECTION RATE
+
+33.3%",True,"Real PostgREST ledger, controlled GoTrue identity adapter"
+dashboard_matches_real_audit_three_reviews,Approval rate,66.7%,"REVIEWED RECEIPTS
+
+3
+
+PENDING RECEIPTS
+
+2
+
+AVERAGE REVIEW TIME
+
+30 min
+
+APPROVAL RATE
+
+66.7%
+
+REJECTION RATE
+
+33.3%",True,"Real PostgREST ledger, controlled GoTrue identity adapter"
+dashboard_matches_real_audit_three_reviews,Rejection rate,33.3%,"REVIEWED RECEIPTS
+
+3
+
+PENDING RECEIPTS
+
+2
+
+AVERAGE REVIEW TIME
+
+30 min
+
+APPROVAL RATE
+
+66.7%
+
+REJECTION RATE
+
+33.3%",True,"Real PostgREST ledger, controlled GoTrue identity adapter"
+dashboard_updates_after_actual_fourth_review,Reviewed receipts,4,"REVIEWED RECEIPTS
+
+4
+
+PENDING RECEIPTS
+
+1
+
+AVERAGE REVIEW TIME
+
+25 min
+
+APPROVAL RATE
+
+75%
+
+REJECTION RATE
+
+25%",True,"Real PostgREST ledger, controlled GoTrue identity adapter"
+dashboard_updates_after_actual_fourth_review,Pending receipts,1,"REVIEWED RECEIPTS
+
+4
+
+PENDING RECEIPTS
+
+1
+
+AVERAGE REVIEW TIME
+
+25 min
+
+APPROVAL RATE
+
+75%
+
+REJECTION RATE
+
+25%",True,"Real PostgREST ledger, controlled GoTrue identity adapter"
+dashboard_updates_after_actual_fourth_review,Average review time,25 min,"REVIEWED RECEIPTS
+
+4
+
+PENDING RECEIPTS
+
+1
+
+AVERAGE REVIEW TIME
+
+25 min
+
+APPROVAL RATE
+
+75%
+
+REJECTION RATE
+
+25%",True,"Real PostgREST ledger, controlled GoTrue identity adapter"
+dashboard_updates_after_actual_fourth_review,Approval rate,75%,"REVIEWED RECEIPTS
+
+4
+
+PENDING RECEIPTS
+
+1
+
+AVERAGE REVIEW TIME
+
+25 min
+
+APPROVAL RATE
+
+75%
+
+REJECTION RATE
+
+25%",True,"Real PostgREST ledger, controlled GoTrue identity adapter"
+dashboard_updates_after_actual_fourth_review,Rejection rate,25%,"REVIEWED RECEIPTS
+
+4
+
+PENDING RECEIPTS
+
+1
+
+AVERAGE REVIEW TIME
+
+25 min
+
+APPROVAL RATE
+
+75%
+
+REJECTION RATE
+
+25%",True,"Real PostgREST ledger, controlled GoTrue identity adapter"

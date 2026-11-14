@@ -490,6 +490,7 @@ export class AdminPaymentsPage {
   protected readonly selected = computed(() => this.admin.payments().find((p) => p.id === this.selectedId()) ?? null);
   protected readonly note = signal('');
   protected readonly noteErr = signal(false);
+  protected readonly actionError = signal<string | null>(null);
 
   // Assistant revenue masking rule: assistant cannot see revenue
   protected readonly canViewRevenue = computed(() => {
@@ -542,35 +543,35 @@ export class AdminPaymentsPage {
     this.selectedId.set(p.id);
   }
 
-  protected approve(p: AdminPayment): void {
-    this.admin.approve(p.id);
+  protected async approve(p: AdminPayment): Promise<void> {
+    const res = await this.admin.reviewReceiptRpc(p.id, 'approved');
+    if (!res.success) { this.actionError.set(res.error || 'Review failed'); return; }
+    this.actionError.set(null);
     this.selectedId.set(null);
   }
 
-  protected quickReject(p: AdminPayment): void {
-    const defaultReason =
-      this.i18n.lang() === 'ar'
-        ? 'بيانات التحويل غير مطابقة أو لقطة الشاشة غير واضحة'
-        : 'Payment reference or receipt details could not be verified';
+  protected async quickReject(p: AdminPayment): Promise<void> {
+    const defaultReason = this.i18n.lang() === 'ar' ? 'بيانات التحويل غير مطابقة أو لقطة الشاشة غير واضحة' : 'Payment reference or receipt details could not be verified';
     const note = prompt(
       this.i18n.lang() === 'ar' ? 'تأكيد رفض الإيصال - سبب الرفض:' : 'Confirm Payment Rejection - Reason:',
       defaultReason
     );
     if (note !== null) {
-      this.admin.reject(p.id, note.trim() || defaultReason);
+      const res = await this.admin.reviewReceiptRpc(p.id, 'rejected', note.trim() || defaultReason);
+      if (!res.success) { this.actionError.set(res.error || 'Review failed'); return; }
+      this.actionError.set(null);
       if (this.selectedId() === p.id) {
         this.selectedId.set(null);
       }
     }
   }
 
-  protected reject(p: AdminPayment): void {
-    const defaultReason =
-      this.i18n.lang() === 'ar'
-        ? 'بيانات التحويل غير مطابقة أو لقطة الشاشة غير واضحة'
-        : 'Payment reference or receipt details could not be verified';
+  protected async reject(p: AdminPayment): Promise<void> {
+    const defaultReason = this.i18n.lang() === 'ar' ? 'بيانات التحويل غير مطابقة أو لقطة الشاشة غير واضحة' : 'Payment reference or receipt details could not be verified';
     const finalNote = this.note().trim() || defaultReason;
-    this.admin.reject(p.id, finalNote);
+    const res = await this.admin.reviewReceiptRpc(p.id, 'rejected', finalNote);
+    if (!res.success) { this.actionError.set(res.error || 'Review failed'); return; }
+    this.actionError.set(null);
     this.selectedId.set(null);
   }
 

@@ -1,4 +1,5 @@
-const CACHE_NAME = 'adel-mostafa-pwa-v1';
+const CACHE_PREFIX = 'adel-mostafa-pwa-';
+const CACHE_NAME = CACHE_PREFIX + 'v2';
 const STATIC_ASSETS = [
   '/',
   '/manifest.webmanifest',
@@ -8,16 +9,20 @@ const STATIC_ASSETS = [
 
 // Helper to determine if a request contains protected video content
 function isProtectedMedia(requestUrl) {
-  const url = requestUrl.toLowerCase();
-  return (
-    url.endsWith('.mp4') ||
-    url.endsWith('.m3u8') ||
-    url.endsWith('.ts') ||
-    url.includes('/recorded%20lecture/') ||
-    url.includes('/storage/v1/object/public/recorded') ||
-    url.includes('webrtc://') ||
-    url.includes('live-stream')
-  );
+  const path = new URL(requestUrl, self.location.origin).pathname.toLowerCase();
+  return /\.(?:mp4|m3u8|m4s|ts|webm|mpd|key)$/.test(path)
+    || /\/(?:storage|api|rest|auth)\//.test(path)
+    || path.includes('/recorded%20lecture/') || path.includes('live-stream');
+}
+
+function safeNotificationTarget(value) {
+  try {
+    const target = new URL(value || '/', self.location.origin);
+    if (target.origin === self.location.origin && ['http:', 'https:'].includes(target.protocol)) {
+      return target.href;
+    }
+  } catch (_) { /* Invalid payload targets fall back to this application. */ }
+  return new URL('/', self.location.origin).href;
 }
 
 self.addEventListener('install', (event) => {
@@ -34,7 +39,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
-          if (key !== CACHE_NAME) {
+          if (key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME) {
             return caches.delete(key);
           }
         })
@@ -46,36 +51,19 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const request = event.request;
-  const url = request.url;
-
-  // RULE: Protected video is NEVER cached in service worker storage
-  if (isProtectedMedia(url) || request.method !== 'GET') {
-    event.respondWith(fetch(request));
+  const url = new URL(request.url);
+  // Only this explicit public asset list may participate in cache lookup.
+  // Never look up authenticated/API/media responses, even if an old cache contains one.
+  if (request.method !== 'GET' || url.origin !== self.location.origin
+      || isProtectedMedia(request.url) || request.headers.has('Authorization')
+      || (!STATIC_ASSETS.includes(url.pathname) && request.mode !== 'navigate') || url.search) {
     return;
   }
-
-  event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Stale-while-revalidate for cached static resources
-        fetch(request)
-          .then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(request, networkResponse));
-            }
-          })
-          .catch(() => {});
-        return cachedResponse;
-      }
-
-      return fetch(request).catch(() => {
-        // Navigation fallback to offline page
-        if (request.mode === 'navigate') {
-          return caches.match('/offline.html');
-        }
-      });
-    })
-  );
+  event.respondWith(fetch(request).catch(async () => {
+    if (request.mode === 'navigate') return caches.match('/offline.html');
+    const cached = await caches.match(request);
+    return cached || Response.error();
+  }));
 });
 
 // Web Push Notification Handling
@@ -96,7 +84,7 @@ self.addEventListener('push', (event) => {
     icon: '/favicon.svg',
     badge: '/favicon.svg',
     vibrate: [100, 50, 100],
-    data: { url: payload.url || '/' },
+    data: { url: safeNotificationTarget(payload.url) },
   };
 
   event.waitUntil(self.registration.showNotification(payload.title, options));
@@ -104,12 +92,12 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl = event.notification.data?.url || '/';
+  const targetUrl = safeNotificationTarget(event.notification.data?.url);
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (const client of windowClients) {
-        if (client.url.includes(targetUrl) && 'focus' in client) {
+        if (client.url === targetUrl && 'focus' in client) {
           return client.focus();
         }
       }

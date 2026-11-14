@@ -1,22 +1,22 @@
 import { Routes } from '@angular/router';
-import { staffGuard } from './core/auth/staff.guard';
+import { adminGuard, staffGuard } from './core/auth/staff.guard';
 import { ShellComponent } from './shared/layout/shell.component';
 
 export const routes: Routes = [
   {
     // Admin panel: same app, lazy-loaded, own layout. Real protection is Supabase RLS on profiles.role.
     path: 'admin',
-    canMatch: [staffGuard],
+    canMatch: [adminGuard],
     loadComponent: () => import('./features/admin/admin-shell.component').then((m) => m.AdminShellComponent),
     children: [
-      { path: '', title: 'titles.admin.dashboard', loadComponent: () => import('./features/admin/dashboard.page').then((m) => m.AdminDashboardPage) },
+      { path: '', title: 'titles.admin.dashboard', canMatch: [adminGuard], loadComponent: () => import('./features/admin/dashboard.page').then((m) => m.AdminDashboardPage) },
       { path: 'users', title: 'titles.admin.users', loadComponent: () => import('./features/admin/users.page').then((m) => m.AdminUsersPage) },
       { path: 'lectures', title: 'titles.admin.lectures', loadComponent: () => import('./features/admin/lectures.page').then((m) => m.AdminLecturesPage) },
       { path: 'live', title: 'titles.admin.live', loadComponent: () => import('./features/admin/live.page').then((m) => m.AdminLivePage) },
-      { path: 'payments', title: 'titles.admin.payments', loadComponent: () => import('./features/admin/payments.page').then((m) => m.AdminPaymentsPage) },
+      { path: 'payments', title: 'titles.admin.payments', canMatch: [adminGuard], loadComponent: () => import('./features/admin/payments.page').then((m) => m.AdminPaymentsPage) },
       { path: 'announcements', title: 'titles.admin.announcements', loadComponent: () => import('./features/admin/announcements.page').then((m) => m.AdminAnnouncementsPage) },
-      { path: 'metrics', title: 'titles.admin.metrics', loadComponent: () => import('./features/admin/metrics.page').then((m) => m.AdminMetricsPage) },
-      { path: 'settings', title: 'titles.admin.settings', loadComponent: () => import('./features/admin/settings.page').then((m) => m.AdminSettingsPage) },
+      { path: 'metrics', title: 'titles.admin.metrics', canMatch: [adminGuard], loadComponent: () => import('./features/admin/metrics.page').then((m) => m.AdminMetricsPage) },
+      { path: 'settings', title: 'titles.admin.settings', canMatch: [adminGuard], loadComponent: () => import('./features/admin/settings.page').then((m) => m.AdminSettingsPage) },
     ],
   },
   {

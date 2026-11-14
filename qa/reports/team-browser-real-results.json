@@ -1,0 +1,71 @@
+{
+  "boundary": "Actual production browser UI and real local PostgreSQL/PostgREST. Supabase getUser/session is an explicitly controlled test identity adapter, NOT real GoTrue authentication or delivery.",
+  "cases": [
+    {
+      "name": "real_browser_admin_create_and_independent_student_visibility",
+      "passed": true,
+      "detail": {
+        "independentStudentContext": true,
+        "viewport": 360
+      }
+    },
+    {
+      "name": "real_browser_admin_edit_persists_to_student",
+      "passed": false,
+      "error": "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Edited through browser and real server', { exact: true }) to be visible\u001b[22m\n",
+      "adminText": "Announcements\n\nSend updates to students in-app and by email.\n\nAll\nScheduled 0\nDrafts 0\n1 announcements\n\nBrowser real backend acceptance\nSent\n\nCreated by actual browser, committed through PostgRESTEdited through browser and real server\n\n25 Oct, 8:30 AM · Grade 3 · seen by 0 of 214 (0%)\n\nNew announcement\nTitle\nMessage\n0 / 500\nAudience\nAll students · 347\nGrade 3 · 214\nGrade 2 · 71\nGrade 1 · 44\nMiddle School · 18\nSend via\nIn-app\nEmail\nPin to top\nSchedule\nSave draft\nSend now",
+      "studentText": "Browser real backend acceptance\nOct 25, 2026\n\nCreated by actual browser, committed through PostgRESTEdited through browser and real server\n\nLatest Announcement\nTailored for Egyptian & Arab learners\nLearn English with Confidence\n\nMaster natural speaking, essential grammar and real-world conversation with structured guidance built for young Arabic-speaking learners and students.\n\nGet Started\nWatch a Free Lesson\nOM\nFZ\nYH\n\n4.9/5\n\nfrom 1,200+ ambitious students across Egypt and Arab countries\n\nIntroductory Video\n5-Day Streak\nWatch Introductory Video\n\n“Let's catch up soon!”\n\nPhonetic focus: /kætʃ ʌp/\n\nB2 Idiom\nFluency Confidence Index\n98%\n\nCOMPREHENSIVE PEDAGOGY\n\nEverything You Need to Succeed in English\n\nDesigned to remove speaking anxiety, break language barriers and build lasting fluency habits.\n\nRecorded Lectures\n\nHD video lessons with bilingual captions and searchable transcripts, built for clarity and easy revision.\n\nArabic & English subtitles\n\nQuizzes and Exercises\n\nInteractive grammar drills, vocabulary flashcards and instant explanations designed for active recall.\n\nInstant error feedback\n\nTrack Your Progress\n\nVisual milestones, daily streaks and a detailed breakdown of your speaking, listening and grammar.\n\nCEFR level milestones\n\nLearn at Your Own Pace\n\n24/7 access, mobile and desktop sync, and a 360p data-saver mode for learning anywhere.\n\nLow-bandwidth mode\n\nFACULTY SPOTLIGHT\n\nMeet Your Instructor\n\nMr. Adel Mostafa\n\nSenior English Teacher & Mentor\n\n20+ Years of Excellence & Inspiring Generations\n\nMr. Adel Mostafa is a highly accomplished and dedicated Senior English Teacher with over two decades of rich experience in inspiring, educating, and mentoring students. Throughout an illustrious career, he has successfully nurtured consecutive generations of learners, employing modern active and interactive learning strategies that balance a robust linguistic foundation with critical thinking skills.\n\n“We balance a robust linguistic foundation with critical thinking skills, empowering every student to speak and succeed with true mastery.”\n\n— Mr. Adel Mostafa\nYears Experience\n20+\nYears Experience\nStudents Mentored\n10,000+\nStudents Mentored\nDedication & Mastery\n100%\nDedication & Mastery\n\nSTUDENT VOICES\n\nWhat Our Students Say\n\nReal stories from ambitious learners across the Arab world.\n\n“I used to freeze whenever native speakers spoke to me. Teacher Kareem's phonetics breakdown fixed my pronunciation within 4 weeks, and I cleared my university admissions interview.”\nOA\n\nOmar Al-Mansoor\n\nCairo, Egypt\n\n“The recorded lessons with bilingual captions are pure gold. I downloaded the transcripts, practiced on the commute, and scored 7.5 on my IELTS Academic exam.”\nFA\n\nFatima Al-Zahra\n\nAlexandria, Egypt\n\n“Mr. Adel treated me like an adult learner. Instead of childish drills, we worked on real business communication, and I landed a senior role at a multinational agency.”\nYH\n\nYousef Haddad\n\nRiyadh, Saudi Arabia\n\nقناة مدرستنا التعليمية (Madrasetna TV)\nشريك المنهج الرسمي\n\nتابع شروحات وحصص وزارة التربية والتعليم الرسمية لصفوف الثانوية العامة بالتكامل مع محاضرات مستر عادل مصطفى.\n\nزيارة قناة مدرستنا\n\nStart your journey today\n\nReady to Speak English Naturally and Fearlessly?\n\nJoin more than 1,200 ambitious Arab learners. Get direct instructor guidance, interactive drills and lifelong speaking confidence.\n\nSign Up Now\nExplore All Lectures\n\nNo credit card required for the introductory placement test. Cancel anytime."
+    },
+    {
+      "name": "real_browser_admin_delete_and_student_empty_state",
+      "passed": true,
+      "detail": {
+        "empty": true
+      }
+    },
+    {
+      "name": "dashboard_matches_real_audit_three_reviews",
+      "passed": true,
+      "detail": {
+        "expected": {
+          "Reviewed receipts": "3",
+          "Pending receipts": "2",
+          "Average review time": "30 min",
+          "Approval rate": "66.7%",
+          "Rejection rate": "33.3%"
+        },
+        "actualText": "REVIEWED RECEIPTS\n\n3\n\nPENDING RECEIPTS\n\n2\n\nAVERAGE REVIEW TIME\n\n30 min\n\nAPPROVAL RATE\n\n66.7%\n\nREJECTION RATE\n\n33.3%"
+      }
+    },
+    {
+      "name": "dashboard_updates_after_actual_fourth_review",
+      "passed": true,
+      "detail": {
+        "expected": {
+          "Reviewed receipts": "4",
+          "Pending receipts": "1",
+          "Average review time": "25 min",
+          "Approval rate": "75%",
+          "Rejection rate": "25%"
+        },
+        "actualText": "REVIEWED RECEIPTS\n\n4\n\nPENDING RECEIPTS\n\n1\n\nAVERAGE REVIEW TIME\n\n25 min\n\nAPPROVAL RATE\n\n75%\n\nREJECTION RATE\n\n25%"
+      }
+    },
+    {
+      "name": "assistant_cannot_open_admin_dashboard",
+      "passed": true,
+      "detail": {
+        "redirect": "http://127.0.0.1:55133/assistant",
+        "notAnInventedStatic403": true
+      }
+    },
+    {
+      "name": "student_browser_real_api_writes_blocked",
+      "passed": true,
+      "detail": {
+        "actualHttpStatus": 403
+      }
+    }
+  ],
+  "passed": false
+}

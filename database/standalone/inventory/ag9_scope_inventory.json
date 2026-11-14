@@ -1,0 +1,295 @@
+{
+  "metadata": {
+    "title": "Mr. Adel Mostafa EdTech Platform - AG-9 Relational Database Inventory",
+    "jira_scope": [
+      "AG-9",
+      "AG-10",
+      "AG-11",
+      "AG-12",
+      "AG-13",
+      "AG-14",
+      "AG-15",
+      "AG-16",
+      "AG-17",
+      "AG-18",
+      "AG-19",
+      "AG-29"
+    ],
+    "generated_at": "2026-10-24T10:48:41.412108Z",
+    "author": "Samer Elhamy (Database Architect, Profile @jira)",
+    "architectural_verdict": "Canonical PostgreSQL 16 contains exactly 20 base tables and 1 analytical view. SQLite contains 21 base tables and 1 view due to explicit legacy password_reset_otps retention."
+  },
+  "domains": {
+    "identity_and_users": {
+      "tables": [
+        "groups",
+        "users",
+        "refresh_tokens",
+        "auth_otps"
+      ],
+      "legacy_tables_sqlite_only": [
+        "password_reset_otps"
+      ],
+      "constraints": [
+        {
+          "table": "users",
+          "constraint": "phone_number ~ '^01[0125][0-9]{8}$'",
+          "description": "Egyptian mobile standard validation"
+        },
+        {
+          "table": "users",
+          "constraint": "parent_phone_number != phone_number",
+          "description": "Student phone cannot equal parent phone (evasion guard)"
+        },
+        {
+          "table": "users",
+          "constraint": "char_length(trim(password_hash)) >= 20",
+          "description": "Minimum hash length format guard"
+        },
+        {
+          "table": "users",
+          "constraint": "total_points >= 0",
+          "description": "Non-negative student points balance"
+        },
+        {
+          "table": "refresh_tokens",
+          "constraint": "expires_at > created_at",
+          "description": "Forward chronological token expiry"
+        },
+        {
+          "table": "auth_otps",
+          "constraint": "attempts_count BETWEEN 0 AND 5",
+          "description": "OWASP brute-force rate limit"
+        },
+        {
+          "table": "groups",
+          "constraint": "char_length(trim(name)) > 0",
+          "description": "Non-empty group name"
+        }
+      ],
+      "enums": [
+        "user_role_enum",
+        "student_type_enum"
+      ]
+    },
+    "courses_and_lectures": {
+      "tables": [
+        "courses",
+        "lectures",
+        "lecture_access",
+        "lecture_watch_logs"
+      ],
+      "constraints": [
+        {
+          "table": "courses",
+          "constraint": "char_length(trim(title)) > 0",
+          "description": "Non-empty course title"
+        },
+        {
+          "table": "lectures",
+          "constraint": "price >= 0",
+          "description": "Non-negative lecture pricing"
+        },
+        {
+          "table": "lecture_access",
+          "constraint": "UNIQUE(student_id, lecture_id)",
+          "description": "Singular active access grant per student-lecture pair"
+        },
+        {
+          "table": "lecture_access",
+          "constraint": "views_count >= 0",
+          "description": "Non-negative view counter"
+        },
+        {
+          "table": "lecture_watch_logs",
+          "constraint": "watch_seconds >= 0",
+          "description": "Non-negative streaming playback tracking"
+        }
+      ],
+      "enums": [
+        "lecture_type_enum",
+        "access_grant_type_enum"
+      ]
+    },
+    "assignments_and_deadlines": {
+      "tables": [
+        "assignments",
+        "assignment_submissions"
+      ],
+      "constraints": [
+        {
+          "table": "assignments",
+          "constraint": "max_score > 0",
+          "description": "Strictly positive maximum assignment points"
+        },
+        {
+          "table": "assignment_submissions",
+          "constraint": "score_achieved >= 0",
+          "description": "Non-negative submission score"
+        },
+        {
+          "table": "assignment_submissions",
+          "constraint": "UNIQUE(assignment_id, student_id)",
+          "description": "Singular submission per student per assignment"
+        }
+      ],
+      "enums": [
+        "submission_status_enum"
+      ]
+    },
+    "quizzes_and_mcq": {
+      "tables": [
+        "quizzes",
+        "quiz_questions",
+        "quiz_attempts"
+      ],
+      "constraints": [
+        {
+          "table": "quizzes",
+          "constraint": "passing_score BETWEEN 0 AND 100",
+          "description": "Percentage passing boundary"
+        },
+        {
+          "table": "quiz_questions",
+          "constraint": "UNIQUE(quiz_id, question_order)",
+          "description": "Strict question sequence integrity"
+        },
+        {
+          "table": "quiz_attempts",
+          "constraint": "UNIQUE(quiz_id, student_id, attempt_number)",
+          "description": "Strict attempt enumeration"
+        },
+        {
+          "table": "quiz_attempts",
+          "constraint": "score_achieved <= total_possible_score",
+          "description": "Score cap enforcement"
+        }
+      ]
+    },
+    "gamification_and_leaderboard": {
+      "tables": [
+        "leaderboard_points_ledger",
+        "leaderboard_tiers"
+      ],
+      "views": [
+        "v_student_leaderboard_tiers"
+      ],
+      "constraints": [
+        {
+          "table": "leaderboard_points_ledger",
+          "constraint": "points_change != 0",
+          "description": "Zero delta point adjustments rejected"
+        },
+        {
+          "table": "leaderboard_tiers",
+          "constraint": "min_points >= 0",
+          "description": "Non-negative tier minimum"
+        },
+        {
+          "table": "leaderboard_tiers",
+          "constraint": "UNIQUE(tier_key)",
+          "description": "Unique tier identifier"
+        },
+        {
+          "table": "leaderboard_tiers",
+          "constraint": "UNIQUE(sort_order)",
+          "description": "Unique podium progression ordering"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "trg_sync_user_total_points",
+          "table": "leaderboard_points_ledger",
+          "event": "AFTER INSERT",
+          "action": "Sync total_points to users"
+        },
+        {
+          "name": "trg_prevent_points_ledger_update",
+          "table": "leaderboard_points_ledger",
+          "event": "BEFORE UPDATE",
+          "action": "SQLSTATE 55000 WORM Append-Only"
+        }
+      ],
+      "enums": [
+        "point_action_type_enum"
+      ]
+    },
+    "payments_audit_and_settings": {
+      "tables": [
+        "payments",
+        "admin_audit_logs",
+        "vouchers",
+        "notifications",
+        "system_settings"
+      ],
+      "constraints": [
+        {
+          "table": "payments",
+          "constraint": "UNIQUE(receipt_image_hash)",
+          "description": "SHA-256 anti-replay uniqueness"
+        },
+        {
+          "table": "payments",
+          "constraint": "UNIQUE(transaction_reference)",
+          "description": "Rail transaction reference uniqueness"
+        },
+        {
+          "table": "payments",
+          "constraint": "amount >= 0",
+          "description": "Non-negative payment amount"
+        },
+        {
+          "table": "vouchers",
+          "constraint": "UNIQUE(code)",
+          "description": "Unique voucher coupon code"
+        },
+        {
+          "table": "system_settings",
+          "constraint": "PRIMARY KEY(key)",
+          "description": "Unique key-value store"
+        }
+      ],
+      "triggers": [
+        {
+          "name": "trg_prevent_audit_log_update",
+          "table": "admin_audit_logs",
+          "event": "BEFORE UPDATE",
+          "action": "SQLSTATE 55000 Forensic WORM Immutability"
+        },
+        {
+          "name": "trg_prevent_audit_log_delete",
+          "table": "admin_audit_logs",
+          "event": "BEFORE DELETE",
+          "action": "SQLSTATE 55000 Forensic WORM Immutability"
+        }
+      ],
+      "enums": [
+        "payment_method_enum",
+        "payment_status_enum"
+      ]
+    }
+  },
+  "counts_summary": {
+    "postgresql_16": {
+      "base_tables": 20,
+      "analytical_views": 1,
+      "domain_enums": 8,
+      "b_tree_indexes": 11,
+      "stored_functions": 3,
+      "triggers": 4
+    },
+    "sqlite_3": {
+      "base_tables": 21,
+      "analytical_views": 1,
+      "b_tree_indexes": 12,
+      "triggers": 4,
+      "custom_python_udfs": [
+        "REGEXP",
+        "uuid_generate_v4()",
+        "gen_random_uuid()",
+        "char_length()",
+        "now()"
+      ]
+    }
+  }
+}

@@ -6,30 +6,31 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#4E342E',
-          hover: '#3E2723',
-          mid: '#6D4C41',
-          light: '#8D6E63',
+          DEFAULT: 'rgb(var(--color-primary-rgb) / <alpha-value>)',
+          hover: 'var(--color-primary-hover)',
+          mid: 'var(--color-primary-mid)',
+          light: 'var(--color-primary-light)',
+          foreground: 'var(--color-primary-foreground)',
         },
         ink: {
-          DEFAULT: '#361F1A', // headings
-          body: '#504442',
-          soft: '#79564B',
-          muted: '#827471',
+          DEFAULT: 'rgb(var(--color-ink-rgb) / <alpha-value>)', // headings
+          body: 'rgb(var(--color-ink-body-rgb) / <alpha-value>)',
+          soft: 'rgb(var(--color-ink-soft-rgb) / <alpha-value>)',
+          muted: 'rgb(var(--color-ink-muted-rgb) / <alpha-value>)',
         },
         line: {
-          DEFAULT: '#D4C3BF',
-          soft: '#E6DFDA',
+          DEFAULT: 'rgb(var(--color-line-rgb) / <alpha-value>)',
+          soft: 'rgb(var(--color-line-soft-rgb) / <alpha-value>)',
         },
         surface: {
-          page: '#FFF8F6',
-          card: '#FFFFFF',
-          tint: '#F9EBE7',
-          tint2: '#F3E5E2',
-          tint3: '#EDE0DC',
-          tint4: '#E4D7D4',
-          highlight: '#FFDBCF',
-          warm: '#FFF1ED',
+          page: 'rgb(var(--color-surface-page-rgb) / <alpha-value>)',
+          card: 'rgb(var(--color-surface-card-rgb) / <alpha-value>)',
+          tint: 'rgb(var(--color-surface-tint-rgb) / <alpha-value>)',
+          tint2: 'rgb(var(--color-surface-tint2-rgb) / <alpha-value>)',
+          tint3: 'rgb(var(--color-surface-tint3-rgb) / <alpha-value>)',
+          tint4: 'rgb(var(--color-surface-tint4-rgb) / <alpha-value>)',
+          highlight: 'rgb(var(--color-surface-highlight-rgb) / <alpha-value>)',
+          warm: 'rgb(var(--color-surface-warm-rgb) / <alpha-value>)',
         },
         gold: {
           DEFAULT: '#D4AF37',

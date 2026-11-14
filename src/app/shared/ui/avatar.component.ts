@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 
-const TINTS = ['bg-surface-highlight text-primary', 'bg-gold-soft text-gold-dark', 'bg-surface-tint3 text-ink-soft', 'bg-success-soft text-success'];
+const TINTS = ['bg-surface-highlight text-primary', 'bg-surface-tint3 text-ink', 'bg-surface-tint3 text-ink-soft', 'bg-success-soft text-success'];
 
 /** Profile photo from the backend, or initials on a warm tint. */
 @Component({

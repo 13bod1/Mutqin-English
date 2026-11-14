@@ -49,6 +49,10 @@ export interface AdminPayment {
   receiptFiles?: string[];
   duplicateOf?: string;
   note?: string;
+  reviewedAt?: string | null;
+  reviewerId?: string | null;
+  reviewerName?: string | null;
+  turnaroundMinutes?: number | null;
 }
 
 export type LectureState = 'published' | 'draft' | 'processing' | 'scheduled';

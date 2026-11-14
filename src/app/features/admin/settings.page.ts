@@ -27,6 +27,7 @@ type BoolKey = { [K in keyof AcademySettings]-?: NonNullable<AcademySettings[K]>
         </button>
       </app-admin-header>
 
+      @if (saveError()) { <p class="note tone-danger" role="alert">{{ saveError() }}</p> }
       @if (form(); as f) {
         <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
           <nav class="card hidden p-2 lg:sticky lg:top-24 lg:block" [attr.aria-label]="'admin.settings.title' | t">
@@ -337,6 +338,7 @@ type BoolKey = { [K in keyof AcademySettings]-?: NonNullable<AcademySettings[K]>
   `,
 })
 export class AdminSettingsPage {
+  protected readonly saveError = signal<string | null>(null);
   protected readonly admin = inject(AdminService);
   protected readonly i18n = inject(LanguageService);
   private readonly guardianService = inject(GuardianReportService);
@@ -507,13 +509,10 @@ export class AdminSettingsPage {
   protected save(): void {
     const f = this.form();
     if (!f) return;
-    if (f.guardianReportsEnabled !== undefined) {
-      this.guardianService.setReportsEnabled(f.guardianReportsEnabled);
-    }
-    this.admin.saveSettings(f).subscribe(() => {
-      this.baseline.set(JSON.stringify(f));
-      this.saved.set(true);
-      setTimeout(() => this.saved.set(false), 2500);
+    this.saveError.set(null);
+    this.admin.saveSettings(f).subscribe({
+      next: () => { if (f.guardianReportsEnabled !== undefined) this.guardianService.setReportsEnabled(f.guardianReportsEnabled); this.baseline.set(JSON.stringify(f)); this.saved.set(true); setTimeout(() => this.saved.set(false), 2500); },
+      error: (error: Error) => { this.saved.set(false); this.saveError.set(error.message || 'Settings were not saved'); }
     });
   }
 }

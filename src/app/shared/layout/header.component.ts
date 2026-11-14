@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { filter } from 'rxjs';
-import { AdminService } from '../../core/data/admin.service';
+import { PublicSettingsService, isSafeBannerUrl } from '../../core/services/public-settings.service';
 import { AuthService } from '../../core/data/auth.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
@@ -24,10 +24,10 @@ interface NavItem {
   },
   template: `
     @if (popup(); as p) {
-      @if (p.enabled && !popupDismissed()) {
-        <div class="relative isolate flex items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold sm:text-sm"
+      @if (p.enabled && !bannerDismissed()) {
+        <div class="relative isolate flex items-center justify-center gap-2 px-16 py-2 text-center text-xs font-semibold sm:text-sm"
           [class]="popupToneClass(p.type)">
-          <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+          <div class="min-w-0 flex flex-wrap items-center justify-center gap-1.5 break-words sm:gap-2">
             @if (p.title) {
               <span class="inline-flex items-center gap-1 font-bold underline decoration-white/40 underline-offset-2">
                 <lucide-icon name="sparkles" [size]="14" />
@@ -35,15 +35,21 @@ interface NavItem {
               </span>
             }
             <span class="opacity-95">{{ p.message }}</span>
-            @if (p.linkText && p.linkUrl && p.linkText !== 'Explore sessions' && p.linkText !== 'Explore Sessions') {
-              <a [routerLink]="p.linkUrl" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
-                {{ p.linkText }} &rarr;
-              </a>
+            @if (p.linkText && p.linkUrl && isSafeBannerLink(p.linkUrl) && p.linkText.toLowerCase() !== 'explore sessions') {
+              @if (isExternalUrl(p.linkUrl)) {
+                <a [href]="p.linkUrl" target="_blank" rel="noopener noreferrer" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
+                  {{ p.linkText }} &rarr;
+                </a>
+              } @else {
+                <a [routerLink]="p.linkUrl" class="font-bold underline hover:opacity-80 ms-1 inline-flex items-center gap-0.5">
+                  {{ p.linkText }} &rarr;
+                </a>
+              }
             }
           </div>
           @if (p.dismissible) {
-            <button type="button" (click)="dismissPopup()" class="absolute end-2 sm:end-4 top-1/2 -translate-y-1/2 rounded p-1 hover:bg-black/15 transition opacity-80 hover:opacity-100" aria-label="Dismiss banner">
-              <lucide-icon name="x" [size]="14" />
+            <button type="button" (click)="dismissPopup($event)" class="absolute end-2 sm:end-4 top-1/2 -translate-y-1/2 grid h-11 w-11 place-items-center rounded p-1 hover:bg-black/15 transition opacity-80 hover:opacity-100 z-10 cursor-pointer" aria-label="Dismiss banner">
+              <lucide-icon name="x" [size]="14" class="pointer-events-none" />
             </button>
           }
         </div>
@@ -64,11 +70,6 @@ interface NavItem {
               <span class="absolute -end-1 -top-0.5 flex h-2.5 w-2.5" aria-label="Live session in progress">
                 <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
                 <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
-              </span>
-            }
-            @if (item.path === '/announcements' && announcementsCount() > 0) {
-              <span class="ms-1.5 rounded-full bg-primary/15 px-1.5 py-0.5 text-[0.6875rem] font-bold text-primary">
-                {{ announcementsCount() }}
               </span>
             }
           </a>
@@ -197,7 +198,7 @@ interface NavItem {
 export class HeaderComponent {
   protected readonly i18n = inject(LanguageService);
   protected readonly auth = inject(AuthService);
-  private readonly adminSvc = inject(AdminService);
+  private readonly publicSettings = inject(PublicSettingsService);
   protected readonly menuOpen = signal(false);
 
   protected readonly isStaff = computed(() => {
@@ -214,33 +215,60 @@ export class HeaderComponent {
 
   /** True when at least one live class currently has status === 'live'. Powers the navbar badge. */
   protected readonly hasLiveSession = computed(() =>
-    this.adminSvc.liveClasses().some((s) => s.status === 'live')
+    this.publicSettings.liveClasses().some((s) => s.status === 'live')
   );
 
-  protected readonly popup = this.adminSvc.activePopup;
-  protected readonly popupDismissed = signal(false);
+  protected readonly popup = this.publicSettings.activePopup;
+  private readonly locallyDismissedKey = signal<string | null>(null);
 
-  protected dismissPopup(): void {
-    this.popupDismissed.set(true);
+  protected readonly bannerDismissed = computed(() => {
+    const p = this.popup();
+    if (!p || !p.enabled) return true;
+    const key = this.publicSettings.getBannerDismissKey(p);
+    if (this.locallyDismissedKey() === key) return true;
+    return this.publicSettings.isBannerDismissed(p);
+  });
+  protected readonly popupDismissed = this.bannerDismissed;
+
+  protected dismissPopup(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const p = this.popup();
+    if (p) {
+      const key = this.publicSettings.getBannerDismissKey(p);
+      this.locallyDismissedKey.set(key);
+      this.publicSettings.dismissBanner(p);
+    }
+  }
+
+  protected dismissBanner(event?: Event): void {
+    this.dismissPopup(event);
+  }
+
+  protected isExternalUrl(url?: string | null): boolean {
+    if (!url) return false;
+    return /^https?:\/\//i.test(url.trim());
+  }
+
+  protected isSafeBannerLink(url?: string | null): boolean {
+    return isSafeBannerUrl(url);
   }
 
   protected popupToneClass(type?: string): string {
     switch (type) {
       case 'warning':
-        return 'bg-amber-600 text-white';
+        return 'bg-amber-800 text-white';
       case 'success':
         return 'bg-emerald-700 text-white';
       case 'info':
-        return 'bg-sky-600 text-white';
+        return 'bg-sky-800 text-white';
       case 'announcement':
       default:
         return 'bg-primary text-white';
     }
   }
-
-  protected readonly announcementsCount = computed(() =>
-    this.adminSvc.announcements().filter((a) => a.state !== 'draft').length
-  );
 
   protected readonly nav: NavItem[] = [
     { path: '/', key: 'nav.home', exact: true },

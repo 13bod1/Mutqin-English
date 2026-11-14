@@ -32,7 +32,7 @@ import { LogoComponent } from '../ui/logo.component';
             <li><a routerLink="/lectures" class="text-ink-body hover:text-ink">{{ 'nav.lectures' | t }}</a></li>
             <li><a routerLink="/quizzes" class="text-ink-body hover:text-ink">{{ 'nav.quizzes' | t }}</a></li>
             <li>
-              <a href="https://www.youtube.com/@madrasetnatv" target="_blank" rel="noopener" class="text-red-700 hover:text-red-800 font-semibold flex items-center gap-1.5" title="قناة مدرستنا التعليمية (وزارة التربية والتعليم)">
+              <a href="https://www.youtube.com/@madrasetnatv" target="_blank" rel="noopener" class="text-ink-body hover:text-ink font-semibold flex items-center gap-1.5" title="قناة مدرستنا التعليمية (وزارة التربية والتعليم)">
                 <span class="h-2 w-2 rounded-full bg-red-600 inline-block animate-pulse"></span>
                 قناة مدرستنا (Madrasetna TV)
               </a>

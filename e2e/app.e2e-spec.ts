@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Mutqin English Application E2E Tests', () => {
+test.describe('Mr. Adel Mostafa Application E2E Tests', () => {
   test('Landing page loads with brand title and hero section', async ({ page }) => {
     await page.goto('/');
 
     // Check title
-    await expect(page).toHaveTitle(/متقن|Mutqin/i);
+    await expect(page).toHaveTitle(/Mr\. Adel Mostafa/i);
 
     // Check header logo
-    const logo = page.locator('app-logo');
+    const logo = page.locator('app-header app-logo');
     await expect(logo).toBeVisible();
 
     // Check hero heading

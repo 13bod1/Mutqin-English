@@ -1,0 +1,30 @@
+🎓 أكاديمية مستر عادل مصطفى — Mr. Adel Mostafa Academy
+إيصال تأكيد الدفع والاشتراك | Official Payment Receipt
+
+أهلاً بك يا {{student_name}}،
+تم تأكيد عملية الدفع وتفعيل اشتراكك بنجاح.
+
+تفاصيل الإيصال:
+----------------------------------------------------------------------
+رقم العملية المرجعي : {{order_reference}}
+المحاضرة / الكورس   : {{course_title}}
+طريقة الدفع        : {{payment_method}}
+تاريخ العملية       : {{transaction_date}}
+المبلغ الإجمالي     : {{amount_egp}} جنيه مصري (EGP)
+----------------------------------------------------------------------
+رابط المحاضرة المباشر: {{lecture_access_url}}
+
+----------------------------------------------------------------------
+Payment Summary:
+Student: {{student_name}}
+Order Ref: {{order_reference}}
+Course: {{course_title}}
+Total Paid: {{amount_egp}} EGP ({{payment_method}})
+Date: {{transaction_date}}
+----------------------------------------------------------------------
+
+لأي استفسار بخصوص اشتراكك:
+البريد الإلكتروني: {{support_email}}
+واتساب: {{support_phone}}
+
+© {{year}} Mr. Adel Mostafa Academy.

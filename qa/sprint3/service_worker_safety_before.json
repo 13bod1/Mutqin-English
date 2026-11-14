@@ -1,0 +1,26 @@
+{
+  "passed": false,
+  "results": [
+    {
+      "name": "protected_media_querystring_classified",
+      "passed": false,
+      "error": "Expected values to be strictly equal:\n\nfalse !== true\n"
+    },
+    {
+      "name": "unrelated_origin_cache_preserved",
+      "passed": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(!deletions.includes('different-app-cache'))\n"
+    },
+    {
+      "name": "cross_origin_notification_target_not_opened",
+      "passed": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(opened.every(u=>new URL(u,origin).origin===origin))\n"
+    },
+    {
+      "name": "credentials_api_request_never_served_from_cache",
+      "passed": false,
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n"
+    }
+  ],
+  "boundary": "Actual service-worker source executed in Node VM. Not browser install/push provider acceptance."
+}

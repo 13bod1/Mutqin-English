@@ -1,0 +1,73 @@
+{
+  "boundary": "Real local built Angular browser screenshots. WIP preview, not accepted completed Sprint3 stories; no real provider/GoTrue/staging/video claim.",
+  "screenshots": [
+    {
+      "file": "landing.png",
+      "url": "http://127.0.0.1:64706/",
+      "title": "Learn English with Confidence · Mr. Adel Mostafa",
+      "classification": "LOCAL_WIP_PREVIEW"
+    },
+    {
+      "file": "live_catalog.png",
+      "url": "http://127.0.0.1:64706/live",
+      "title": "Live Sessions · Mr. Adel Mostafa",
+      "classification": "LOCAL_WIP_PREVIEW"
+    },
+    {
+      "file": "guardian_invalid_link.png",
+      "url": "http://127.0.0.1:64706/guardian/report/synthetic-invalid-token",
+      "title": "Guardian Weekly Progress Report · Mr. Adel Mostafa",
+      "classification": "LOCAL_WIP_PREVIEW"
+    },
+    {
+      "file": "offline_fallback_document.png",
+      "url": "http://127.0.0.1:64706/offline.html",
+      "title": "غير متصل بالإنترنت · منصة أ. عادل مصطفى",
+      "classification": "LOCAL_WIP_PREVIEW"
+    },
+    {
+      "file": "live_session_wip.png",
+      "url": "http://127.0.0.1:64706/live/reading-inference",
+      "classification": "LOCAL_WIP_PREVIEW"
+    }
+  ],
+  "diagnostics": [
+    {
+      "name": "actual_serviceworker_registration",
+      "observed": {
+        "controller": true,
+        "registrations": 1,
+        "cacheNames": [
+          "adel-mostafa-pwa-v2"
+        ]
+      }
+    },
+    {
+      "name": "actual_offline_navigation",
+      "url": "http://127.0.0.1:64706/live",
+      "body": "أنت غير متصل بالإنترنت حالياً\n\nيبدو أنك فقدت الاتصال بشبكة الإنترنت. يمكنك الاستمرار في مراجعة الصفحات المحفوظة مسبقاً.\n\nتنويه أمني: حصص البث المباشر والمحاضرات المشفرة تتطلب اتصالاً مباشراً بالإنترنت ولا يتم تخزينها دون اتصال.\nإعادة المحاولة",
+      "offlineFallback": true
+    },
+    {
+      "name": "actual_local_4g_emulated_fcp",
+      "route": "/",
+      "fcpMs": 432,
+      "under1800": true,
+      "notAStagingLoadMeasurement": true
+    },
+    {
+      "name": "actual_local_4g_emulated_fcp",
+      "route": "/live",
+      "fcpMs": 608,
+      "under1800": true,
+      "notAStagingLoadMeasurement": true
+    },
+    {
+      "name": "actual_local_4g_emulated_fcp",
+      "route": "/login",
+      "fcpMs": 408,
+      "under1800": true,
+      "notAStagingLoadMeasurement": true
+    }
+  ]
+}

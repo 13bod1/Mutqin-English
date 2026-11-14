@@ -1,0 +1,30 @@
+{
+  "unit": {
+    "total": 138,
+    "failed": 2,
+    "skipped": 0,
+    "passed": 136,
+    "failures": [
+      "AuthService should handle login successfully",
+      "AuthService should signup a new user"
+    ],
+    "junit_hash": "134f2da37a329dc4ff757343c9f5171bde3c1ea02fda4206abbd504d951b98c7",
+    "exit_code": 1
+  },
+  "e2e": {
+    "stats": {
+      "startTime": "2026-10-25T07:31:49.633Z",
+      "duration": 33730.087,
+      "expected": 18,
+      "skipped": 0,
+      "unexpected": 3,
+      "flaky": 0
+    },
+    "errors": [],
+    "exit_code": 1,
+    "report": "C:\\Users\\Samer\\AppData\\Local\\hermes\\profiles\\jira\\workspace\\samer_sherry_delivery\\actual_done\\final_checks\\e2e_report.json",
+    "global_timeout": false
+  },
+  "build_exit": 0,
+  "immutable_tests": true
+}

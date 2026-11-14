@@ -1,0 +1,880 @@
+[
+  {
+    "key": "AG-6",
+    "summary": "notification system for sending any new moodle content",
+    "jira_status": "To Do",
+    "assignee": "Unassigned",
+    "parent": "AG-4",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Related public notification/settings source only; automatic Moodle ingestion/sending is NOT implemented or verified by this delivery.",
+    "links": [
+      {
+        "path": "src/app/core/services/public-settings.service.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/services/public-settings.service.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-10",
+    "summary": "DB-01: Full Relational ERD & Schemas (PG 20+1 View vs SQLite 21+1 View Mismatch Tracked)",
+    "jira_status": "Done",
+    "assignee": "Samer Elhamy",
+    "parent": "AG-9",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "database/standalone/schema/01_mr_adel_production_schema_pg16.sql",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/database/standalone/schema/01_mr_adel_production_schema_pg16.sql"
+      },
+      {
+        "path": "database/standalone/inventory/AG9_SCOPE_INVENTORY.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/database/standalone/inventory/AG9_SCOPE_INVENTORY.md"
+      }
+    ]
+  },
+  {
+    "key": "AG-11",
+    "summary": "DB-02: Dual-Engine Database Configuration & Harness (PostgreSQL 16.6 Runtime Probed; Docker Not Verified)",
+    "jira_status": "Done",
+    "assignee": "Samer Elhamy",
+    "parent": "AG-9",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "database/standalone/QUICKSTART.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/database/standalone/QUICKSTART.md"
+      },
+      {
+        "path": "docs/database/jira/evidence/pg-runtime-summary.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/docs/database/jira/evidence/pg-runtime-summary.md"
+      }
+    ]
+  },
+  {
+    "key": "AG-12",
+    "summary": "DB-03: Data Access Layer for Identity, Session & OTP Storage (Not Live WhatsApp / Hash Length Check Only)",
+    "jira_status": "Done",
+    "assignee": "Samer Elhamy",
+    "parent": "AG-9",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "database/standalone/adapter/db_adapter.py",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/database/standalone/adapter/db_adapter.py"
+      },
+      {
+        "path": "database/standalone/migrations/001_identity_rbac_courses.sql",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/database/standalone/migrations/001_identity_rbac_courses.sql"
+      }
+    ]
+  },
+  {
+    "key": "AG-20",
+    "summary": "Build Landing page",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-3",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/landing/landing.page.html",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/landing/landing.page.html"
+      }
+    ]
+  },
+  {
+    "key": "AG-21",
+    "summary": "Build Login and Sign-up pages",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-3",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/auth/login.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/auth/login.page.ts"
+      },
+      {
+        "path": "src/app/features/auth/signup.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/auth/signup.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-22",
+    "summary": "Set up project and routing",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-3",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/app.routes.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/app.routes.ts"
+      },
+      {
+        "path": "package.json",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/package.json"
+      }
+    ]
+  },
+  {
+    "key": "AG-23",
+    "summary": "Build shared UI components",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-3",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/shared/ui/avatar.component.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/shared/ui/avatar.component.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-24",
+    "summary": "progress tracking ",
+    "jira_status": "To Do",
+    "assignee": "Unassigned",
+    "parent": "AG-5",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Related progress implementation exists; unassigned To Do task acceptance is not verified.",
+    "links": [
+      {
+        "path": "src/app/core/data/progress.service.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/data/progress.service.ts"
+      },
+      {
+        "path": "src/app/features/progress/progress.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/progress/progress.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-25",
+    "summary": "Design Recorded Lectures page",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-3",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/lectures/lectures.page.html",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/lectures/lectures.page.html"
+      }
+    ]
+  },
+  {
+    "key": "AG-26",
+    "summary": "Design Quizzes and Exercises pages",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-3",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/quizzes/quizzes.page.html",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/quizzes/quizzes.page.html"
+      }
+    ]
+  },
+  {
+    "key": "AG-27",
+    "summary": "Design Track Your Progress page",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-3",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/progress/progress.page.html",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/progress/progress.page.html"
+      }
+    ]
+  },
+  {
+    "key": "AG-28",
+    "summary": "Design Learn at Your Own Pace page",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-3",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/landing/landing.page.html",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/landing/landing.page.html"
+      }
+    ]
+  },
+  {
+    "key": "AG-51",
+    "summary": "UI/UX: Payment checkout mockups [8h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-40",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Implemented UI link, not proof of original design-tool mockup approval.",
+    "links": [
+      {
+        "path": "src/app/features/checkout/checkout.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/checkout/checkout.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-52",
+    "summary": "UI/UX: Live page mockups [8h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-41",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Implemented UI link, not proof of original design-tool mockup approval.",
+    "links": [
+      {
+        "path": "src/app/features/live/live-list.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/live/live-list.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-53",
+    "summary": "UI/UX: Admin portal and dashboard layout [10h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-42",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Implemented UI link, not proof of original design-tool mockup approval.",
+    "links": [
+      {
+        "path": "src/app/features/admin/admin-shell.component.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/admin/admin-shell.component.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-54",
+    "summary": "UI/UX: Theme picker and popup design [6h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-43",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Implemented UI link, not proof of original design-tool mockup approval.",
+    "links": [
+      {
+        "path": "src/app/features/admin/settings.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/admin/settings.page.ts"
+      },
+      {
+        "path": "src/app/shared/layout/header.component.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/shared/layout/header.component.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-55",
+    "summary": "UI/UX: Announcements page and logo lockup [6h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-44",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Implemented UI link, not proof of original logo/design-tool mockup approval.",
+    "links": [
+      {
+        "path": "src/app/features/announcements/announcements.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/announcements/announcements.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-56",
+    "summary": "UI/UX: Assistant KPI dashboard mockup [4h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Ehab",
+    "parent": "AG-45",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Implemented UI link, not proof of original design-tool mockup approval.",
+    "links": [
+      {
+        "path": "src/app/features/admin/metrics.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/admin/metrics.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-57",
+    "summary": "Frontend: Checkout UI with payment states [12h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Hamdy",
+    "parent": "AG-40",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/checkout/checkout.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/checkout/checkout.page.ts"
+      },
+      {
+        "path": "src/app/features/checkout/payment-result.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/checkout/payment-result.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-58",
+    "summary": "Frontend: Live page UI [12h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Hamdy",
+    "parent": "AG-41",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/live/live-session.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/live/live-session.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-59",
+    "summary": "Frontend: Admin shell, theme settings UI and main-page popup [14h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Hamdy",
+    "parent": "AG-42",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/admin/admin-shell.component.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/admin/admin-shell.component.ts"
+      },
+      {
+        "path": "src/app/features/admin/settings.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/admin/settings.page.ts"
+      },
+      {
+        "path": "src/app/core/services/public-settings.service.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/services/public-settings.service.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-60",
+    "summary": "Frontend: Announcements page UI [6h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Hamdy",
+    "parent": "AG-44",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/announcements/announcements.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/announcements/announcements.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-61",
+    "summary": "Backend: Payment gateway integration, webhook and payments table [16h]",
+    "jira_status": "Done",
+    "assignee": "Abdullah Ahmed",
+    "parent": "AG-40",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Related payment service/schema only. Actual external gateway webhook/production integration is not certified here.",
+    "links": [
+      {
+        "path": "src/app/core/services/payment.service.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/services/payment.service.ts"
+      },
+      {
+        "path": "database/standalone/migrations/006_payments_antifraud_audit.sql",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/database/standalone/migrations/006_payments_antifraud_audit.sql"
+      }
+    ]
+  },
+  {
+    "key": "AG-62",
+    "summary": "Backend: Live sessions API [10h]",
+    "jira_status": "Done",
+    "assignee": "Abdullah Ahmed",
+    "parent": "AG-41",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/core/services/live-session.service.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/services/live-session.service.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-63",
+    "summary": "Backend: Admin API, RBAC admin role and theme/popup settings endpoint [10h]",
+    "jira_status": "Done",
+    "assignee": "Abdullah Ahmed",
+    "parent": "AG-42",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "supabase/migrations/20261024_002_announcements_settings_receipt_rpc.sql",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/supabase/migrations/20261024_002_announcements_settings_receipt_rpc.sql"
+      },
+      {
+        "path": "src/app/core/auth/staff.guard.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/auth/staff.guard.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-64",
+    "summary": "Backend: Announcements CRUD API [5h]",
+    "jira_status": "Done",
+    "assignee": "Abdullah Ahmed",
+    "parent": "AG-44",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "supabase/migrations/20261024_002_announcements_settings_receipt_rpc.sql",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/supabase/migrations/20261024_002_announcements_settings_receipt_rpc.sql"
+      },
+      {
+        "path": "src/app/core/services/public-settings.service.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/services/public-settings.service.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-65",
+    "summary": "Backend: Assistant activity logging and metrics API [8h]",
+    "jira_status": "Done",
+    "assignee": "Abdullah Ahmed",
+    "parent": "AG-45",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "supabase/migrations/20261024_002_announcements_settings_receipt_rpc.sql",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/supabase/migrations/20261024_002_announcements_settings_receipt_rpc.sql"
+      },
+      {
+        "path": "src/app/core/data/admin.service.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/data/admin.service.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-66",
+    "summary": "Frontend: Assistant KPI dashboard UI [6h]",
+    "jira_status": "Done",
+    "assignee": "Mohammed Hamdy",
+    "parent": "AG-45",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/features/admin/metrics.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/admin/metrics.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-67",
+    "summary": "QA: Payment test plan and Gherkin test cases [8h]",
+    "jira_status": "Done",
+    "assignee": "HAZEM AHMED",
+    "parent": "AG-40",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "qa/test-plans/AG-67-payment-test-plan.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/test-plans/AG-67-payment-test-plan.md"
+      },
+      {
+        "path": "qa/features/AG-67-payment.feature",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/features/AG-67-payment.feature"
+      }
+    ]
+  },
+  {
+    "key": "AG-68",
+    "summary": "QA: Execute payment tests and security checks [8h]",
+    "jira_status": "Done",
+    "assignee": "HAZEM AHMED",
+    "parent": "AG-40",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Existing team report/test source only; this index does not independently certify its historical results.",
+    "links": [
+      {
+        "path": "qa/reports/sprint-2-qa-execution-report.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/reports/sprint-2-qa-execution-report.md"
+      },
+      {
+        "path": "src/app/core/services/payment.service.spec.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/services/payment.service.spec.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-69",
+    "summary": "QA: Live page tests (access, start/end, mobile) [8h]",
+    "jira_status": "Done",
+    "assignee": "HAZEM AHMED",
+    "parent": "AG-41",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Existing team test source only; this index does not independently certify live provider start/end acceptance.",
+    "links": [
+      {
+        "path": "qa/features/AG-69-live-streaming.feature",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/features/AG-69-live-streaming.feature"
+      },
+      {
+        "path": "src/app/core/services/live-session.service.spec.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/services/live-session.service.spec.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-70",
+    "summary": "QA: Regression of Sprint 1 features after rebrand [6h]",
+    "jira_status": "Done",
+    "assignee": "HAZEM AHMED",
+    "parent": "AG-39",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Fresh regression suites are not fully green; historical Done is preserved, not independently re-approved.",
+    "links": [
+      {
+        "path": "src/app/core/services/rebrand-regression.spec.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/services/rebrand-regression.spec.ts"
+      },
+      {
+        "path": "qa/features/AG-70-rebrand-regression.feature",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/features/AG-70-rebrand-regression.feature"
+      }
+    ]
+  },
+  {
+    "key": "AG-72",
+    "summary": "QA: Admin portal and RBAC tests (incl. IDOR) [10h]",
+    "jira_status": "In Progress",
+    "assignee": "sherryhany",
+    "parent": "AG-42",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Real isolated PostgREST RBAC cases27/27 passed; complete browser-route acceptance/defect workflow remains open.",
+    "links": [
+      {
+        "path": "qa/sherry/AG-72-admin-rbac-security-test-plan.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/sherry/AG-72-admin-rbac-security-test-plan.md"
+      },
+      {
+        "path": "qa/sherry/real-backend-acceptance.feature",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/sherry/real-backend-acceptance.feature"
+      }
+    ]
+  },
+  {
+    "key": "AG-73",
+    "summary": "QA: Theme and popup tests (cross-browser, mobile, WCAG) [6h]",
+    "jira_status": "In Progress",
+    "assignee": "sherryhany",
+    "parent": "AG-43",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Fresh browser/theme sample results linked below; gradients/media and full cross-client everywhere/WCAG acceptance unverified.",
+    "links": [
+      {
+        "path": "qa/sherry/AG-73-theme-popup-test-plan.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/sherry/AG-73-theme-popup-test-plan.md"
+      },
+      {
+        "path": "src/styles.scss",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/styles.scss"
+      }
+    ]
+  },
+  {
+    "key": "AG-74",
+    "summary": "QA: Announcements tests [4h]",
+    "jira_status": "In Progress",
+    "assignee": "sherryhany",
+    "parent": "AG-44",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Actual backend CRUD/blocked student writes and browser empty/mobile checks passed separately; combined authenticated browser CRUD still unverified.",
+    "links": [
+      {
+        "path": "qa/sherry/AG-74-announcements-test-plan.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/sherry/AG-74-announcements-test-plan.md"
+      },
+      {
+        "path": "src/app/features/admin/announcements.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/admin/announcements.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-75",
+    "summary": "QA: Validate assistant KPI accuracy against raw logs [6h]",
+    "jira_status": "In Progress",
+    "assignee": "sherryhany",
+    "parent": "AG-45",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Real audit CSV and manual comparison are available; complete dashboard-to-raw-event reconciliation remains unverified.",
+    "links": [
+      {
+        "path": "qa/sherry/AG-75-assistant-kpi-verification-matrix.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/sherry/AG-75-assistant-kpi-verification-matrix.md"
+      },
+      {
+        "path": "src/app/features/admin/metrics.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/admin/metrics.page.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-76",
+    "summary": "QA: UAT script for the Sprint 2 Review [4h]",
+    "jira_status": "In Progress",
+    "assignee": "sherryhany",
+    "parent": "AG-71",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Authored script delivered; QA Lead and Scrum Master approvals remain pending. No human signatures inferred.",
+    "links": [
+      {
+        "path": "qa/sherry/AG-76-sprint-2-uat-script-mr-adel.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/qa/sherry/AG-76-sprint-2-uat-script-mr-adel.md"
+      }
+    ]
+  },
+  {
+    "key": "AG-77",
+    "summary": "Branding: Replace site name with \"Mr. Adel Mostafa\" in all UI text and emails [6h]",
+    "jira_status": "Done",
+    "assignee": "Samer Elhamy",
+    "parent": "AG-39",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "email-templates/render_templates.py",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/email-templates/render_templates.py"
+      },
+      {
+        "path": "email-templates/rendered_samples/sample_confirmation.html",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/email-templates/rendered_samples/sample_confirmation.html"
+      },
+      {
+        "path": "src/index.html",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/index.html"
+      }
+    ]
+  },
+  {
+    "key": "AG-78",
+    "summary": "Branding: Update favicon, page titles, meta tags and manifest name [3h]",
+    "jira_status": "Done",
+    "assignee": "Samer Elhamy",
+    "parent": "AG-39",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/index.html",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/index.html"
+      },
+      {
+        "path": "public/manifest.webmanifest",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/public/manifest.webmanifest"
+      },
+      {
+        "path": "public/favicon.svg",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/public/favicon.svg"
+      }
+    ]
+  },
+  {
+    "key": "AG-79",
+    "summary": "Branding: Update footer and social icon labels [2h]",
+    "jira_status": "In Progress",
+    "assignee": "Samer Elhamy",
+    "parent": "AG-39",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Footer labels/source available; official social-account ownership/URLs not independently confirmed.",
+    "links": [
+      {
+        "path": "src/app/shared/layout/footer.component.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/shared/layout/footer.component.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-80",
+    "summary": "Docs: Update README and documentation with the new name [2h]",
+    "jira_status": "Done",
+    "assignee": "Samer Elhamy",
+    "parent": "AG-39",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "README.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/README.md"
+      },
+      {
+        "path": "database/standalone/README.md",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/database/standalone/README.md"
+      }
+    ]
+  },
+  {
+    "key": "AG-81",
+    "summary": "Content: Arabic/English payment step texts and error messages [4h]",
+    "jira_status": "Done",
+    "assignee": "Gafar",
+    "parent": "AG-40",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/core/i18n/i18n.s2.ar.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/i18n/i18n.s2.ar.ts"
+      },
+      {
+        "path": "src/app/core/i18n/i18n.s2.en.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/i18n/i18n.s2.en.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-82",
+    "summary": "Content: Help text for the live and payment pages [4h]",
+    "jira_status": "Done",
+    "assignee": "Gafar",
+    "parent": "AG-41",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/core/i18n/i18n.s2.ar.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/i18n/i18n.s2.ar.ts"
+      },
+      {
+        "path": "src/app/core/i18n/i18n.s2.en.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/i18n/i18n.s2.en.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-83",
+    "summary": "Content: Three sample announcements for testing and demo [2h]",
+    "jira_status": "Done",
+    "assignee": "Gafar",
+    "parent": "AG-44",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Explicit sample announcement fixtures, not live announcements or delivery evidence.",
+    "links": [
+      {
+        "path": "src/app/core/mock/admin.mock.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/mock/admin.mock.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-84",
+    "summary": "Content: Update the guide-video script [3h]",
+    "jira_status": "Done",
+    "assignee": "Gafar",
+    "parent": "AG-39",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Related video metadata/content only; original guide-video script artifact not independently identified.",
+    "links": [
+      {
+        "path": "src/app/core/mock/content.mock.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/core/mock/content.mock.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-85",
+    "summary": "Frontend (small): Announcement card, LIVE badge and empty-state components [8h]",
+    "jira_status": "To Do",
+    "assignee": "KingKarmy",
+    "parent": "AG-44",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Related existing announcement components found; original To Do acceptance is not independently approved.",
+    "links": [
+      {
+        "path": "src/app/features/announcements/announcements.page.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/announcements/announcements.page.ts"
+      },
+      {
+        "path": "src/app/features/landing/landing.page.html",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/landing/landing.page.html"
+      }
+    ]
+  },
+  {
+    "key": "AG-86",
+    "summary": "Frontend (small): \"Live now\" badge in the navbar [3h]",
+    "jira_status": "To Do",
+    "assignee": "KingKarmy",
+    "parent": "AG-41",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Related header source found; dynamic Live now badge acceptance is not independently verified.",
+    "links": [
+      {
+        "path": "src/app/shared/layout/header.component.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/shared/layout/header.component.ts"
+      }
+    ]
+  },
+  {
+    "key": "AG-87",
+    "summary": "Frontend (small): Responsive fixes on the main page [4h]",
+    "jira_status": "Done",
+    "assignee": "KingKarmy",
+    "parent": "AG-43",
+    "evidence_class": "TASK SOURCE ARTIFACT",
+    "scope_note": "Existing source artifact linked; Jira status is a snapshot, not a new acceptance decision.",
+    "links": [
+      {
+        "path": "src/app/shared/layout/header.component.ts",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/shared/layout/header.component.ts"
+      },
+      {
+        "path": "src/app/features/landing/landing.page.html",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/src/app/features/landing/landing.page.html"
+      }
+    ]
+  },
+  {
+    "key": "AG-88",
+    "summary": "Docs: Demo screenshots for the Sprint 2 Review [2h]",
+    "jira_status": "Done",
+    "assignee": "KingKarmy",
+    "parent": "AG-71",
+    "evidence_class": "RELATED SOURCE / ACCEPTANCE NOT CERTIFIED",
+    "scope_note": "Existing team screenshots available; capture provenance/approval not independently established by index generation.",
+    "links": [
+      {
+        "path": "docs/screenshots/01_landing_hero.webp",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/docs/screenshots/01_landing_hero.webp"
+      },
+      {
+        "path": "docs/screenshots/07_mobile_responsive_ar.webp",
+        "url": "https://github.com/13bod1/Mutqin-English/blob/48886771b3e4fe53ab0c12791cdbaabb76f546be/docs/screenshots/07_mobile_responsive_ar.webp"
+      }
+    ]
+  }
+]

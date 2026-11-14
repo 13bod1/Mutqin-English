@@ -1,0 +1,82 @@
+{
+  "boundary": "Actual production browser UI and real local PostgreSQL/PostgREST. Supabase getUser/session is an explicitly controlled test identity adapter, NOT real GoTrue authentication or delivery.",
+  "cases": [
+    {
+      "name": "real_browser_admin_create_and_independent_student_visibility",
+      "passed": true,
+      "detail": {
+        "independentStudentContext": true,
+        "viewport": 360
+      }
+    },
+    {
+      "name": "real_browser_admin_edit_persists_to_student",
+      "passed": true,
+      "detail": {
+        "consecutiveEditsPassed": 2,
+        "firstEdit": "First edit replacement through browser and real server",
+        "secondEdit": "Second consecutive edit replacement verified in PostgREST",
+        "studentVerifiedExact": true
+      }
+    },
+    {
+      "name": "real_browser_admin_schedule_edit_roundtrip",
+      "passed": true,
+      "detail": {
+        "scheduledEditRestoredLocalWhen": "2026-11-18T15:45",
+        "defaultOct31Avoided": true
+      }
+    },
+    {
+      "name": "real_browser_admin_delete_and_student_empty_state",
+      "passed": true,
+      "detail": {
+        "empty": true
+      }
+    },
+    {
+      "name": "dashboard_matches_real_audit_three_reviews",
+      "passed": true,
+      "detail": {
+        "expected": {
+          "Reviewed receipts": "3",
+          "Pending receipts": "2",
+          "Average review time": "30 min",
+          "Approval rate": "66.7%",
+          "Rejection rate": "33.3%"
+        },
+        "actualText": "REVIEWED RECEIPTS\n\n3\n\nPENDING RECEIPTS\n\n2\n\nAVERAGE REVIEW TIME\n\n30 min\n\nAPPROVAL RATE\n\n66.7%\n\nREJECTION RATE\n\n33.3%"
+      }
+    },
+    {
+      "name": "dashboard_updates_after_actual_fourth_review",
+      "passed": true,
+      "detail": {
+        "expected": {
+          "Reviewed receipts": "4",
+          "Pending receipts": "1",
+          "Average review time": "25 min",
+          "Approval rate": "75%",
+          "Rejection rate": "25%"
+        },
+        "actualText": "REVIEWED RECEIPTS\n\n4\n\nPENDING RECEIPTS\n\n1\n\nAVERAGE REVIEW TIME\n\n25 min\n\nAPPROVAL RATE\n\n75%\n\nREJECTION RATE\n\n25%"
+      }
+    },
+    {
+      "name": "assistant_cannot_open_admin_dashboard",
+      "passed": true,
+      "detail": {
+        "redirect": "http://127.0.0.1:49315/assistant",
+        "notAnInventedStatic403": true
+      }
+    },
+    {
+      "name": "student_browser_real_api_writes_blocked",
+      "passed": true,
+      "detail": {
+        "actualHttpStatus": 403
+      }
+    }
+  ],
+  "passed": true
+}

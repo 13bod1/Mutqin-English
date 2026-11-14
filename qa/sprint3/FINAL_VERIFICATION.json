@@ -1,0 +1,97 @@
+{
+  "source_base": "84130d3deef21271ab2ab0071e02aa2c76365557",
+  "build": {
+    "exit_code": 0
+  },
+  "unit": {
+    "passed": 173,
+    "failed": 0,
+    "skipped": 0
+  },
+  "e2e": {
+    "passed": 21,
+    "failed": 0,
+    "skipped": 0,
+    "engines": [
+      "chromium",
+      "firefox",
+      "webkit"
+    ]
+  },
+  "browser_behavior": {
+    "passed": 25,
+    "failed": 0,
+    "serviceWorkers": "blocked only for controlled transport fixture checks"
+  },
+  "real_database_browser": {
+    "passed": 8,
+    "migration_replayed": true,
+    "boundary": "Fresh disposable PG16, local JWTs and real PostgREST 16.5. Explicit test identity adapter for getUser; real PostgREST client-server data flow. Not production Supabase GoTrue."
+  },
+  "service_worker_safety": {
+    "passed": true,
+    "results": [
+      {
+        "name": "protected_media_querystring_classified",
+        "passed": true
+      },
+      {
+        "name": "unrelated_origin_cache_preserved",
+        "passed": true
+      },
+      {
+        "name": "cross_origin_notification_target_not_opened",
+        "passed": true
+      },
+      {
+        "name": "credentials_api_request_never_served_from_cache",
+        "passed": true
+      }
+    ],
+    "boundary": "Actual service-worker source executed in Node VM. Not browser install/push provider acceptance."
+  },
+  "real_offline_and_fcp": [
+    {
+      "name": "actual_serviceworker_registration",
+      "observed": {
+        "controller": true,
+        "registrations": 1,
+        "cacheNames": [
+          "adel-mostafa-pwa-v2"
+        ]
+      }
+    },
+    {
+      "name": "actual_offline_navigation",
+      "url": "http://127.0.0.1:64706/live",
+      "body": "أنت غير متصل بالإنترنت حالياً\n\nيبدو أنك فقدت الاتصال بشبكة الإنترنت. يمكنك الاستمرار في مراجعة الصفحات المحفوظة مسبقاً.\n\nتنويه أمني: حصص البث المباشر والمحاضرات المشفرة تتطلب اتصالاً مباشراً بالإنترنت ولا يتم تخزينها دون اتصال.\nإعادة المحاولة",
+      "offlineFallback": true
+    },
+    {
+      "name": "actual_local_4g_emulated_fcp",
+      "route": "/",
+      "fcpMs": 432,
+      "under1800": true,
+      "notAStagingLoadMeasurement": true
+    },
+    {
+      "name": "actual_local_4g_emulated_fcp",
+      "route": "/live",
+      "fcpMs": 608,
+      "under1800": true,
+      "notAStagingLoadMeasurement": true
+    },
+    {
+      "name": "actual_local_4g_emulated_fcp",
+      "route": "/login",
+      "fcpMs": 408,
+      "under1800": true,
+      "notAStagingLoadMeasurement": true
+    }
+  ],
+  "full_wcag_audit": false,
+  "staging_250_video_acceptance": false,
+  "external_push_delivery": false,
+  "real_drm_license": false,
+  "human_review_signatures": false
+}

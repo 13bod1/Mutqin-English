@@ -23,6 +23,8 @@ export const SAMPLE_QUESTIONS: { body: string; topic: string }[] = [
   { body: 'Can you explain the difference between "used to" and "would" for past habits?', topic: 'Grammar' },
   { body: 'How do we identify the tone of the writer in unseen reading passages?', topic: 'Exam Skills' },
   { body: 'When does the past perfect continuous take precedence over the simple past perfect?', topic: 'Grammar' },
+  { body: 'What is the grammatical rule for subject-verb agreement with collective nouns?', topic: 'Grammar' },
+  { body: 'Which transitional phrases are most effective for contrasting points in an essay?', topic: 'Writing Skills' },
 ];
 
 @Injectable({
