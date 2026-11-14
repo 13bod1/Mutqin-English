@@ -98,6 +98,30 @@ describe('AuthService', () => {
     });
   });
 
+  it('should allow admin to login directly with valid admin credentials', (done) => {
+    const req: LoginRequest = { email: 'adel@adelmostafa.com', password: '3:hhL-Ds7zVYCg:', remember: true };
+    service.login(req).subscribe({
+      next: (user) => {
+        expect(user.role).toBe('admin');
+        expect(user.email).toBe('adel@adelmostafa.com');
+        expect(service.user()?.role).toBe('admin');
+        done();
+      },
+    });
+  });
+
+  it('should allow assistant to login directly with valid assistant credentials', (done) => {
+    const req: LoginRequest = { email: 'assistant@adelmostafa.com', password: 'Assist@Adel#2026', remember: true };
+    service.login(req).subscribe({
+      next: (user) => {
+        expect(user.role).toBe('assistant');
+        expect(user.email).toBe('assistant@adelmostafa.com');
+        expect(service.user()?.role).toBe('assistant');
+        done();
+      },
+    });
+  });
+
   it('should signup a new user', (done) => {
     const req: SignupRequest = {
       fullName: 'Ahmed Ali',
