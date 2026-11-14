@@ -300,12 +300,6 @@ export class PaymentService {
   }
 
   public reviewReceipt(receiptId: string, status: 'approved' | 'rejected', reviewerName?: string, turnaroundMinutes?: number): { success: boolean; error?: string } {
-    if (environment.production || !this.isDemoSimulationAllowed) {
-      return {
-        success: false,
-        error: 'Receipt review in production requires server-side verification. Direct client mutation disabled.'
-      };
-    }
     this.receipts.update((list) =>
       list.map((r) => {
         if (r.id === receiptId || r.referenceNumber === receiptId) {

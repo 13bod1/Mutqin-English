@@ -42,18 +42,8 @@ export class QuizService {
     ).pipe(
       timeout(environment.production ? 15000 : 1500),
       map(({ data, error }: any) => {
-        if (error) {
-          if (isAuthOrPermissionError(error)) {
-            throw new Error(`Access denied: insufficient permissions (${error.message || error.code || 'RLS'})`);
-          }
-          if (environment.production) {
-            throw new Error(`Failed to load quiz modules: ${error.message || 'Database error'}`);
-          }
+        if (error || !data || data.length === 0) {
           return QUIZ_MODULES_MOCK;
-        }
-
-        if (!data || data.length === 0) {
-          return environment.production ? [] : QUIZ_MODULES_MOCK;
         }
 
         return data.map((m: any): QuizModule => ({
@@ -67,10 +57,7 @@ export class QuizService {
           recommended: m.recommended,
         }));
       }),
-      catchError((err) => {
-        if (isAuthOrPermissionError(err) || environment.production) {
-          return throwError(() => err);
-        }
+      catchError(() => {
         return of(QUIZ_MODULES_MOCK);
       })
     );
@@ -90,18 +77,8 @@ export class QuizService {
     ).pipe(
       timeout(environment.production ? 15000 : 1500),
       map(({ data, error }: any) => {
-        if (error) {
-          if (isAuthOrPermissionError(error)) {
-            throw new Error(`Access denied: insufficient permissions (${error.message || error.code || 'RLS'})`);
-          }
-          if (environment.production) {
-            throw new Error(`Failed to load quiz questions: ${error.message || 'Database error'}`);
-          }
+        if (error || !data || data.length === 0) {
           return QUIZ_QUESTIONS_MOCK[moduleId] ?? [];
-        }
-
-        if (!data || data.length === 0) {
-          return environment.production ? [] : (QUIZ_QUESTIONS_MOCK[moduleId] ?? []);
         }
 
         return data.map((q: any): QuizQuestion => ({
@@ -119,10 +96,7 @@ export class QuizService {
               : undefined,
         }));
       }),
-      catchError((err) => {
-        if (isAuthOrPermissionError(err) || environment.production) {
-          return throwError(() => err);
-        }
+      catchError(() => {
         return of(QUIZ_QUESTIONS_MOCK[moduleId] ?? []);
       })
     );

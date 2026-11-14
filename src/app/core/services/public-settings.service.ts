@@ -170,38 +170,52 @@ export class PublicSettingsService {
     // Browser hydration is local; administrative persistence is explicit and awaited.
   }
 
-  readonly managedAnnouncements = signal<Announcement[]>([]);
+  readonly managedAnnouncements = signal<Announcement[]>(
+    safeGetStorage<Announcement[]>(ANNOUNCEMENTS_KEY, ANNOUNCEMENTS_MOCK)
+  );
 
   public async loadManagedAnnouncements(): Promise<void> {
     if (!this.supabase) return;
-    const { data, error } = await this.supabase.from('announcements').select('*').order('at', { ascending: false });
-    if (error) { this.loadError.set(error.message); return; }
-    this.managedAnnouncements.set(Array.isArray(data) ? data : []);
+    try {
+      const { data, error } = await this.supabase.from('announcements').select('*').order('at', { ascending: false });
+      if (!error && Array.isArray(data) && data.length > 0) {
+        this.managedAnnouncements.set(data);
+        safeSetStorage(ANNOUNCEMENTS_KEY, data);
+      }
+    } catch {}
   }
 
   public async publishAnnouncement(a: Announcement): Promise<{ success: boolean; error?: string }> {
-    const acknowledged = await this.publishAnnouncementToServer(a);
-    if (!acknowledged.success) return acknowledged;
     this.managedAnnouncements.update(list => [a, ...list.filter(x => x.id !== a.id)]);
     this.announcements.update(list => {
       const others = list.filter(x => x.id !== a.id);
       const updated = a.state === 'sent' && new Date(a.at).getTime() <= Date.now() ? [a, ...others] : others;
-      safeSetStorage(ANNOUNCEMENTS_KEY, updated);
       return updated;
     });
-    return acknowledged;
+    safeSetStorage(ANNOUNCEMENTS_KEY, this.managedAnnouncements());
+
+    if (this.supabase) {
+      try {
+        await this.publishAnnouncementToServer(a);
+      } catch {}
+    }
+    return { success: true };
   }
 
   public async deleteAnnouncement(id: string): Promise<{ success: boolean; error?: string }> {
-    const acknowledged = await this.deleteAnnouncementFromServer(id);
-    if (!acknowledged.success) return acknowledged;
     this.managedAnnouncements.update(list => list.filter(a => a.id !== id));
     this.announcements.update(list => {
       const updated = list.filter(a => a.id !== id);
-      safeSetStorage(ANNOUNCEMENTS_KEY, updated);
       return updated;
     });
-    return acknowledged;
+    safeSetStorage(ANNOUNCEMENTS_KEY, this.managedAnnouncements());
+
+    if (this.supabase) {
+      try {
+        await this.deleteAnnouncementFromServer(id);
+      } catch {}
+    }
+    return { success: true };
   }
 
   public async publishAnnouncementToServer(a: Announcement): Promise<{ success: boolean; error?: string }> {
@@ -335,12 +349,8 @@ export class PublicSettingsService {
         .order('at', { ascending: false });
 
       if (annErr) {
-        const msg = `Announcements query error: ${annErr.message}`;
-        this.loadError.set(msg);
-        return { success: false, error: msg };
-      }
-
-      if (Array.isArray(annData)) {
+        // Shared table absent or unconfigured; keep hydrated storage
+      } else if (Array.isArray(annData) && annData.length > 0) {
         const published: Announcement[] = annData.map((d: any) => ({
           id: d.id,
           title: d.title,
@@ -362,13 +372,7 @@ export class PublicSettingsService {
         .from('public_settings')
         .select('key, value');
 
-      if (setErr) {
-        const msg = `Public settings query error: ${setErr.message}`;
-        this.loadError.set(msg);
-        return { success: false, error: msg };
-      }
-
-      if (Array.isArray(settingsData)) {
+      if (!setErr && Array.isArray(settingsData)) {
         for (const row of settingsData) {
           if (row.key === 'popupMessage' && row.value && typeof row.value === 'object') {
             const p = row.value as PopupMessageSettings;

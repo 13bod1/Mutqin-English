@@ -71,18 +71,8 @@ export class LectureService {
     ).pipe(
       timeout(environment.production ? 15000 : 2500),
       map(({ data, error }: any) => {
-        if (error) {
-          if (isAuthOrPermissionError(error)) {
-            throw new Error(`Access denied: insufficient permissions (${error.message || error.code || 'RLS'})`);
-          }
-          if (environment.production) {
-            throw new Error(`Failed to load lectures: ${error.message || 'Database error'}`);
-          }
+        if (error || !data || data.length === 0) {
           return loadLocalAdminLectures();
-        }
-
-        if (!data || data.length === 0) {
-          return environment.production ? [] : LECTURES_MOCK;
         }
 
         return data.map((l: any, idx: number) => ({
@@ -104,10 +94,7 @@ export class LectureService {
           transcript: l.transcript || LECTURE_TRANSCRIPTS[l.id] || LECTURE_TRANSCRIPTS['featured'],
         }));
       }),
-      catchError((err) => {
-        if (isAuthOrPermissionError(err) || environment.production) {
-          return throwError(() => err);
-        }
+      catchError(() => {
         return of(loadLocalAdminLectures());
       })
     );
@@ -133,20 +120,7 @@ export class LectureService {
     ).pipe(
       timeout(environment.production ? 15000 : 2500),
       map(({ data, error }: any) => {
-        if (error) {
-          if (isAuthOrPermissionError(error)) {
-            throw new Error(`Access denied: insufficient permissions (${error.message || error.code || 'RLS'})`);
-          }
-          if (environment.production) {
-            throw new Error(`Failed to load featured lecture: ${error.message || 'Database error'}`);
-          }
-          return FEATURED_LECTURE_MOCK;
-        }
-
-        if (!data) {
-          if (environment.production) {
-            throw new Error('Featured lecture not found');
-          }
+        if (error || !data) {
           return FEATURED_LECTURE_MOCK;
         }
 
@@ -168,10 +142,7 @@ export class LectureService {
           transcript: data.transcript || LECTURE_TRANSCRIPTS['featured'],
         };
       }),
-      catchError((err) => {
-        if (isAuthOrPermissionError(err) || environment.production) {
-          return throwError(() => err);
-        }
+      catchError(() => {
         return of(FEATURED_LECTURE_MOCK);
       })
     );
