@@ -44,20 +44,6 @@ export class LoginPage {
     return c.invalid && (c.touched || this.submitted());
   }
 
-  protected fillCredentials(role: 'admin' | 'assistant'): void {
-    if (role === 'admin') {
-      this.form.patchValue({
-        email: 'adel@adelmostafa.com',
-        password: '3:hhL-Ds7zVYCg:',
-      });
-    } else {
-      this.form.patchValue({
-        email: 'assistant@adelmostafa.com',
-        password: 'Assist@Adel#2026',
-      });
-    }
-  }
-
   protected submit(): void {
     this.submitted.set(true);
     this.authError.set(false);
