@@ -9,6 +9,7 @@ import { saveCustomAssistantAccount } from '../../core/data/auth.service';
 import { LanguageService } from '../../core/i18n/language.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { AcademySettings, SiteTheme, UserPortalTheme } from '../../core/models/admin';
+import { GuardianReportService } from '../../core/services/guardian-report.service';
 import { AccessEditorComponent } from './access-editor.component';
 import { AdminHeaderComponent, DrawerComponent, InitialsComponent } from './admin-ui';
 
@@ -228,6 +229,12 @@ type BoolKey = { [K in keyof AcademySettings]-?: NonNullable<AcademySettings[K]>
               </div>
               <ng-container *ngTemplateOutlet="toggle; context: { key: 'recordReplays', label: 'admin.settings.record', hint: 'admin.settings.recordHint' }" />
               <ng-container *ngTemplateOutlet="toggle; context: { key: 'slowMode', label: 'admin.settings.slow', hint: 'admin.settings.slowHint' }" />
+              <div class="border-t border-line/70 pt-4 space-y-4">
+                <h3 class="font-display text-sm font-bold text-ink">Content Protection & Parent Portal (Sprint 3)</h3>
+                <ng-container *ngTemplateOutlet="toggle; context: { key: 'guardianReportsEnabled', label: 'Enable Weekly Guardian Progress Reports', hint: 'Allows guardians to view secure 7-day expiring progress reports via private links.' }" />
+                <ng-container *ngTemplateOutlet="toggle; context: { key: 'webPushEnabled', label: 'Enable Web Push Notifications', hint: 'Dispatches real-time browser push notifications for new announcements and live broadcasts.' }" />
+                <ng-container *ngTemplateOutlet="toggle; context: { key: 'drmStrictProtection', label: 'Enforce DRM Protection & Single Device Viewing', hint: 'Blocks concurrent sessions, disables downloading, and renders dynamic moving watermark on videos.' }" />
+              </div>
             </section>
 
             <!-- Languages -->
@@ -334,6 +341,7 @@ export class AdminSettingsPage {
   protected readonly saveError = signal<string | null>(null);
   protected readonly admin = inject(AdminService);
   protected readonly i18n = inject(LanguageService);
+  private readonly guardianService = inject(GuardianReportService);
   private readonly loaded = toSignal(this.admin.getSettings());
 
   protected readonly form = linkedSignal<AcademySettings | undefined>(() => (this.loaded() ? { ...this.loaded()! } : undefined));
@@ -503,7 +511,7 @@ export class AdminSettingsPage {
     if (!f) return;
     this.saveError.set(null);
     this.admin.saveSettings(f).subscribe({
-      next: () => { this.baseline.set(JSON.stringify(f)); this.saved.set(true); setTimeout(() => this.saved.set(false), 2500); },
+      next: () => { if (f.guardianReportsEnabled !== undefined) this.guardianService.setReportsEnabled(f.guardianReportsEnabled); this.baseline.set(JSON.stringify(f)); this.saved.set(true); setTimeout(() => this.saved.set(false), 2500); },
       error: (error: Error) => { this.saved.set(false); this.saveError.set(error.message || 'Settings were not saved'); }
     });
   }

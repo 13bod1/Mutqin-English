@@ -1,4 +1,5 @@
 import { EN_S2 } from './i18n.s2.en';
+import { EN_S3 } from './i18n.s3.en';
 
 /** English UI copy. Keys must stay in sync with i18n.ar.ts. */
 export const EN = {
@@ -453,4 +454,5 @@ export const EN = {
     back: 'Back to home',
   },
   ...EN_S2,
+  ...EN_S3,
 };

@@ -89,7 +89,10 @@ describe('Sprint 1 Regression & Rebrand Verification Suite (AG-70)', () => {
 
   describe('Feature 2: Recorded Lectures Library (Sprint 1 Regression)', () => {
     it('TC-REG-04: should retrieve active lectures catalog and verify instructor name', (done) => {
+      let called = false;
       lectureService.getLectures().subscribe((lectures) => {
+        if (called) return;
+        called = true;
         expect(lectures.length).toBeGreaterThan(0);
         const first = lectures[0];
         expect(first.instructor.en).toBe('Mr. Adel Mostafa');
@@ -99,7 +102,10 @@ describe('Sprint 1 Regression & Rebrand Verification Suite (AG-70)', () => {
     });
 
     it('TC-REG-05: should retrieve featured revision lecture metadata for Thanawya Amma', (done) => {
+      let called = false;
       lectureService.getFeaturedLecture().subscribe((featured) => {
+        if (called) return;
+        called = true;
         expect(featured).toBeDefined();
         expect(featured.subtitle.en).toContain('Mr. Adel Mostafa');
         expect(featured.durationSec).toBeGreaterThan(0);
@@ -110,7 +116,10 @@ describe('Sprint 1 Regression & Rebrand Verification Suite (AG-70)', () => {
 
   describe('Feature 3: Quizzes & Interactive Diagnostic Engine (Sprint 1 Regression)', () => {
     it('TC-REG-06: should load quiz modules with questions count and difficulty level', (done) => {
+      let called = false;
       quizService.getModules().subscribe((modules) => {
+        if (called) return;
+        called = true;
         expect(modules.length).toBeGreaterThan(0);
         const module = modules[0];
         expect(module.id).toBeDefined();
@@ -120,9 +129,12 @@ describe('Sprint 1 Regression & Rebrand Verification Suite (AG-70)', () => {
     });
 
     it('TC-REG-07: should grade quiz answers accurately and award XP bonus', (done) => {
+      let called = false;
       quizService.getModules().subscribe((modules) => {
         const testModule = modules[0];
         quizService.getQuestions(testModule.id).subscribe((questions) => {
+          if (called) return;
+          called = true;
           expect(questions.length).toBeGreaterThan(0);
           const answers = questions.map((q) => q.correctIndex);
           const result = quizService.grade(testModule, questions, answers, 45);

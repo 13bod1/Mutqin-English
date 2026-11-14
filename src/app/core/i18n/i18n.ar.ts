@@ -1,5 +1,6 @@
 import { EN } from './i18n.en';
 import { AR_S2 } from './i18n.s2.ar';
+import { AR_S3 } from './i18n.s3.ar';
 
 type Dictionary<T> = { [K in keyof T]: T[K] extends string ? string : Dictionary<T[K]> };
 
@@ -454,4 +455,5 @@ export const AR: Dictionary<typeof EN> = {
     back: 'العودة للرئيسية',
   },
   ...AR_S2,
+  ...AR_S3,
 };

@@ -246,4 +246,7 @@ export const SETTINGS_MOCK: AcademySettings = {
     linkText: '',
     linkUrl: '',
   },
+  guardianReportsEnabled: true,
+  webPushEnabled: true,
+  drmStrictProtection: true,
 };

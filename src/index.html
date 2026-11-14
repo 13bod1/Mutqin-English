@@ -56,8 +56,10 @@
   <meta name="geo.region" content="EG">
   <meta name="geo.country" content="Egypt">
 
-  <!-- Theme -->
-  <meta name="theme-color" content="#4E342E">
+  <!-- Theme & PWA -->
+  <meta name="theme-color" content="#8B2500">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/favicon.svg">
 
   <!-- Fonts are self-hosted via @fontsource (see angular.json styles). -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -65,5 +67,12 @@
 </head>
 <body>
   <app-root></app-root>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function() {});
+      });
+    }
+  </script>
 </body>
 </html>
