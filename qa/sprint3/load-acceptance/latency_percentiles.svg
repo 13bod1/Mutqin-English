@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="640" height="320" viewBox="0 0 640 320" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#ffffff" rx="8" />
+  <text x="24" y="32" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="#0f172a">Phase 2: 250 Concurrent Media Range Latency Percentiles</text>
+  <text x="24" y="50" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">HTTP 206 Partial Content (bytes=0-65535) | Mean: 129.25ms | StdDev: 20.66ms</text>
+  <line x1="40" y1="240" x2="600" y2="240" stroke="#e2e8f0" stroke-width="2" />
+  
+      <rect x="60" y="129.79336492890994" width="45" height="110.20663507109006" fill="#3b82f6" rx="4" />
+      <text x="82.5" y="121.79336492890994" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#1e293b" font-weight="600">96.89ms</text>
+      <text x="82.5" y="258" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">Min</text>
+    
+      <rect x="130" y="120" width="45" height="120" fill="#3b82f6" rx="4" />
+      <text x="152.5" y="112" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#1e293b" font-weight="600">105.5ms</text>
+      <text x="152.5" y="258" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">p25</text>
+    
+      <rect x="200" y="94.4303317535545" width="45" height="145.5696682464455" fill="#3b82f6" rx="4" />
+      <text x="222.5" y="86.4303317535545" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#1e293b" font-weight="600">127.98ms</text>
+      <text x="222.5" y="258" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">p50</text>
+    
+      <rect x="270" y="70.88530805687205" width="45" height="169.11469194312795" fill="#3b82f6" rx="4" />
+      <text x="292.5" y="62.88530805687205" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#1e293b" font-weight="600">148.68ms</text>
+      <text x="292.5" y="258" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">p75</text>
+    
+      <rect x="340" y="63.99241706161135" width="45" height="176.00758293838865" fill="#3b82f6" rx="4" />
+      <text x="362.5" y="55.99241706161135" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#1e293b" font-weight="600">154.74ms</text>
+      <text x="362.5" y="258" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">p90</text>
+    
+      <rect x="410" y="61.91090047393365" width="45" height="178.08909952606635" fill="#3b82f6" rx="4" />
+      <text x="432.5" y="53.91090047393365" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#1e293b" font-weight="600">156.57ms</text>
+      <text x="432.5" y="258" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">p95</text>
+    
+      <rect x="480" y="60.31848341232228" width="45" height="179.68151658767772" fill="#3b82f6" rx="4" />
+      <text x="502.5" y="52.31848341232228" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#1e293b" font-weight="600">157.97ms</text>
+      <text x="502.5" y="258" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">p99</text>
+    
+      <rect x="550" y="60" width="45" height="180" fill="#3b82f6" rx="4" />
+      <text x="572.5" y="52" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#1e293b" font-weight="600">158.25ms</text>
+      <text x="572.5" y="258" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#64748b">Max</text>
+    
+</svg>
