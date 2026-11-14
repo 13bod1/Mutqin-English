@@ -15,13 +15,13 @@ describe('AuthService', () => {
         onAuthStateChange: jasmine.createSpy('onAuthStateChange').and.returnValue({ data: { subscription: { unsubscribe: () => {} } } }),
         signInWithPassword: jasmine.createSpy('signInWithPassword').and.returnValue(
           Promise.resolve({
-            data: { user: { id: 'test_id', email: 'test@example.com', user_metadata: { full_name: 'Test Student', stage: 'sec3' } } },
+            data: { user: { id: 'test_id', email: 'test@example.com', user_metadata: { full_name: 'Test Student', stage: 'sec3' } }, session: { user: { id: 'test_id' }, access_token: 'synthetic-test-access', refresh_token: 'synthetic-test-refresh', token_type: 'bearer', expires_in: 3600 } },
             error: null,
           })
         ),
         signUp: jasmine.createSpy('signUp').and.returnValue(
           Promise.resolve({
-            data: { user: { id: 'new_id', email: 'new@example.com' } },
+            data: { user: { id: 'new_id', email: 'new@example.com' }, session: { user: { id: 'new_id' }, access_token: 'synthetic-signup-access', refresh_token: 'synthetic-signup-refresh', token_type: 'bearer', expires_in: 3600 } },
             error: null,
           })
         ),
@@ -113,6 +113,30 @@ describe('AuthService', () => {
         expect(service.user()?.fullName).toBe('Ahmed Ali');
         done();
       },
+    });
+  });
+
+  it('rejects a successful-looking login without a session', (done) => {
+    supabaseMock.auth.signInWithPassword.and.returnValue(Promise.resolve({ data: { user: { id: 'test_id', email: 'test@example.com' }, session: null }, error: null }));
+    service.login({ email: 'test@example.com', password: 'synthetic', remember: false }).subscribe({
+      next: () => { fail('Sessionless login must not authenticate'); done(); },
+      error: () => { expect(service.user()).toBeNull(); done(); },
+    });
+  });
+
+  it('rejects a login session belonging to a different user', (done) => {
+    supabaseMock.auth.signInWithPassword.and.returnValue(Promise.resolve({ data: { user: { id: 'test_id' }, session: { user: { id: 'other_id' } } }, error: null }));
+    service.login({ email: 'test@example.com', password: 'synthetic', remember: false }).subscribe({
+      next: () => { fail('Mismatched identity must not authenticate'); done(); },
+      error: () => { expect(service.user()).toBeNull(); done(); },
+    });
+  });
+
+  it('keeps email-confirmation signup unauthenticated without a session', (done) => {
+    supabaseMock.auth.signUp.and.returnValue(Promise.resolve({ data: { user: { id: 'pending_id' }, session: null }, error: null }));
+    service.signup({ fullName: 'Synthetic Learner', stage: 'sec3', email: 'synthetic@example.invalid', password: 'synthetic-password' }).subscribe({
+      next: () => { expect(service.user()).toBeNull(); expect(supabaseMock.from).not.toHaveBeenCalledWith('profiles'); done(); },
+      error: (error) => { fail(error); done(); },
     });
   });
 
