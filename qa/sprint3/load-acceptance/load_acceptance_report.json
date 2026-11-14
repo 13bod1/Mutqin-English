@@ -1,0 +1,143 @@
+{
+  "testRunMetadata": {
+    "timestamp": "2026-11-14T05:23:06.317Z",
+    "nodeVersion": "v24.15.0",
+    "targetUrl": "http://127.0.0.1:8091",
+    "concurrency": 250,
+    "syntheticVideoFixture": {
+      "path": "C:\\Users\\Samer\\AppData\\Local\\hermes\\profiles\\jira\\workspace\\samer_sherry_delivery\\merge_main_repository\\qa\\sprint3\\load-acceptance\\synthetic_lecture_test.mp4",
+      "bytes": 117659,
+      "type": "video/mp4",
+      "prefix64kSha256": "4aebc8502c930bf561c4a325fa2cf1a3a3cee9f3b2cf8eb40f2e517dc7d67f50"
+    },
+    "securityBoundary": {
+      "loopbackOnlyDefault": true,
+      "authorizedStagingFlag": false,
+      "allowedHost": "127.0.0.1",
+      "hardDeniedProductionHosts": [
+        "mutqin-english-amber.vercel.app",
+        "lbzphsipfsvhfrareqky.supabase.co",
+        "lbzphsipfsvhfrareqky",
+        "api.mutqin.com",
+        "mutqin-english.com",
+        "adelmostafa.com"
+      ]
+    }
+  },
+  "stagingDiscovery": {
+    "status": "NOT_FOUND_IN_TWO_CONFIG_FILES",
+    "inspectedFiles": [
+      "src/environments/environment.ts",
+      "src/environments/environment.prod.ts"
+    ],
+    "finding": "Project configuration strictly references production Supabase (lbzphsipfsvhfrareqky.supabase.co) and production Vercel. Zero authorized staging endpoints exist in these two config files."
+  },
+  "phases": {
+    "phase1_auth": {
+      "status": "BLOCKED",
+      "reason": "No authorized staging auth endpoint or test credentials configured in LOAD_AUTH_TOKEN. Invention of fake endpoints prohibited.",
+      "totalRequests": 0,
+      "successfulRequests": 0,
+      "failedRequests": 0
+    },
+    "phase2_media_range": {
+      "status": "PASSED",
+      "concurrency": 250,
+      "totalRequests": 250,
+      "successfulRequests": 250,
+      "failedRequests": 0,
+      "errorRatePercent": 0,
+      "totalDurationMs": 176.07,
+      "latencyPercentilesMs": {
+        "min": 96.89,
+        "p25": 105.5,
+        "p50": 127.98,
+        "p75": 148.68,
+        "p90": 154.74,
+        "p95": 156.57,
+        "p99": 157.97,
+        "max": 158.25,
+        "mean": 129.25,
+        "stddev": 20.66
+      },
+      "ttfbPercentilesMs": {
+        "min": 96.61,
+        "p25": 105.48,
+        "p50": 127.96,
+        "p75": 148.66,
+        "p90": 154.72,
+        "p95": 156.55,
+        "p99": 157.95,
+        "max": 158.23,
+        "mean": 129.22,
+        "stddev": 20.66
+      }
+    },
+    "phase3_live_html_delivery": {
+      "status": "PASSED",
+      "totalRequests": 25,
+      "successfulRequests": 25,
+      "failedRequests": 0,
+      "latencyPercentilesMs": {
+        "min": 11.09,
+        "p25": 12.37,
+        "p50": 13.31,
+        "p75": 14.11,
+        "p90": 14.64,
+        "p95": 19.62,
+        "p99": 20.02,
+        "max": 20.02,
+        "mean": 13.56,
+        "stddev": 2.12
+      }
+    },
+    "phase4_checkout_static_spa": {
+      "status": "PASSED",
+      "totalRequests": 25,
+      "successfulRequests": 25,
+      "failedRequests": 0,
+      "mutatingOperationsExecuted": 0,
+      "refundsExecuted": 0,
+      "latencyPercentilesMs": {
+        "min": 6.91,
+        "p25": 7.6,
+        "p50": 8.35,
+        "p75": 9.61,
+        "p90": 10.07,
+        "p95": 10.3,
+        "p99": 10.61,
+        "max": 10.61,
+        "mean": 8.56,
+        "stddev": 1.13
+      }
+    },
+    "phase5_cdp_4g_fcp": {
+      "status": "FAILED",
+      "firstContentfulPaintMs": 1904,
+      "firstPaintMs": 1904,
+      "domInteractiveMs": 143.9,
+      "domContentLoadedMs": 2037.1,
+      "totalNavigationDurationMs": 3755.41,
+      "profile": "Cellular 4G (20ms RTT, 4 Mbps DL, 3 Mbps UL) + 4x CPU Throttling",
+      "pageTitle": "Learn English with Confidence · Mr. Adel Mostafa",
+      "appRootInitialized": true,
+      "jsBundlesObserved": 12,
+      "jsMimeVerified": true,
+      "thresholdMs": 1800,
+      "verdict": "FAILED (> 1.8s threshold: 1904ms)"
+    }
+  },
+  "overallVerdict": {
+    "status": "FAILED",
+    "mode": "LOCAL_ONLY",
+    "localSyntheticMediaSmoke": {
+      "status": "PASSED",
+      "notes": "250 concurrent HTTP 206 Partial Content video range requests (65536 bytes, verified SHA-256)."
+    },
+    "stagingAcceptance": {
+      "status": "BLOCKED",
+      "notes": "Cannot claim real staging students or authenticated DRM playback because no authorized staging environment or student test accounts exist."
+    },
+    "honestBoundaryPreserved": true
+  }
+}

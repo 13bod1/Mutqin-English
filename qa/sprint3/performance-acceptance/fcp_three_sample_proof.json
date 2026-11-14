@@ -1,0 +1,50 @@
+[
+  {
+    "sample": 1,
+    "firstContentfulPaintMs": 1752.0,
+    "firstPaintMs": 1752.0,
+    "domInteractiveMs": 88.2,
+    "domContentLoadedMs": 1939.2,
+    "totalNavigationDurationMs": 3588.28,
+    "thresholdMs": 1800,
+    "verdict": "PASSED (<= 1.8s)",
+    "cdpProfile": {
+      "network": "Cellular 4G (20ms RTT, 4 Mbps DL, 3 Mbps UL)",
+      "cpuThrottlingRate": 4,
+      "serviceWorkerBlocked": true,
+      "externalNetworkBlocked": true
+    }
+  },
+  {
+    "sample": 2,
+    "firstContentfulPaintMs": 932.0,
+    "firstPaintMs": 932.0,
+    "domInteractiveMs": 71.3,
+    "domContentLoadedMs": 2019.2,
+    "totalNavigationDurationMs": 3526.72,
+    "thresholdMs": 1800,
+    "verdict": "PASSED (<= 1.8s)",
+    "cdpProfile": {
+      "network": "Cellular 4G (20ms RTT, 4 Mbps DL, 3 Mbps UL)",
+      "cpuThrottlingRate": 4,
+      "serviceWorkerBlocked": true,
+      "externalNetworkBlocked": true
+    }
+  },
+  {
+    "sample": 3,
+    "firstContentfulPaintMs": 952.0,
+    "firstPaintMs": 952.0,
+    "domInteractiveMs": 76.9,
+    "domContentLoadedMs": 2019.3,
+    "totalNavigationDurationMs": 3543.98,
+    "thresholdMs": 1800,
+    "verdict": "PASSED (<= 1.8s)",
+    "cdpProfile": {
+      "network": "Cellular 4G (20ms RTT, 4 Mbps DL, 3 Mbps UL)",
+      "cpuThrottlingRate": 4,
+      "serviceWorkerBlocked": true,
+      "externalNetworkBlocked": true
+    }
+  }
+]

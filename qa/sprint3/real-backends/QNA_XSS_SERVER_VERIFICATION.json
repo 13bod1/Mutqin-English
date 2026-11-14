@@ -1,0 +1,530 @@
+{
+  "counts": {
+    "passed": 50,
+    "failed": 0
+  },
+  "assertions": [
+    {
+      "name": "function_privileges",
+      "passed": true,
+      "detail": [
+        false,
+        true
+      ]
+    },
+    {
+      "name": "pinned_search_paths",
+      "passed": true,
+      "detail": [
+        [
+          "protect_profiles_role_change",
+          [
+            "search_path=public, pg_temp"
+          ]
+        ],
+        [
+          "review_receipt_rpc",
+          [
+            "search_path=public, pg_temp"
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "student_cannot_issue_report",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Administrator required"
+        }
+      }
+    },
+    {
+      "name": "assistant_cannot_issue_report",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Administrator required"
+        }
+      }
+    },
+    {
+      "name": "token_stored_only_as_hash",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "guardian_capability_reads_only_intended_student",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "tampered_token_returns_no_report",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "student_cannot_enumerate_reports",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "assistant_cannot_enumerate_reports",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "expired_token_no_data",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "admin_revokes_report",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "revoked_token_no_data",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "studentA_cannot_request_refund",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Administrator required"
+        }
+      }
+    },
+    {
+      "name": "studentB_cannot_request_refund",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Administrator required"
+        }
+      }
+    },
+    {
+      "name": "assistant_cannot_request_refund",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Administrator required"
+        }
+      }
+    },
+    {
+      "name": "refund_idempotency_same_record",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "refund_idempotency_conflict_rejected",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "code": "22023",
+          "details": null,
+          "hint": null,
+          "message": "Idempotency key payload conflict"
+        }
+      }
+    },
+    {
+      "name": "refund_overpayment_rejected",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "code": "22023",
+          "details": null,
+          "hint": null,
+          "message": "Refund exceeds payment balance"
+        }
+      }
+    },
+    {
+      "name": "student_cannot_read_refunds",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "entitled_media_asset_authorized",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "copied_session_other_student_denied",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Viewing session expired or replaced"
+        }
+      }
+    },
+    {
+      "name": "wrong_device_denied",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Viewing session expired or replaced"
+        }
+      }
+    },
+    {
+      "name": "tampered_media_session_denied",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Viewing session expired or replaced"
+        }
+      }
+    },
+    {
+      "name": "old_device_session_replaced_server_side",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Viewing session expired or replaced"
+        }
+      }
+    },
+    {
+      "name": "expired_media_session_denied",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Viewing session expired or replaced"
+        }
+      }
+    },
+    {
+      "name": "revoked_lecture_entitlement_denied",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Lecture entitlement required"
+        }
+      }
+    },
+    {
+      "name": "session_table_not_enumerable",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "permission denied for table playback_sessions"
+        }
+      }
+    },
+    {
+      "name": "qna_owner_identity_from_jwt",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "qna_pending_invisible_studentA",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "qna_pending_invisible_studentB",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "qna_pending_invisible_anon",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "qna_staff_sees_pending",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "qna_student_cannot_moderate",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Forbidden: only staff (admin/assistant) can moderate live questions"
+        }
+      }
+    },
+    {
+      "name": "qna_direct_write_blocked",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "permission denied for table live_questions"
+        }
+      }
+    },
+    {
+      "name": "qna_direct_insert_blocked",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "permission denied for table live_questions"
+        }
+      }
+    },
+    {
+      "name": "qna_server_rate_limit",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "code": "P0001",
+          "details": "{\"secondsRemaining\" : 15}",
+          "hint": null,
+          "message": "Rate limit exceeded: please wait 15 seconds before submitting another question."
+        }
+      }
+    },
+    {
+      "name": "qna_null_body_rejected",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "code": "22023",
+          "details": null,
+          "hint": null,
+          "message": "Question body must be between 5 and 1000 characters"
+        }
+      }
+    },
+    {
+      "name": "qna_staff_approves",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "qna_approved_visible_to_other_student",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "qna_hidden_not_visible",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "qna_atomic_concurrent_rate_limit",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "push_anon_register_denied",
+      "passed": true,
+      "detail": {
+        "status": 401,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "permission denied for function register_push_subscription"
+        }
+      }
+    },
+    {
+      "name": "push_identity_server_bound",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "push_other_student_cannot_read",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "push_other_student_cannot_steal_endpoint",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "Subscription belongs to another account"
+        }
+      }
+    },
+    {
+      "name": "push_direct_write_denied",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "body": {
+          "code": "42501",
+          "details": null,
+          "hint": null,
+          "message": "permission denied for table push_subscriptions"
+        }
+      }
+    },
+    {
+      "name": "push_private_endpoint_rejected",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "code": "22023",
+          "details": null,
+          "hint": null,
+          "message": "Endpoint domain is not an authorized Web Push gateway"
+        }
+      }
+    },
+    {
+      "name": "push_custom_port_rejected",
+      "passed": true,
+      "detail": {
+        "status": 400,
+        "body": {
+          "code": "22023",
+          "details": null,
+          "hint": null,
+          "message": "Endpoint domain is not an authorized Web Push gateway"
+        }
+      }
+    },
+    {
+      "name": "push_nonowner_revoke_no_effect",
+      "passed": true,
+      "detail": true
+    },
+    {
+      "name": "push_owner_revoke",
+      "passed": true,
+      "detail": true
+    }
+  ],
+  "browser": {
+    "boundary": "Actual production browser UI and real local PostgreSQL/PostgREST. Supabase getUser/session is an explicitly controlled test identity adapter, NOT real GoTrue authentication or delivery.",
+    "cases": [
+      {
+        "name": "student_submit_is_committed_and_pending_private",
+        "passed": true,
+        "detail": {
+          "pendingInvisibleEvenToAuthor": true
+        }
+      },
+      {
+        "name": "staff_browser_approves_and_other_student_sees_exact_text",
+        "passed": true,
+        "detail": {
+          "actualBrowserModeration": true
+        }
+      },
+      {
+        "name": "stored_question_markup_is_literal_and_never_executes",
+        "passed": true,
+        "detail": {
+          "actualStoredRawMarkup": true,
+          "escapedTextNode": true,
+          "noExecutableElements": true,
+          "noCanaryExecution": true
+        }
+      },
+      {
+        "name": "guardian_actual_server_report_not_sample_fallback",
+        "passed": true,
+        "detail": {
+          "realHashedTokenLookup": true,
+          "tamperedNoData": true
+        }
+      }
+    ],
+    "passed": true
+  },
+  "migrations": [
+    {
+      "file": "20261114_003_live_qna.sql",
+      "sha256": "6949667c2773a88af3ab6f8c79c20751a070b892ed8bf0d266421474f9e5b5d4",
+      "replayed": true
+    },
+    {
+      "file": "20261114_004_push_subscriptions.sql",
+      "sha256": "dcf2d9160823435e44c2f65e376e5a5f3110c319f59b6b7c17241540e89db3e3",
+      "replayed": true
+    },
+    {
+      "file": "20261114_005_private_reports_refunds.sql",
+      "sha256": "981e8c8f793d494bc813dd6b24d6130071b4a885f08083b17d653fa8160132b4",
+      "replayed": true
+    },
+    {
+      "file": "20261114_006_playback_sessions.sql",
+      "sha256": "a52667d78b040c034215e20371cf6f936a841243c88f020781beb6bad3b43335",
+      "replayed": true
+    }
+  ],
+  "boundary": "Fresh disposable PG16, local JWTs and real PostgREST 16.5. Explicit test identity adapter for getUser; real PostgREST client-server data flow. Not production Supabase GoTrue.",
+  "app_source_changed_for_this_verification": false,
+  "production_unchanged": true,
+  "acceptance_limit": "Does not prove licensedDRM/providerPush/250studentstaging or humanreview. PR-only."
+}

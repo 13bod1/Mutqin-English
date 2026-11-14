@@ -1,0 +1,151 @@
+{
+  "executionTimestamp": "2026-11-14T03:44:34.885Z",
+  "boundary": "AGENT INTERNAL UAT WALKTHROUGH ONLY — Not human PO sign-off. Built Angular SPA from dist/mutqin-english/browser served on local HTTP server. No live DRM license server, no physical mobile hardware, no production DDL.",
+  "environment": {
+    "baseUrl": "http://127.0.0.1:64343",
+    "engine": "Chromium (Playwright)",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    }
+  },
+  "executedSteps": [
+    {
+      "step": "1. Landing Page Navigation",
+      "status": "PASS",
+      "route": "/",
+      "title": "Learn English with Confidence · Mr. Adel Mostafa"
+    },
+    {
+      "step": "2. Live Catalog Navigation",
+      "status": "PASS",
+      "route": "/live"
+    },
+    {
+      "step": "3. Live Session WIP Navigation",
+      "status": "PASS",
+      "route": "/live/reading-inference"
+    },
+    {
+      "step": "4. Guardian Report Invalid Token Handling",
+      "status": "PASS",
+      "route": "/guardian/report/synthetic-invalid-token"
+    },
+    {
+      "step": "5. Service Worker Offline Simulation",
+      "status": "PASS",
+      "details": {
+        "hasController": true,
+        "registrationCount": 1,
+        "caches": [
+          "adel-mostafa-pwa-v2"
+        ]
+      }
+    },
+    {
+      "step": "6. Q&A House Rules & 5 Pedagogical Questions Check",
+      "status": "PASS",
+      "details": {
+        "enWordCount": 52,
+        "arWordCount": 51,
+        "sampleQuestionsCount": 5
+      }
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "landing.png",
+      "route": "/",
+      "title": "Learn English with Confidence · Mr. Adel Mostafa"
+    },
+    {
+      "file": "live_catalog.png",
+      "route": "/live",
+      "title": "Live Sessions · Mr. Adel Mostafa"
+    },
+    {
+      "file": "live_session_wip.png",
+      "route": "/live/reading-inference",
+      "title": "Live Sessions · Mr. Adel Mostafa"
+    },
+    {
+      "file": "guardian_invalid_or_empty.png",
+      "route": "/guardian/report/synthetic-invalid-token",
+      "title": "Guardian Weekly Progress Report · Mr. Adel Mostafa"
+    },
+    {
+      "file": "offline_fallback.png",
+      "route": "/live (offline)",
+      "title": "غير متصل بالإنترنت · منصة أ. عادل مصطفى"
+    }
+  ],
+  "houseRulesVerification": {
+    "criteria": "Bilingual (Arabic & English), respectful, on-topic, no personal contact, under 60 words each",
+    "english": {
+      "rules": [
+        "Questions must be directly related to the current lecture or topic.",
+        "Be polite and concise so Mr. Adel and the assistants can respond effectively.",
+        "Rate limit: 1 question every 15 seconds.",
+        "Questions pass through moderation before becoming visible to all students.",
+        "Spam, disruptive messages, or sharing personal contacts will lead to suspension."
+      ],
+      "wordCount": 52,
+      "under60Words": true,
+      "coversRespectAndTopic": true,
+      "coversNoPersonalContact": true,
+      "coversRateLimit": true
+    },
+    "arabic": {
+      "rules": [
+        "يجب أن تكون الأسئلة متعلقة مباشرة بموضوع الحصة أو المحاضرة الحالية.",
+        "يرجى صياغة السؤال بإيجاز ووضوح لتسهيل الإجابة من قِبل الأستاذ عادل ومساعديه.",
+        "الحد الزمني: سؤال واحد كل 15 ثانية كحد أقصى.",
+        "تخضع الأسئلة للمراجعة قبل أن تظهر لجميع الطلاب.",
+        "يُمنع التكرار أو إرسال أرقام هواتف أو روابط غير مصرح بها."
+      ],
+      "wordCount": 51,
+      "under60Words": true,
+      "coversRespectAndTopic": true,
+      "coversNoPersonalContact": true,
+      "coversRateLimit": true
+    }
+  },
+  "sampleQuestionsVerification": {
+    "criteria": "5 sample questions matching English-lesson topics, synthetic prompts without real student PII",
+    "count": 5,
+    "fiveQuestionsPresent": true,
+    "questions": [
+      {
+        "body": "Can you explain the difference between \"used to\" and \"would\" for past habits?",
+        "topic": "Grammar"
+      },
+      {
+        "body": "How do we identify the tone of the writer in unseen reading passages?",
+        "topic": "Exam Skills"
+      },
+      {
+        "body": "When does the past perfect continuous take precedence over the simple past perfect?",
+        "topic": "Grammar"
+      },
+      {
+        "body": "What is the grammatical rule for subject-verb agreement with collective nouns?",
+        "topic": "Grammar"
+      },
+      {
+        "body": "Which transitional phrases are most effective for contrasting points in an essay?",
+        "topic": "Writing Skills"
+      }
+    ]
+  },
+  "offlineFallbackVerification": {
+    "serviceWorker": {
+      "hasController": true,
+      "registrationCount": 1,
+      "caches": [
+        "adel-mostafa-pwa-v2"
+      ]
+    },
+    "offlineFallbackTriggered": true,
+    "observedBodySnippet": "أنت غير متصل بالإنترنت حالياً\n\nيبدو أنك فقدت الاتصال بشبكة الإنترنت. يمكنك الاستمرار في مراجعة الصفحات المحفوظة مسبقاً.\n\nتنويه أمني: حصص البث المباشر والمحاضرات المشفرة تتطلب اتصالاً مباشراً بالإنترنت ولا يتم تخزينها دون اتصال.\nإعادة المحاولة"
+  }
+}

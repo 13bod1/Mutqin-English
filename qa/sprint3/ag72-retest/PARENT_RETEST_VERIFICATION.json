@@ -1,0 +1,179 @@
+{
+  "task": "AG-72",
+  "status": "ALL_AG72_CASES_PASSED",
+  "source_hash": "1cb9324be34aa627824154e41b3544d7d0ba33ca",
+  "boundary": "Actual disposablePG/PostgRESTsignedlocalJWTandactualAngularDOM;getUser/sessionusesexplicitcontrolledidentityadapter,NOTrealGoTrue. No sourcefixes orproductionwrites.",
+  "assertions": [
+    {
+      "name": "student_direct_admin_financial_summary_403",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "denied": true
+      }
+    },
+    {
+      "name": "assistant_financial_report_endpoint_must_not_return_total_revenue",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "denied": true,
+        "revenue_withheld": true
+      }
+    },
+    {
+      "name": "admin_financial_summary_authorized_200",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "total_revenue": 1250.0,
+        "approved_count": 2
+      }
+    },
+    {
+      "name": "student_cannot_issue_guardian_report_403",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "denied": true
+      }
+    },
+    {
+      "name": "assistant_cannot_issue_guardian_report_403",
+      "passed": true,
+      "detail": {
+        "status": 403,
+        "denied": true
+      }
+    },
+    {
+      "name": "student_reads_own_push_subscriptions",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "count": 1,
+        "own_user_id": "11111111-1111-4111-8111-111111111111"
+      }
+    },
+    {
+      "name": "substitutions_private_userId_not_exposed",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "items_leaked": 0,
+        "criterion": "RLS filters foreign user_id returning 200 []"
+      }
+    },
+    {
+      "name": "assistant_push_subscriptions_empty_under_rls",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "items_leaked": 0
+      }
+    },
+    {
+      "name": "student_cannot_view_other_student_payments",
+      "passed": true,
+      "detail": {
+        "status": 200,
+        "items_leaked": 0
+      }
+    },
+    {
+      "name": "announcements_admin_only_write_enforced",
+      "passed": true,
+      "detail": {
+        "student_denied": 403,
+        "assistant_denied": 403
+      }
+    },
+    {
+      "name": "public_settings_write_protected",
+      "passed": true,
+      "detail": {
+        "settings_integrity_intact": true,
+        "student_blocked": true,
+        "assistant_blocked": true
+      }
+    }
+  ],
+  "browser_cases": [
+    {
+      "name": "student_admin_route_redirected_to_home",
+      "passed": true,
+      "detail": {
+        "finalUrl": "/",
+        "redirected": true,
+        "adminShellCount": 0
+      }
+    },
+    {
+      "name": "student_admin_payments_redirected_to_home",
+      "passed": true,
+      "detail": {
+        "finalUrl": "/",
+        "redirected": true
+      }
+    },
+    {
+      "name": "student_assistant_route_redirected_to_home",
+      "passed": true,
+      "detail": {
+        "finalUrl": "/",
+        "redirected": true
+      }
+    },
+    {
+      "name": "assistant_admin_route_redirected_to_assistant_portal",
+      "passed": true,
+      "detail": {
+        "finalUrl": "/assistant",
+        "redirectedToAssistant": true
+      }
+    },
+    {
+      "name": "assistant_admin_payments_redirected_to_assistant_portal",
+      "passed": true,
+      "detail": {
+        "finalUrl": "/assistant",
+        "redirectedToAssistant": true
+      }
+    },
+    {
+      "name": "assistant_admin_settings_redirected_to_assistant_portal",
+      "passed": true,
+      "detail": {
+        "finalUrl": "/assistant",
+        "redirectedToAssistant": true
+      }
+    },
+    {
+      "name": "assistant_portal_renders_without_total_revenue",
+      "passed": true,
+      "detail": {
+        "assistantPortalAccessible": true,
+        "noRevenueInDom": true
+      }
+    },
+    {
+      "name": "admin_allowed_access_to_admin_portal",
+      "passed": true,
+      "detail": {
+        "adminPortalAccessible": true
+      }
+    }
+  ],
+  "notes": [],
+  "acceptance_review": {
+    "executed_checks": "19/19PASS",
+    "literal_page_http403": "NOT_MET:AngularredirectnotHTTP403",
+    "jira_done_eligible": false,
+    "reason": "Originalcriterionexplicitly403foradmin-onlypageorAPI. API403verified, SPApagesredirect. Humancriterionclarificationneeded; do not silentlyrewriteAC."
+  },
+  "source_content_hashes": {
+    "src/app/app.routes.ts": "411bc3e7d1564119273456a5dfdf97a89663d5426cb7239adcdc51feed9d4bf0",
+    "src/app/core/data/auth.service.ts": "15b80fe1eed068d9f0477c598bd82ebb75a993c447469f5151156144af1b1fad",
+    "supabase/migrations/20261024_002_announcements_settings_receipt_rpc.sql": "ffb3b8a45c09f0da967e82de571d0a11741082c13e0dfc7313d7792d972937b5"
+  }
+}

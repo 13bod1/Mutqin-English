@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { LanguageService } from '../../core/i18n/language.service';
@@ -208,10 +208,18 @@ export class GuardianReportPage {
   protected readonly i18n = inject(LanguageService);
   private readonly guardianService = inject(GuardianReportService);
 
-  protected readonly reportStatus = computed(() => {
-    const t = this.token();
-    // Default to sample valid report if no token provided in URL
-    const searchToken = t || 'tok_nour_saeed_7d_valid_hash_98a72b1';
-    return this.guardianService.getReportByToken(searchToken);
-  });
+  protected readonly reportStatus = signal<ReturnType<GuardianReportService['getReportByToken']>>({ report: null, status: 'not_found' });
+
+  constructor() {
+    effect((onCleanup) => {
+      const token = this.token();
+      let cancelled = false;
+      onCleanup(() => { cancelled = true; });
+      this.reportStatus.set({ report: null, status: 'not_found' });
+      if (!token) return; // A missing token must never select a sample student's report.
+      void this.guardianService.readReport(token).then((result) => {
+        if (!cancelled) this.reportStatus.set(result);
+      });
+    });
+  }
 }

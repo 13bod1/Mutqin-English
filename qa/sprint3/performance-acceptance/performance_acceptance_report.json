@@ -1,0 +1,183 @@
+{
+  "benchmarkMetadata": {
+    "timestamp": "2026-11-14T05:39:00.000Z",
+    "targetUrl": "http://127.0.0.1:8094",
+    "environment": "Local production build SPA candidate (Angular 18+ esbuild application builder)",
+    "cdpThrottleProfile": {
+      "rttMs": 20,
+      "downloadKbps": 4096,
+      "uploadKbps": 3072,
+      "cpuThrottlingRate": 4,
+      "serviceWorkerDisabled": true,
+      "externalNetworkEgressBlocked": true
+    },
+    "acceptanceThresholdMs": 1800
+  },
+  "rootCauseAnalysis": {
+    "baselineReportedFcpMs": 1904.0,
+    "baselineFlashFcpMs": 2064.0,
+    "finding": "Root-cause network trace revealed severe startup pipeline congestion caused by full @fontsource package imports in angular.json. Each root font import (e.g. @fontsource/inter/400.css) declared font-face rules for all available unicode subsets (cyrillic, cyrillic-ext, greek, greek-ext, vietnamese, latin-ext, latin). Total @font-face declarations reached 83 across the 4 families.",
+    "criticalCssBloat": {
+      "beastiesInlinedCssBytes": 38593,
+      "inlinedFontFaceRulesCount": 83,
+      "inlinedFontFaceBytes": 35224,
+      "baselineIndexHtmlSizeBytes": 45883,
+      "baselineStylesCssSizeBytes": 145889,
+      "totalInitialTransferBytes": 925343
+    },
+    "impactOn4G": "Under regular 4G bandwidth limits (500 KB/s), downloading 46KB index.html and 146KB critical stylesheet simultaneously with 7 preloaded application chunks saturated the network pipe, deferring First Contentful Paint to 1904ms (failing the 1800ms threshold)."
+  },
+  "narrowRemediation": {
+    "filesModified": [
+      "angular.json"
+    ],
+    "fileModificationsCount": 1,
+    "appCodeChanges": "None (zero changes to src/app, src/index.html, src/styles.scss, services, or edge functions)",
+    "strategy": "Preserve all required font families and weights while restricting language subsets strictly to English (Latin) for Plus Jakarta Sans and Inter, and Arabic + English (Arabic + Latin) for Alexandria and IBM Plex Sans Arabic using existing @fontsource package exports.",
+    "fontsPreserved": {
+      "Plus Jakarta Sans": [
+        "latin-500",
+        "latin-600",
+        "latin-700",
+        "latin-800"
+      ],
+      "Inter": [
+        "latin-400",
+        "latin-500",
+        "latin-600",
+        "latin-700",
+        "latin-400-italic"
+      ],
+      "Alexandria": [
+        "arabic-400",
+        "arabic-500",
+        "arabic-600",
+        "arabic-700",
+        "latin-400",
+        "latin-500",
+        "latin-600",
+        "latin-700"
+      ],
+      "IBM Plex Sans Arabic": [
+        "arabic-400",
+        "arabic-500",
+        "arabic-600",
+        "arabic-700",
+        "latin-400",
+        "latin-500",
+        "latin-600",
+        "latin-700"
+      ]
+    },
+    "totalFontFaceRulesPostFix": 25,
+    "fontFaceRuleReductionPercent": 69.88
+  },
+  "postFixArtifactSizes": {
+    "indexHtmlSizeBytes": 18215,
+    "indexHtmlReductionBytes": 29059,
+    "indexHtmlReductionPercent": 63.33,
+    "stylesCssSizeBytes": 116830,
+    "stylesCssReductionBytes": 29059,
+    "stylesCssReductionPercent": 19.92
+  },
+  "cdpThreeSampleFcpVerification": {
+    "samples": [
+      {
+        "sample": 1,
+        "mode": "COLD_CACHE_CLEAN_CONTEXT",
+        "firstContentfulPaintMs": 1752.0,
+        "firstPaintMs": 1752.0,
+        "domInteractiveMs": 88.2,
+        "domContentLoadedMs": 1939.2,
+        "totalNavigationDurationMs": 3588.28,
+        "thresholdMs": 1800,
+        "verdict": "PASSED (<= 1.8s)"
+      },
+      {
+        "sample": 2,
+        "mode": "COLD_CACHE_CLEAN_CONTEXT",
+        "firstContentfulPaintMs": 932.0,
+        "firstPaintMs": 932.0,
+        "domInteractiveMs": 71.3,
+        "domContentLoadedMs": 2019.2,
+        "totalNavigationDurationMs": 3526.72,
+        "thresholdMs": 1800,
+        "verdict": "PASSED (<= 1.8s)"
+      },
+      {
+        "sample": 3,
+        "mode": "COLD_CACHE_CLEAN_CONTEXT",
+        "firstContentfulPaintMs": 952.0,
+        "firstPaintMs": 952.0,
+        "domInteractiveMs": 76.9,
+        "domContentLoadedMs": 2019.3,
+        "totalNavigationDurationMs": 3543.98,
+        "thresholdMs": 1800,
+        "verdict": "PASSED (<= 1.8s)"
+      }
+    ],
+    "meanFcpMs": 1212.0,
+    "worstFcpMs": 1752.0,
+    "overallCdpFcpVerdict": "WORKER_RUN_ONLY_PASS; PARENT_INDEPENDENT_RUN_HAS_1_FAILURE; NOT_FULL_ACCEPTANCE"
+  },
+  "regressionVerification": {
+    "harness": "ROOT/merge_new_scope/real_backends/run_final.py",
+    "outputDir": "ROOT/merge_new_scope/real_backends/perf_final",
+    "previousBaselineReportPreserved": "ROOT/merge_new_scope/real_backends/final_acceptance_baseline_preserved",
+    "results": {
+      "buildExitCode": 0,
+      "unitTests": {
+        "total": 173,
+        "passed": 173,
+        "failed": 0,
+        "skipped": 0,
+        "exitCode": 0
+      },
+      "playwrightE2E": {
+        "expected": 21,
+        "unexpected": 0,
+        "flaky": 0,
+        "skipped": 0,
+        "exitCode": 0
+      },
+      "controlledBrowserAcceptance": {
+        "totalChecks": 25,
+        "passedChecks": 25,
+        "exitCode": 0
+      },
+      "brandingProbe": {
+        "passed": true,
+        "manifestStatus": 200,
+        "faviconStatus": 200,
+        "routesVerified": 6
+      },
+      "databaseQuickstart": {
+        "tables": 21,
+        "exitCode": 0
+      },
+      "testsImmutable": true,
+      "sourceFrozenUnchanged": true
+    }
+  },
+  "safetyAndIntegrityEnforcement": {
+    "noProductionAccess": true,
+    "noFakePlaceholders": true,
+    "noTestThresholdWeakening": true,
+    "noDomAssertChanges": true,
+    "noServiceWorkerMasking": true,
+    "noCpuThrottleWeakening": true
+  },
+  "parentReview": {
+    "actualFreshProcessFcpMs": [
+      1876,
+      276,
+      404
+    ],
+    "allSamplesMeet1800ms": false,
+    "acceptance": "NOT_ACCEPTED_AS_UNIVERSAL_OR_STAGING_PASS",
+    "note": "Worker3samples1752/932/952passed in its setup; parentindependentprocess/cache-disabledprobe1876/276/404contains1failure. Keep allruns. NarrowfontCSSreductionverified;staging250watchingcriterionstillblocked.",
+    "actualIndexBytes": 18215,
+    "actualStylesBytes": 116830,
+    "angularJsonSha256": "005271c8d17e839ae17c0aeb89a8f530f8b0d6819a7848d0dc91de099bf4671c"
+  }
+}

@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, Optional, signal } from '@angular/core';
+import { SupabaseService } from '../supabase/supabase.service';
+import { environment } from '../../../environments/environment';
 import { GuardianContact, GuardianReport } from '../models/sprint3';
 
 @Injectable({
@@ -14,7 +16,8 @@ export class GuardianReportService {
   // Storage for issued weekly guardian reports
   private issuedReports: GuardianReport[] = [];
 
-  constructor() {
+  constructor(@Optional() private readonly supabase?: SupabaseService) {
+    if (environment.production) return;
     this.loadState();
     if (this.issuedReports.length === 0) {
       this.seedSampleReports();
@@ -146,6 +149,19 @@ export class GuardianReportService {
     this.persistState();
   }
 
+  /** Production reports are resolved by a server-side hashed, expiring capability. */
+  async readReport(token: string): Promise<ReturnType<GuardianReportService['getReportByToken']>> {
+    if (!environment.production) return this.getReportByToken(token);
+    if (!token || !this.supabase) return { report: null, status: 'not_found' };
+    try {
+      const { data, error } = await this.supabase.client.rpc('read_guardian_report', { p_token: token });
+      if (error || !data || !['ok', 'expired', 'disabled', 'not_found'].includes(data.status)) {
+        return { report: null, status: 'not_found', errorMessage: { en: 'Unable to load this report.', ar: 'تعذر تحميل التقرير.' } };
+      }
+      return { status: data.status, report: data.status === 'ok' ? data.report : null };
+    } catch { return { report: null, status: 'not_found' }; }
+  }
+
   /**
    * Retrieves a guardian report by token.
    * Acceptance Criteria:
@@ -158,6 +174,7 @@ export class GuardianReportService {
     status: 'ok' | 'expired' | 'disabled' | 'not_found';
     errorMessage?: { en: string; ar: string };
   } {
+    if (environment.production) return { report: null, status: 'not_found' };
     if (!this.reportsEnabled()) {
       return {
         report: null,

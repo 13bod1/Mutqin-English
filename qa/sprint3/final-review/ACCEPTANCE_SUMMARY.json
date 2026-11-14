@@ -1,0 +1,67 @@
+{
+  "tasks": [
+    "AG-74",
+    "AG-75",
+    "AG-97",
+    "AG-98",
+    "AG-119",
+    "AG-123",
+    "AG-124",
+    "AG-132",
+    "AG-133",
+    "AG-135",
+    "AG-136"
+  ],
+  "task_count": 11,
+  "source_pr": "https://github.com/13bod1/Mutqin-English/pull/13",
+  "statuses": {
+    "AG-74": {
+      "jira": "Done",
+      "acceptance": "VERIFIED / Done"
+    },
+    "AG-75": {
+      "jira": "Done",
+      "acceptance": "VERIFIED / Done"
+    },
+    "AG-97": {
+      "jira": "Done",
+      "acceptance": "PARTIAL — full DoD not met"
+    },
+    "AG-98": {
+      "jira": "Done",
+      "acceptance": "PREPARATION + INTERNAL WALKTHROUGH EXECUTED; human Review pending"
+    },
+    "AG-119": {
+      "jira": "Done",
+      "acceptance": "PARTIAL — physical install/push/Lighthouse not verified"
+    },
+    "AG-123": {
+      "jira": "Done",
+      "acceptance": "VERIFIED CONTENT"
+    },
+    "AG-124": {
+      "jira": "Done",
+      "acceptance": "REAL SERVER CONTRACTS VERIFIED; full QA DoD still open"
+    },
+    "AG-132": {
+      "jira": "Done",
+      "acceptance": "BLOCKED / NOT EXECUTED ON AUTHORIZED STAGING"
+    },
+    "AG-133": {
+      "jira": "Done",
+      "acceptance": "PARTIAL — SQL authorization verified, provider/player gaps remain"
+    },
+    "AG-135": {
+      "jira": "Done",
+      "acceptance": "REAL WIP CAPTURES PROVIDED; finished-story requirement not overstated"
+    },
+    "AG-136": {
+      "jira": "Done",
+      "acceptance": "DOCUMENTED; Scrum Master review pending"
+    }
+  },
+  "walkthrough_steps": 6,
+  "all_walkthrough_assertions_passed": true,
+  "external_human_gates_not_fabricated": true,
+  "pr_only": true
+}
