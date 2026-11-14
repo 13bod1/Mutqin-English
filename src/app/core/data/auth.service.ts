@@ -119,6 +119,40 @@ export function saveCustomAssistantAccount(account: AssistantAccount): void {
 
 export const STUDENT_LOGINS_KEY = 'mutqin_student_logins';
 export const REGISTERED_STUDENTS_KEY = 'mutqin_admin_students';
+export const STUDENT_ACCOUNTS_KEY = 'mutqin_student_accounts';
+
+export interface StudentAccount {
+  id: string;
+  fullName: string;
+  email: string;
+  password?: string;
+  stage: AcademicStage;
+  initials: string;
+}
+
+export function getStoredStudentAccounts(): StudentAccount[] {
+  if (typeof localStorage === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(STUDENT_ACCOUNTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveStudentAccount(account: StudentAccount): void {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    const list = getStoredStudentAccounts();
+    const idx = list.findIndex((s) => s.email.toLowerCase() === account.email.toLowerCase());
+    if (idx !== -1) {
+      list[idx] = { ...list[idx], ...account };
+    } else {
+      list.push(account);
+    }
+    localStorage.setItem(STUDENT_ACCOUNTS_KEY, JSON.stringify(list));
+  } catch {}
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -195,30 +229,30 @@ export class AuthService {
    */
   async revalidateRoleProfile(timeoutMs = 15000): Promise<AuthUser | null> {
     const cur = this.user();
-    if (cur && (cur.role === 'admin' || cur.role === 'assistant')) {
+    if (cur) {
       return cur;
     }
 
-    const storedStaff = this.getStoredUser();
-    if (storedStaff && (storedStaff.role === 'admin' || storedStaff.role === 'assistant')) {
-      this.user.set(storedStaff);
-      return storedStaff;
+    const storedUser = this.getStoredUser();
+    if (storedUser) {
+      this.user.set(storedUser);
+      return storedUser;
     }
 
     await this.awaitInitialized(Math.min(timeoutMs, 2500));
 
     const initializedUser = this.user();
-    if (initializedUser && (initializedUser.role === 'admin' || initializedUser.role === 'assistant')) {
+    if (initializedUser) {
       return initializedUser;
     }
 
     try {
       const { data, error } = await this.supabase.auth.getUser();
       if (error || !data?.user) {
-        const fallbackStaff = this.getStoredUser();
-        if (fallbackStaff && (fallbackStaff.role === 'admin' || fallbackStaff.role === 'assistant')) {
-          this.user.set(fallbackStaff);
-          return fallbackStaff;
+        const fallback = this.getStoredUser();
+        if (fallback) {
+          this.user.set(fallback);
+          return fallback;
         }
         this.clearLocalSession();
         return null;
@@ -231,36 +265,21 @@ export class AuthService {
         timerHandle = setTimeout(() => {
           this.sessionEpoch++;
           const current = this.user();
-          if (current && (current.role === 'admin' || current.role === 'assistant')) {
-            const safeStudent = { ...current, role: 'student' as UserRole };
-            this.user.set(safeStudent);
-            this.saveStoredUser(safeStudent);
-            resolve(safeStudent);
-          } else {
-            resolve(current);
-          }
+          resolve(current);
         }, timeoutMs);
       });
 
       const res = await Promise.race([
-        revalidateTask.catch(() => {
-          const current = this.user();
-          if (current && (current.role === 'admin' || current.role === 'assistant')) {
-            const safeStudent = { ...current, role: 'student' as UserRole };
-            this.user.set(safeStudent);
-            return safeStudent;
-          }
-          return current;
-        }),
+        revalidateTask.catch(() => this.user()),
         timer,
       ]);
       clearTimeout(timerHandle);
       return res;
     } catch {
-      const fallbackStaff = this.getStoredUser();
-      if (fallbackStaff && (fallbackStaff.role === 'admin' || fallbackStaff.role === 'assistant')) {
-        this.user.set(fallbackStaff);
-        return fallbackStaff;
+      const fallback = this.getStoredUser();
+      if (fallback) {
+        this.user.set(fallback);
+        return fallback;
       }
       this.clearLocalSession();
       return null;
@@ -291,7 +310,7 @@ export class AuthService {
     const currentEpoch = ++this.sessionEpoch;
     try {
       const stored = this.getStoredUser();
-      if (stored && (stored.role === 'admin' || stored.role === 'assistant')) {
+      if (stored) {
         this.user.set(stored);
         return stored;
       }
@@ -304,16 +323,18 @@ export class AuthService {
         const authUser = await this.resolveUserProfile(data.user, currentEpoch, 'INITIAL_BOOT');
         return authUser;
       } else {
-        if (!stored || (stored.role !== 'admin' && stored.role !== 'assistant')) {
-          this.clearLocalSession();
+        const fallback = this.getStoredUser();
+        if (fallback) {
+          this.user.set(fallback);
+          return fallback;
         }
         return this.user();
       }
     } catch {
       if (this.sessionEpoch === currentEpoch) {
         const stored = this.getStoredUser();
-        if (!stored || (stored.role !== 'admin' && stored.role !== 'assistant')) {
-          this.clearLocalSession();
+        if (stored) {
+          this.user.set(stored);
         }
       }
       return this.user();
@@ -334,7 +355,13 @@ export class AuthService {
     this.supabase.auth.onAuthStateChange((event, session) => {
       const currentEpoch = ++this.sessionEpoch;
       if (event === 'PASSWORD_RECOVERY' && session?.user?.id) { this.recoveryUserId = session.user.id; this.recoveryAuthorized.set(true); }
-      if (event === 'SIGNED_OUT' || !session || !session.user) {
+      if (event === 'SIGNED_OUT') {
+        this.clearLocalSession();
+        return;
+      }
+      if (!session || !session.user) {
+        const stored = this.getStoredUser();
+        if (stored) return;
         this.clearLocalSession();
         return;
       }
@@ -567,7 +594,52 @@ export class AuthService {
       return of(customAssistantUser);
     }
 
-    // 4. Supabase Auth for Students and cloud accounts
+    // 4a. Check locally stored student accounts (created via signup or admin)
+    const studentAccounts = getStoredStudentAccounts();
+    const matchedStudent = studentAccounts.find(
+      (s) => s.email.toLowerCase() === cleanEmail && s.password === req.password
+    );
+    if (matchedStudent) {
+      const studentUser: AuthUser = {
+        id: matchedStudent.id,
+        fullName: matchedStudent.fullName,
+        email: matchedStudent.email,
+        stage: matchedStudent.stage,
+        initials: matchedStudent.initials,
+        role: 'student',
+      };
+      this.user.set(studentUser);
+      this.saveStoredUser(studentUser);
+      this.recordStudentActivity(studentUser, 'login');
+      return of(studentUser);
+    }
+
+    // 4b. Check admin-registered students (added manually by admin, may have password stored)
+    try {
+      const rawStudents = typeof localStorage !== 'undefined' ? localStorage.getItem(REGISTERED_STUDENTS_KEY) : null;
+      if (rawStudents) {
+        const registeredList: any[] = JSON.parse(rawStudents);
+        const regStudent = Array.isArray(registeredList)
+          ? registeredList.find((s) => s.email?.toLowerCase() === cleanEmail && s.password === req.password)
+          : null;
+        if (regStudent) {
+          const regStudentUser: AuthUser = {
+            id: regStudent.id || ('u_' + Date.now()),
+            fullName: regStudent.name || regStudent.fullName || cleanEmail.split('@')[0],
+            email: cleanEmail,
+            stage: regStudent.stage || 'sec3',
+            initials: extractInitials(regStudent.name || regStudent.fullName || cleanEmail),
+            role: 'student',
+          };
+          this.user.set(regStudentUser);
+          this.saveStoredUser(regStudentUser);
+          this.recordStudentActivity(regStudentUser, 'login');
+          return of(regStudentUser);
+        }
+      }
+    } catch { /* ignore parse errors */ }
+
+    // 4c. Supabase Auth for Students and cloud accounts
     const loginTask = (async () => {
       const { data, error } = await this.supabase.auth.signInWithPassword({
         email: cleanEmail,
@@ -575,6 +647,26 @@ export class AuthService {
       });
 
       if (error || !data?.user || !data?.session || !data.session.user || (data.session.user.id && data.session.user.id !== data.user.id)) {
+        // Last resort: check local accounts in case Supabase is unavailable
+        const fallbackStudent = getStoredStudentAccounts().find(
+          (s) => s.email.toLowerCase() === cleanEmail && s.password === req.password
+        );
+        if (fallbackStudent) {
+          const fallbackUser: AuthUser = {
+            id: fallbackStudent.id,
+            fullName: fallbackStudent.fullName,
+            email: fallbackStudent.email,
+            stage: fallbackStudent.stage,
+            initials: fallbackStudent.initials,
+            role: 'student',
+          };
+          if (this.sessionEpoch === currentEpoch) {
+            this.user.set(fallbackUser);
+            this.saveStoredUser(fallbackUser);
+            this.recordStudentActivity(fallbackUser, 'login');
+          }
+          return fallbackUser;
+        }
         throw error || new Error('Invalid login credentials or unconfirmed session');
       }
 
@@ -619,6 +711,16 @@ export class AuthService {
           initials,
           role: 'student',
         };
+
+        // Always save student account locally so they can log in even if email confirmation is required
+        saveStudentAccount({
+          id: data.user.id,
+          fullName: chosenName,
+          email: cleanEmail,
+          password: req.password,
+          stage: req.stage,
+          initials,
+        });
 
         // Fail-closed session check:
         // Requires verified session object matching auth user id. Explicitly rejects null/undefined or mismatched session.
